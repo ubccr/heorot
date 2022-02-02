@@ -1,8 +1,8 @@
 version: "3.8"
 services:
   api:
-    image: dcim-api
-    build: 
+    image: nodejs
+    build:
       dockerfile: node.Dockerfile
       context: .
     ports:
@@ -11,37 +11,14 @@ services:
       - "./node/:/usr/src/app"
     env_file:
       - dcim.env
-  web-server:
-    build:
-      dockerfile: php.Dockerfile
-      context: .
-    restart: always
+  mongodb_container:
+    image: mongo:latest
     env_file:
       - dcim.env
-    volumes:
-      - "./html/:/var/www/html/"
-      - "./data/:/mnt/data/"
-      - "./node/server.cert:/etc/ssl/certs/server.cert"
-      - "./node/server.key:/etc/ssl/private/server.key"
-      - type: bind
-        source: ./data/grendel-api.socket
-        target: /mnt/grendel-api.socket
     ports:
-      - "80:80"
-      - "443:443"
-  mysql-server:
-    image: mariadb:latest
-    restart: always
-    env_file:
-      - dcim.env
+      - 27017:27017
     volumes:
-      - mysql-data:/var/lib/mysql
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    restart: always
-    environment:
-      PMA_HOST: mysql-server
-    ports:
-      - "8080:80"
+      - mongodb_data_container:/data/db
+
 volumes:
-  mysql-data:
+  mongodb_data_container:
