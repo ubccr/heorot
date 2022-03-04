@@ -1,0 +1,8 @@
+.vscode
+node_modules
+/grendel
+server.key
+server.cert
+bmc.key
+bmc.key.pub
+.env

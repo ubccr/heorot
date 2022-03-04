@@ -1,0 +1,23 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "dcim client api",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm run server.js"
+  },
+  "author": "Josh Furlani",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "got": "^12.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.2.4",
+    "node-fetch": "^3.2.1",
+    "socket.io": "^4.4.1",
+    "ssh2": "^1.6.0"
+  }
+}
