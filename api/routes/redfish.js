@@ -11,8 +11,17 @@ const {
 } = require("../modules/nodeApi")
 
 app.get("/", (req, res) => {
-  res.json({ status: "success", route: "/redfish/" })
+  let routes = []
+  app.stack.forEach((element) => {
+    routes.push(element.route.path)
+  })
+  res.json({
+    status: "success",
+    currentRoute: "/redfish/",
+    availibleRoutes: routes,
+  })
 })
+
 app.get("/dell/:node", async (req, res) => {
   const node = req.params.node
   let bmc = ""

@@ -13,7 +13,7 @@ const User = require("./models/User")
 require("./modules/console")
 
 app.get("/", function (req, res) {
-  return res.json({ status: "success" })
+  res.json({ status: "success" })
 })
 // --- routes ---
 const authRouter = require("./routes/auth.js")

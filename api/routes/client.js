@@ -4,7 +4,15 @@ const app = express.Router()
 const grendelRequest = require("../modules/grendel")
 
 app.get("/", (req, res) => {
-  res.json({ status: "success", route: "/client/" })
+  let routes = []
+  app.stack.forEach((element) => {
+    routes.push(element.route.path)
+  })
+  res.json({
+    status: "success",
+    currentRoute: "/client/",
+    availibleRoutes: routes,
+  })
 })
 
 app.get("/rack/:rack", async (req, res) => {

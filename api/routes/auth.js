@@ -6,7 +6,15 @@ const jwt = require("jsonwebtoken")
 const User = require("../models/User")
 
 app.get("/", (req, res) => {
-  res.json({ status: "success", route: "/auth/" })
+  let routes = []
+  app.stack.forEach((element) => {
+    routes.push(element.route.path)
+  })
+  res.json({
+    status: "success",
+    currentRoute: "/auth/",
+    availibleRoutes: routes,
+  })
 })
 
 app.post("/signup", async (req, res) => {
