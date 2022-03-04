@@ -1,6 +1,6 @@
 .vscode
 node_modules
-/grendel
+/grendel/*
 server.key
 server.cert
 bmc.key
