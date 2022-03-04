@@ -1,9 +1,0 @@
-*.env
-.vscode
-*.toml
-node_modules
-server.cert
-server.key
-.htaccess
-bmc.key
-bmc.key.pub
