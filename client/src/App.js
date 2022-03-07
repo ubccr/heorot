@@ -8,17 +8,18 @@ import bgDefault from "./backgrounds/large-triangles.svg"
 // --- Components ---
 import NavbarC from "./components/NavbarC"
 import Home from "./routes/Home"
+import Profile from "./routes/Profile/Profile"
 
 function App() {
+  const bg = `url(${bgDefault})`
   return (
-    <>
-      <div style={{ height: "100vh", backgroundImage: `url(${bgDefault})` }}>
-        <NavbarC />
-        <Routes>
-          <Route exact path="/" element={<Home />} />
-        </Routes>
-      </div>
-    </>
+    <div style={{ height: "100vh", backgroundImage: bg }}>
+      <NavbarC />
+      <Routes>
+        <Route exact path="/" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </div>
   )
 }
 
