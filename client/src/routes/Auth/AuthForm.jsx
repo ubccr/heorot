@@ -29,6 +29,7 @@ const AuthForm = ({ form, setSubmit }) => {
         border: 1,
         borderRadius: 3,
         borderColor: "primary.main",
+        boxShadow: 12,
       }}
     >
       <Typography sx={{ fontSize: 36, fontWeight: "light", letterSpacing: 1 }}>
