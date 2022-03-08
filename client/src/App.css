@@ -1,0 +1,11 @@
+/* AppBar */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+#nav {
+  margin-bottom: 25px;
+}
+button {
+  text-transform: capitalize !important;
+}

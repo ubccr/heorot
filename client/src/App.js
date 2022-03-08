@@ -1,25 +1,27 @@
 import { Routes, Route, Link } from "react-router-dom"
-import { useState } from "react"
-import "bootstrap/dist/css/bootstrap.min.css"
 
-// import { ThemeContext } from "./contexts/ThemeContext"
-import bgDefault from "./backgrounds/large-triangles.svg"
+import "./App.css"
 
 // --- Components ---
-import NavbarC from "./components/NavbarC"
+import AppBarC from "./components/AppBarC"
 import Home from "./routes/Home"
 import Profile from "./routes/Profile/Profile"
+import Login from "./routes/Auth/Login"
+import Signup from "./routes/Auth/Signup"
 
 function App() {
-  const bg = `url(${bgDefault})`
   return (
-    <div style={{ height: "100vh", backgroundImage: bg }}>
-      <NavbarC />
+    <>
+      <AppBarC />
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/Profile" element={<Profile />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
       </Routes>
-    </div>
+    </>
+    // <div style={{ height: "100vh" }}>
+    // </div>
   )
 }
 

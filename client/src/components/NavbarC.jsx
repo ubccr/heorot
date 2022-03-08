@@ -1,19 +1,15 @@
 import React, { useContext } from "react"
-import { Navbar, Nav, Container } from "react-bootstrap"
+import { Navbar, Nav, Container, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"
-// import { ThemeContext } from "../contexts/ThemeContext"
+import { useTheme } from "../contexts/ThemeContext"
 
 const NavbarC = () => {
-  //   const { theme, setTheme, changeTheme } = useContext(ThemeContext)
-  //   FIXME: Implement Themes
-  const theme = {
-    navbar: "primary",
-    navbarText: "dark",
-  }
+  const { theme } = useTheme()
+
   return (
     <>
-      <Navbar bg={theme.navbar} variant={theme.navbarText} expand="lg">
-        <Container>
+      <Navbar bg={theme.navBg} variant={theme.navText} expand="lg">
+        <Container fluid className="mx-2">
           <Navbar.Brand href="#home">
             <img
               src="favicon.ico"
@@ -36,6 +32,9 @@ const NavbarC = () => {
                 Home
               </Nav.Link>
             </Nav>
+            <Button as={Link} to="/profile" variant={theme.navBtn}>
+              Profile
+            </Button>
           </Navbar.Collapse>
         </Container>
       </Navbar>
