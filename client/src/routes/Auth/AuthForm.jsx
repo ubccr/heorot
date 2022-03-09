@@ -29,6 +29,7 @@ const AuthForm = ({ form, setSubmit }) => {
         border: 1,
         borderRadius: 3,
         borderColor: "primary.main",
+        bgcolor: "background.main",
         boxShadow: 12,
       }}
     >

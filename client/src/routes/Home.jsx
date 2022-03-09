@@ -11,7 +11,7 @@ function Home() {
             borderRadius: 3,
             borderColor: "primary.main",
             boxShadow: 12,
-            bgcolor: "action.hover",
+            bgcolor: "background.main",
             color: "text.primary",
           }}
         >
