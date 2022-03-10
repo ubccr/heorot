@@ -5,9 +5,13 @@ import {
   Paper,
   Box,
   TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
   LinearProgress,
 } from "@mui/material"
-import { DataGrid } from "@mui/x-data-grid"
 
 const Rack = () => {
   const { rack } = useParams()
@@ -19,92 +23,47 @@ const Rack = () => {
     fetch(`http://${window.location.hostname}:3030/client/rack/${rack}`)
       .then((res) => res.json())
       .then((response) => {
-        if (response.status === "success") {
-          let test = []
-          response.result.forEach((val, index) => {
-            if (val !== null) {
-              if (val.switch === undefined) {
-                test.push({
-                  id: index,
-                  node: val.node[0].name,
-                  width: val.width,
-                  height: val.height,
-                })
-              }
-            } else {
-              test.push({ id: index, node: "" })
-            }
-          })
-          setRows(test)
-
-          setIsRackLoading(false)
-        }
+        setRows(
+          response.result.map((val, index) => {
+            if (val === null) return { u: index.toString(), node: "" }
+            else return val
+          }),
+        )
+        setIsRackLoading(false)
       })
   }, [])
-  const cols = [
-    {
-      field: "id",
-      headerName: "U",
-      width: 120,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "node",
-      headerName: rack,
-      minWidth: 200,
-      flex: 1,
-      align: "center",
-      headerAlign: "center",
-    },
-  ]
+  console.log(rows)
 
   return (
     <Container>
       <Box>
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
-          <TableContainer
-            sx={{
-              height: "90vh",
-              "& .single": {
-                backgroundColor: "background.table.single",
-                border: 1,
-                borderColor: "border.table.single",
-                borderCollapse: "separate",
-              },
-              "& .double": {
-                backgroundColor: "background.table.double",
-                border: 1,
-                borderColor: "border.table.double",
-                borderCollapse: "separate",
-              },
-              "& .empty": {},
-            }}
-          >
+          <TableContainer sx={{ height: "85vh" }}>
             {isRackLoading && <LinearProgress />}
             {!isRackLoading && (
-              <div style={{ width: "100%", height: "100%" }}>
-                <DataGrid
-                  rows={rows}
-                  columns={cols}
-                  initialState={{
-                    pagination: { pageSize: 42 },
-                    sorting: {
-                      sortModel: [{ field: "id", sort: "desc" }],
-                    },
-                  }}
-                  maxColumns={2}
-                  getCellClassName={(params) => {
-                    if (params.row.height === 2 && params.field !== "id") {
-                      return "double"
-                    }
-                    if (params.row.height === 1 && params.field !== "id") {
-                      return "single"
-                    }
-                    return "empty"
-                  }}
-                />
-              </div>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>U</TableCell>
+                    <TableCell>{rack}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows
+                    .slice(0)
+                    .reverse()
+                    .map((row, index) => (
+                      <TableRow key={row.u}>
+                        <TableCell>{row.u}</TableCell>
+                        {typeof row.node === "object" && (
+                          <TableCell>{row.node[0].name}</TableCell>
+                        )}
+                        {row.node === "" && <TableCell></TableCell>}
+                      </TableRow>
+                    ))}
+                  <TableRow></TableRow>
+                </TableBody>
+              </Table>
             )}
           </TableContainer>
         </Paper>
