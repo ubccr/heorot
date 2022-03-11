@@ -70,69 +70,67 @@ const FloorPlan = () => {
       })
   }, [])
   return (
-    <Container maxWidth="xl">
-      <Box
-        sx={{
-          padding: "20px",
-          border: 1,
-          borderRadius: 3,
-          borderColor: "primary.main",
-          boxShadow: 12,
-          bgcolor: "background.main",
-          color: "text.primary",
-        }}
-      >
-        <Paper sx={{ width: "100%", overflow: "hidden" }}>
-          <TableContainer sx={{ maxHeight: "85vh" }}>
-            {loading && <LinearProgress />}
-            {!loading && (
-              <Table size="small" style={{ tableLayout: "fixed" }}>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.row}>
-                      {cols.map((col) => (
-                        <TableCell
-                          key={col.col}
-                          sx={{
-                            textAlign: "center",
-                            padding: 0,
-                            width: 50,
-                            height: 50,
-                            border: 1,
-                            borderColor: "border.main",
-                          }}
-                        >
-                          {Nodes.find((el) => {
-                            let rack = row.row + col.col
+    <Box
+      sx={{
+        padding: "20px",
+        border: 1,
+        borderRadius: 3,
+        borderColor: "primary.main",
+        boxShadow: 12,
+        bgcolor: "background.main",
+        color: "text.primary",
+      }}
+    >
+      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+        <TableContainer sx={{ maxHeight: "calc(100vh - 135.5px)" }}>
+          {loading && <LinearProgress />}
+          {!loading && (
+            <Table size="small" style={{ tableLayout: "fixed" }}>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow key={row.row}>
+                    {cols.map((col) => (
+                      <TableCell
+                        key={col.col}
+                        sx={{
+                          textAlign: "center",
+                          padding: 0,
+                          width: 50,
+                          height: 50,
+                          border: 1,
+                          borderColor: "border.main",
+                        }}
+                      >
+                        {Nodes.find((el) => {
+                          let rack = row.row + col.col
 
-                            if (el.name.includes(rack)) return true
-                            else return false
-                          }) !== undefined && (
-                            <Button
-                              variant="outlined"
-                              sx={{
-                                minWidth: 0,
-                                width: "100%",
-                                height: "100%",
-                                padding: 0,
-                              }}
-                            >
-                              <Link to={`/Rack/${row.row + col.col}`}>
-                                {row.row + col.col}
-                              </Link>
-                            </Button>
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </TableContainer>
-        </Paper>
-      </Box>
-    </Container>
+                          if (el.name.includes(rack)) return true
+                          else return false
+                        }) !== undefined && (
+                          <Button
+                            variant="outlined"
+                            sx={{
+                              minWidth: 0,
+                              width: "100%",
+                              height: "100%",
+                              padding: 0,
+                            }}
+                          >
+                            <Link to={`/Rack/${row.row + col.col}`}>
+                              {row.row + col.col}
+                            </Link>
+                          </Button>
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+      </Paper>
+    </Box>
   )
 }
 

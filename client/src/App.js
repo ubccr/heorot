@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom"
-import { createTheme, Paper, ThemeProvider } from "@mui/material"
+import { Container, createTheme, Paper, ThemeProvider } from "@mui/material"
 import { useState } from "react"
 
 import "./App.css"
@@ -16,6 +16,7 @@ import Login from "./routes/Auth/Login"
 import Signup from "./routes/Auth/Signup"
 import FloorPlan from "./routes/FloorPlan/FloorPlan"
 import Rack from "./routes/Rack/Rack"
+import Node from "./routes/Node/Index"
 
 function App() {
   const [mode, setMode] = useState("light")
@@ -55,7 +56,7 @@ function App() {
             border: {
               main: "#424242",
               table: {
-                single: "#ffb300z",
+                single: "#ffb300",
                 double: "#43a047",
               },
             },
@@ -74,15 +75,18 @@ function App() {
             }}
           >
             <AppBarC />
-            <Routes>
-              <Route exact path="/" element={<Home />} />
-              <Route path="/Login" element={<Login />} />
-              <Route path="/Signup" element={<Signup />} />
-              <Route path="/Profile" element={<Profile />} />
+            <Container>
+              <Routes>
+                <Route exact path="/" element={<Home />} />
+                <Route path="/Login" element={<Login />} />
+                <Route path="/Signup" element={<Signup />} />
+                <Route path="/Profile" element={<Profile />} />
 
-              <Route path="/FloorPlan" element={<FloorPlan />} />
-              <Route path="/Rack/:rack" element={<Rack />} />
-            </Routes>
+                <Route path="/FloorPlan" element={<FloorPlan />} />
+                <Route path="/Rack/:rack" element={<Rack />} />
+                <Route path="/Node/:node" element={<Node />} />
+              </Routes>
+            </Container>
           </Paper>
         </ThemeContext.Provider>
       </ThemeProvider>
