@@ -128,7 +128,8 @@ async function gpuApi(node) {
               })
             }
           })
-          node.message = "Success"
+          node.status = "success"
+          node.message = "GPU tag found"
           return node
         } else {
           return {
@@ -270,6 +271,7 @@ async function selApi(node) {
           (hours >= 12 ? "pm" : "am")
 
         sel.entries[index] = {
+          id: index,
           date: date,
           time: time,
           message: val.Message,

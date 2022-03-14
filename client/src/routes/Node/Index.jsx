@@ -1,76 +1,59 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
-import {
-  Box,
-  Grid,
-  Paper,
-  Container,
-  Typography,
-  List,
-  ListItemText,
-  ListItem,
-  ListItemButton,
-  Button,
-} from "@mui/material"
+import { Box } from "@mui/material"
+
+import GridC from "./GridC"
+import AccordianC from "./AccordianC"
+import Interfaces from "./Interfaces"
+import TableC from "./TableC"
 
 const Index = () => {
   const { node } = useParams()
+  const [apiData, setApiData] = useState()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch(`http://${window.location.hostname}:3030/client/node/${node}`)
       .then((res) => res.json())
       .then((response) => {
         if (response.status === "success") {
-          console.log(response)
+          let data = response.result[0]
+          data.provision = response.result[0].provision.toString()
+          data.tags = response.result[0].tags.join(", ")
+
+          setApiData(data)
+          setLoading(false)
         }
       })
   }, [])
 
   return (
-    <Container>
-      <Box
-        sx={{
+    <Box>
+      {/* sx={{
           border: 1,
           borderColor: "primary.main",
           boxShadow: 12,
           bgcolor: "background.main",
           color: "text.primary",
-        }}
-      >
-        <List>
-          <ListItem divider>
-            <ListItemText sx={{ textAlign: "start" }}>Provision: </ListItemText>
-            <ListItemText sx={{ textAlign: "end", paddingRight: "20px" }}>
-              True
-            </ListItemText>
-            <Button variant="outlined">Toggle</Button>
-          </ListItem>
-          <ListItem divider>
-            <ListItemText sx={{ textAlign: "start" }}>Tags: </ListItemText>
-            <ListItemText sx={{ textAlign: "end", paddingRight: "20px" }}>
-              ubhpc, h22, gpu
-            </ListItemText>
-            <Button variant="outlined">Submit</Button>
-          </ListItem>
-          <ListItem divider>
-            <ListItemText>Firmware:</ListItemText>
-            <ListItemText sx={{ textAlign: "end" }}>
-              snponly-x86_64.efi
-            </ListItemText>
-          </ListItem>
-          <ListItem divider>
-            <ListItemText>Boot Image:</ListItemText>
-            <ListItemText></ListItemText>
-          </ListItem>
-          <ListItem divider>
-            <ListItemText sx={{ textAlign: "start" }}>
-              BMC Console:{" "}
-            </ListItemText>
-            <Button variant="outlined">Show</Button>
-          </ListItem>
-        </List>
-      </Box>
-    </Container>
+        }} */}
+      {!loading && (
+        <>
+          <GridC
+            heading="Provision:"
+            data={apiData.provision}
+            button="Toggle"
+          />
+          <GridC heading="Tags:" data={apiData.tags} button="Submit" />
+          <GridC heading="Firmware:" data={apiData.firmware} />
+          <Interfaces data={apiData.interfaces} />
+          <GridC heading="Boot Image:" data={apiData.boot_image} />
+          <GridC heading="BMC Console:" button="Show" />
+          <br />
+          <TableC node={node} />
+          <br />
+        </>
+      )}
+    </Box>
   )
 }
 

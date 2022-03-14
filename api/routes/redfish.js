@@ -40,14 +40,17 @@ app.get("/dell/:node", async (req, res) => {
 
   let idracRes = await idracApi(bmc)
 
-  let gpuRes = ""
-  if (bmc) gpuRes = await gpuApi(bmc)
+  let gpuRes = { status: "failed", message: "No GPU tag" }
+  if (grendelNode.tags.includes("gpu")) gpuRes = await gpuApi(bmc)
 
   let sensorsRes = await sensorsApi(bmc)
 
   let selRes = await selApi(bmc)
 
-  res.json({ biosRes, idracRes, gpuRes, sensorsRes, selRes })
+  res.json({
+    status: "success",
+    result: { biosRes, idracRes, gpuRes, sensorsRes, selRes },
+  })
 })
 
 app.get("/:node/sel", async (req, res) => {})

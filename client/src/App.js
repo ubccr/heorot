@@ -70,7 +70,8 @@ function App() {
           <Paper
             sx={{
               bgcolor: "background.default",
-              height: "100vh",
+              minHeight: "100vh",
+              maxHeight: "max-content",
               backgroundImage: theme.palette.background.img,
             }}
           >
