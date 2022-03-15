@@ -1,9 +1,16 @@
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
-import { Toolbar, Button, Switch, MenuItem, Menu } from "@mui/material"
+import {
+  Toolbar,
+  Button,
+  Switch,
+  MenuItem,
+  Menu,
+  Typography,
+} from "@mui/material"
 import IconButton from "@mui/material/IconButton"
 import MenuIcon from "@mui/icons-material/Menu"
-import AccountCircle from "@mui/icons-material/AccountCircle"
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
 
 import { Link } from "react-router-dom"
 import { ThemeContext } from "../contexts/ThemeContext"
@@ -52,7 +59,7 @@ const AppBarC = () => {
     <Box>
       <AppBar position="static" id="nav">
         <Toolbar>
-          <IconButton
+          {/* <IconButton
             size="large"
             edge="start"
             color="inherit"
@@ -60,12 +67,32 @@ const AppBarC = () => {
             sx={{ mr: 2 }}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
+          >
+            <Box
+              sx={{
+                bgcolor: "background.main",
+                padding: "4px",
+                borderRadius: "5px",
+                border: 1,
+                borderColor: "primary.main",
+                width: "30px",
+                height: "30px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img src="./favicon.ico" width="30" height="30" alt="" />
+            </Box>
+          </Typography>
           <Button sx={{ my: 2, color: "white" }}>
             <Link to={"/"}>Home </Link>
-          </Button>
-          <Button sx={{ my: 2, color: "white" }}>
-            <Link to={"/Profile"}>Profile</Link>
           </Button>
           <Button sx={{ my: 2, color: "white" }}>
             <Link to={"/FloorPlan"}>Floor Plan</Link>
@@ -80,7 +107,7 @@ const AppBarC = () => {
           )}
           {user !== null && (
             <IconButton size="large" onClick={handleAccountOpen}>
-              <AccountCircle />
+              <AccountCircleOutlinedIcon sx={{ color: "white" }} />
             </IconButton>
           )}
         </Toolbar>
