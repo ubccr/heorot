@@ -43,14 +43,7 @@ const Interfaces = ({ data }) => {
                 <Grid xs item>
                   FQDN:
                 </Grid>
-                <Grid
-                  xs
-                  item
-                  sx={{
-                    textAlign: "end",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                <Grid xs item sx={{ textAlign: "end" }}>
                   {val.fqdn}
                 </Grid>
                 <Divider

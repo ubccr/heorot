@@ -49,7 +49,7 @@ const Body = ({ array }) => {
                           borderColor: "border.table.quad",
                         }}
                       >
-                        <Link to={`/Node/${val.node}`}>{val.node[0]}</Link>
+                        <Link to={`/Node/${val.node[0]}`}>{val.node[0]}</Link>
                       </TableCell>
                     )}
                     {val.node[1] !== undefined && (
@@ -57,7 +57,7 @@ const Body = ({ array }) => {
                         align="center"
                         sx={{ borderLeft: 2, borderColor: "border.table.quad" }}
                       >
-                        <Link to={`/Node/${val.node}`}>{val.node[1]}</Link>
+                        <Link to={`/Node/${val.node[1]}`}>{val.node[1]}</Link>
                       </TableCell>
                     )}
                   </TableRow>

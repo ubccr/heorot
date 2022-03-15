@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { Box } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 
 import GridC from "./GridC"
 import AccordianC from "./AccordianC"
@@ -38,6 +38,34 @@ const Index = () => {
         }} */}
       {!loading && (
         <>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: "26pt",
+                textAlign: "center",
+                marginTop: "12px",
+                marginBottom: "25px",
+                padding: "10px",
+                border: 1,
+                borderRadius: "10px",
+                borderColor: "border.main",
+                bgcolor: "background.main",
+                color: "text.primary",
+                boxShadow: 16,
+                width: "300px",
+              }}
+            >
+              {node}
+            </Typography>
+          </Box>
+
           <GridC
             heading="Provision:"
             data={apiData.provision}

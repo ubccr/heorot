@@ -11,6 +11,7 @@ import {
   Modal,
   Fade,
   Backdrop,
+  TableContainer,
 } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
@@ -70,91 +71,97 @@ const TableC = ({ node }) => {
 
       {!loading && (
         <>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Typography variant="h1" sx={{ fontSize: "22px" }}>
-                    Redfish API Information:
-                  </Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Button variant="outlined" onClick={handleOpenSEL}>
-                    Show SEL
-                  </Button>
-                </TableCell>
-                <TableCell align="right" width={"20px"}>
-                  <Typography variant="h1" sx={{ fontSize: "16px" }}>
-                    Health
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell>Model:</TableCell>
-                <TableCell align="right">{apiData.biosRes.Model}</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Service Tag:</TableCell>
-                <TableCell align="right">
-                  {apiData.biosRes.ServiceTag}
-                </TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>BIOS Version:</TableCell>
-                <TableCell align="right">
-                  {apiData.biosRes.BiosVersion}
-                </TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>BMC Version:</TableCell>
-                <TableCell align="right">{apiData.idracRes.Firmware}</TableCell>
-                <TableCell align="center">
-                  <IconC icon={apiData.idracRes.Health} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Vlan:</TableCell>
-                <TableCell align="right">{apiData.idracRes.vlan}</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Boot Order:</TableCell>
-                <TableCell align="right">{apiData.biosRes.BootOrder}</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Memory Size:</TableCell>
-                <TableCell align="right">
-                  {apiData.biosRes.MemorySize}
-                </TableCell>
-                <TableCell align="center">
-                  <IconC icon={apiData.sensorsRes.memory} />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>CPU 1:</TableCell>
-                <TableCell align="right">{apiData.biosRes.CPU1}</TableCell>
-                <TableCell align="center">
-                  <IconC icon={apiData.sensorsRes.cpu1} />
-                </TableCell>
-              </TableRow>
-              {apiData.biosRes.CPU2 !== undefined && (
+          <TableContainer>
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell>CPU 2:</TableCell>
-                  <TableCell align="right">{apiData.biosRes.CPU2}</TableCell>
-                  <TableCell align="center">
-                    <IconC icon={apiData.sensorsRes.cpu2} />
+                  <TableCell>
+                    <Typography variant="h1" sx={{ fontSize: "22px" }}>
+                      Redfish API Information:
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Button variant="outlined" onClick={handleOpenSEL}>
+                      Show SEL
+                    </Button>
+                  </TableCell>
+                  <TableCell align="right" width={"20px"}>
+                    <Typography variant="h1" sx={{ fontSize: "16px" }}>
+                      Health
+                    </Typography>
                   </TableCell>
                 </TableRow>
-              )}
-              {apiData.gpuRes.status === "success" && gpuhtml()}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Model:</TableCell>
+                  <TableCell align="right">{apiData.biosRes.Model}</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Service Tag:</TableCell>
+                  <TableCell align="right">
+                    {apiData.biosRes.ServiceTag}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>BIOS Version:</TableCell>
+                  <TableCell align="right">
+                    {apiData.biosRes.BiosVersion}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>BMC Version:</TableCell>
+                  <TableCell align="right">
+                    {apiData.idracRes.Firmware}
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconC icon={apiData.idracRes.Health} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Vlan:</TableCell>
+                  <TableCell align="right">{apiData.idracRes.vlan}</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Boot Order:</TableCell>
+                  <TableCell align="right">
+                    {apiData.biosRes.BootOrder}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Memory Size:</TableCell>
+                  <TableCell align="right">
+                    {apiData.biosRes.MemorySize}
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconC icon={apiData.sensorsRes.memory} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>CPU 1:</TableCell>
+                  <TableCell align="right">{apiData.biosRes.CPU1}</TableCell>
+                  <TableCell align="center">
+                    <IconC icon={apiData.sensorsRes.cpu1} />
+                  </TableCell>
+                </TableRow>
+                {apiData.biosRes.CPU2 !== undefined && (
+                  <TableRow>
+                    <TableCell>CPU 2:</TableCell>
+                    <TableCell align="right">{apiData.biosRes.CPU2}</TableCell>
+                    <TableCell align="center">
+                      <IconC icon={apiData.sensorsRes.cpu2} />
+                    </TableCell>
+                  </TableRow>
+                )}
+                {apiData.gpuRes.status === "success" && gpuhtml()}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <div>
             <Modal
               aria-labelledby="transition-modal-title"
