@@ -15,6 +15,7 @@ import {
 import { DataGrid } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
 import SELTable from "./SELTable"
+import IconC from "../../components/IconC"
 
 const TableC = ({ node }) => {
   const [apiData, setApiData] = useState({})
@@ -34,6 +35,22 @@ const TableC = ({ node }) => {
   const [openSEL, setOpenSEL] = useState(false)
   const handleOpenSEL = () => setOpenSEL(true)
   const handleCloseSEL = () => setOpenSEL(false)
+
+  function gpuhtml() {
+    let res = []
+    apiData.gpuRes.GPUs.forEach((val, index) => {
+      res.push(
+        <TableRow key={index}>
+          <TableCell>GPU {index + 1}:</TableCell>
+          <TableCell align="right">{val.Name}</TableCell>
+          <TableCell align="center">
+            <IconC icon={val.Health} />
+          </TableCell>
+        </TableRow>
+      )
+    })
+    return res
+  }
 
   return (
     <Box
@@ -66,43 +83,76 @@ const TableC = ({ node }) => {
                     Show SEL
                   </Button>
                 </TableCell>
+                <TableCell align="right" width={"20px"}>
+                  <Typography variant="h1" sx={{ fontSize: "16px" }}>
+                    Health
+                  </Typography>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
                 <TableCell>Model:</TableCell>
                 <TableCell align="right">{apiData.biosRes.Model}</TableCell>
+                <TableCell></TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Service Tag:</TableCell>
                 <TableCell align="right">
                   {apiData.biosRes.ServiceTag}
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>BIOS Version:</TableCell>
                 <TableCell align="right">
                   {apiData.biosRes.BiosVersion}
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>BMC Version:</TableCell>
                 <TableCell align="right">{apiData.idracRes.Firmware}</TableCell>
+                <TableCell align="center">
+                  <IconC icon={apiData.idracRes.Health} />
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Vlan:</TableCell>
                 <TableCell align="right">{apiData.idracRes.vlan}</TableCell>
+                <TableCell></TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Boot Order:</TableCell>
                 <TableCell align="right">{apiData.biosRes.BootOrder}</TableCell>
+                <TableCell></TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Memory Size:</TableCell>
                 <TableCell align="right">
                   {apiData.biosRes.MemorySize}
                 </TableCell>
+                <TableCell align="center">
+                  <IconC icon={apiData.sensorsRes.memory} />
+                </TableCell>
               </TableRow>
+              <TableRow>
+                <TableCell>CPU 1:</TableCell>
+                <TableCell align="right">{apiData.biosRes.CPU1}</TableCell>
+                <TableCell align="center">
+                  <IconC icon={apiData.sensorsRes.cpu1} />
+                </TableCell>
+              </TableRow>
+              {apiData.biosRes.CPU2 !== undefined && (
+                <TableRow>
+                  <TableCell>CPU 2:</TableCell>
+                  <TableCell align="right">{apiData.biosRes.CPU2}</TableCell>
+                  <TableCell align="center">
+                    <IconC icon={apiData.sensorsRes.cpu2} />
+                  </TableCell>
+                </TableRow>
+              )}
+              {apiData.gpuRes.status === "success" && gpuhtml()}
             </TableBody>
           </Table>
           <div>
@@ -129,6 +179,8 @@ const TableC = ({ node }) => {
                     borderRadius: "15px",
                     boxShadow: 24,
                     width: "85%",
+                    height: "90%",
+                    overflowX: "scroll",
                   }}
                 >
                   <Box
