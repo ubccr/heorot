@@ -6,6 +6,8 @@ import "./App.css"
 
 // --- Components ---
 import { ThemeContext } from "./contexts/ThemeContext"
+import { UserContext } from "./contexts/UserContext"
+
 import largeTriangles from "./backgrounds/large-triangles.svg"
 import darkTriangles from "./backgrounds/large-triangles-dark.svg"
 
@@ -17,9 +19,10 @@ import Signup from "./routes/Auth/Signup"
 import FloorPlan from "./routes/FloorPlan/FloorPlan"
 import Rack from "./routes/Rack/Rack"
 import Node from "./routes/Node/Index"
+import Signout from "./routes/Auth/Signout"
 
 function App() {
-  const user = JSON.parse(localStorage.getItem("user"))
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")))
   let userTheme = "light"
   if (user) userTheme = user.theme
   const [mode, setMode] = useState(userTheme)
@@ -71,30 +74,33 @@ function App() {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <ThemeContext.Provider value={[mode, setMode]}>
-          <Paper
-            sx={{
-              bgcolor: "background.default",
-              minHeight: "100vh",
-              maxHeight: "max-content",
-              backgroundImage: theme.palette.background.img,
-            }}
-          >
-            <AppBarC />
-            <Container>
-              <Routes>
-                <Route exact path="/" element={<Home />} />
-                <Route path="/Login" element={<Login />} />
-                <Route path="/Signup" element={<Signup />} />
-                <Route path="/Profile" element={<Profile />} />
+        <UserContext.Provider value={[user, setUser]}>
+          <ThemeContext.Provider value={[mode, setMode]}>
+            <Paper
+              sx={{
+                bgcolor: "background.default",
+                minHeight: "100vh",
+                maxHeight: "max-content",
+                backgroundImage: theme.palette.background.img,
+              }}
+            >
+              <AppBarC />
+              <Container>
+                <Routes>
+                  <Route exact path="/" element={<Home />} />
+                  <Route path="/Login" element={<Login />} />
+                  <Route path="/Signup" element={<Signup />} />
+                  <Route path="/Profile" element={<Profile />} />
+                  <Route path="/Signout" element={<Signout />} />
 
-                <Route path="/FloorPlan" element={<FloorPlan />} />
-                <Route path="/Rack/:rack" element={<Rack />} />
-                <Route path="/Node/:node" element={<Node />} />
-              </Routes>
-            </Container>
-          </Paper>
-        </ThemeContext.Provider>
+                  <Route path="/FloorPlan" element={<FloorPlan />} />
+                  <Route path="/Rack/:rack" element={<Rack />} />
+                  <Route path="/Node/:node" element={<Node />} />
+                </Routes>
+              </Container>
+            </Paper>
+          </ThemeContext.Provider>
+        </UserContext.Provider>
       </ThemeProvider>
     </>
   )

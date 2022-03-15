@@ -2,9 +2,11 @@ import AuthForm from "./AuthForm"
 import { useState, useEffect, useContext } from "react"
 import { signin } from "../../modules/Auth"
 import { ThemeContext } from "../../contexts/ThemeContext"
-// import "./styles.css"
+import { UserContext } from "../../contexts/UserContext"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 
 const Login = () => {
+  const { redirect } = useParams()
   const form = {
     name: "Login",
     button: "Login",
@@ -13,11 +15,16 @@ const Login = () => {
   }
   const [submit, setSubmit] = useState()
   const [mode, setMode] = useContext(ThemeContext)
+  const [user, setUser] = useContext(UserContext)
+  const navigate = useNavigate()
 
   useEffect(async () => {
     if (submit !== undefined && submit.password !== "") {
       let response = await signin(submit.username, submit.password)
       setMode(response.theme)
+      setUser(response)
+      if (redirect === undefined) navigate("/")
+      else navigate({ redirect })
     }
   }, [submit])
   return <AuthForm form={form} setSubmit={setSubmit} />
