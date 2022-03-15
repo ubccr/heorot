@@ -50,8 +50,7 @@ const Index = () => {
               sx={{
                 fontSize: "26pt",
                 textAlign: "center",
-                marginTop: "12px",
-                marginBottom: "25px",
+                marginBottom: "16px",
                 padding: "10px",
                 border: 1,
                 borderRadius: "10px",
