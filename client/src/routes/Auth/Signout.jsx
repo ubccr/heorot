@@ -1,11 +1,17 @@
 import { Container, Typography } from "@mui/material"
-import { useContext } from "react"
+import { useContext, useEffect } from "react"
 import { UserContext } from "../../contexts/UserContext"
+import { ThemeContext } from "../../contexts/ThemeContext"
 
 const Signout = () => {
   const [user, setUser] = useContext(UserContext)
-  setUser(null)
-  localStorage.clear("user")
+  const [mode, setMode] = useContext(ThemeContext)
+
+  useEffect(() => {
+    setUser(null)
+    setMode("light")
+    localStorage.clear("user")
+  }, [user, mode])
   return (
     <Container
       sx={{
@@ -17,10 +23,16 @@ const Signout = () => {
         boxShadow: 12,
       }}
     >
-      <Typography sx={{ fontSize: 36, fontWeight: "light", letterSpacing: 1 }}>
+      <Typography
+        sx={{
+          padding: "30px",
+          fontSize: 36,
+          fontWeight: "light",
+          letterSpacing: 1,
+        }}
+      >
         Successfully signed out
       </Typography>
-      {/* <Divider /> */}
     </Container>
   )
 }
