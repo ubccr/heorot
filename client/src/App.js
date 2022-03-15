@@ -38,6 +38,7 @@ function App() {
               table: {
                 single: "#ffb300",
                 double: "#43a047",
+                quad: "#2196f3",
               },
             },
           }
@@ -58,6 +59,7 @@ function App() {
               table: {
                 single: "#ffb300",
                 double: "#43a047",
+                quad: "#2196f3",
               },
             },
           }),
