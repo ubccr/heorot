@@ -195,7 +195,7 @@ const TableC = ({ node }) => {
                     boxShadow: 24,
                     width: "85%",
                     height: "90%",
-                    overflowX: "scroll",
+                    overflowY: "scroll",
                   }}
                 >
                   <Box
