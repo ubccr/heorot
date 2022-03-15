@@ -29,13 +29,6 @@ const Index = () => {
 
   return (
     <Box>
-      {/* sx={{
-          border: 1,
-          borderColor: "primary.main",
-          boxShadow: 12,
-          bgcolor: "background.main",
-          color: "text.primary",
-        }} */}
       {!loading && (
         <>
           <Box

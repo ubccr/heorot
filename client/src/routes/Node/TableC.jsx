@@ -17,10 +17,12 @@ import { DataGrid } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
 import SELTable from "./SELTable"
 import IconC from "../../components/IconC"
+import ErrorC from "../../components/ErrorC"
 
 const TableC = ({ node }) => {
   const [apiData, setApiData] = useState({})
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     fetch(`http://${window.location.hostname}:3030/redfish/dell/${node}`)
@@ -28,7 +30,13 @@ const TableC = ({ node }) => {
       .then((response) => {
         if (response.status === "success") {
           setApiData(response.result)
-          setLoading(false)
+          let arr = Object.values(response.result)
+          arr.forEach((val, index) => {
+            if (val.status === "failed") {
+              setError(val.message)
+            }
+            setLoading(false)
+          })
         }
       })
   }, [])
@@ -68,8 +76,8 @@ const TableC = ({ node }) => {
       }}
     >
       {loading && <LinearProgress />}
-
-      {!loading && (
+      {error !== "" && <ErrorC message={error} />}
+      {!loading && error === "" && (
         <>
           <TableContainer>
             <Table>

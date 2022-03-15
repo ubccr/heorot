@@ -39,12 +39,14 @@ async function biosApi(node) {
       }
     } else {
       return {
+        status: "failed",
         message: "BIOS API error",
         error: json_res.error["@Message.ExtendedInfo"][0].Message,
       }
     }
   } catch (error) {
     return {
+      status: "failed",
       message: "BIOS API error",
       error: error.message,
     }
@@ -93,6 +95,7 @@ async function idracApi(node) {
     return bmc
   } catch (error) {
     return {
+      status: "failed",
       message: "BMC API error",
       error: error.message,
     }
@@ -133,18 +136,21 @@ async function gpuApi(node) {
           return node
         } else {
           return {
+            status: "failed",
             message: "GPU API error",
             error: json_res.error["@Message.ExtendedInfo"][0].Message,
           }
         }
       } catch (error) {
         return {
+          status: "failed",
           message: "GPU API error",
           error: error.message,
         }
       }
     } else {
       return {
+        status: "failed",
         message: "GPU API error",
         error: "node incompatible with GPU query",
         ignore: true,
@@ -152,6 +158,7 @@ async function gpuApi(node) {
     }
   } catch (error) {
     return {
+      status: "failed",
       message: "GPU API error",
       error: error.message,
     }
@@ -200,6 +207,7 @@ async function sensorsApi(node) {
             nodeInfo.message = "Success"
           } else {
             nodeInfo = {
+              status: "failed",
               message: "Sensor API error",
               error: json_res.error["@Message.ExtendedInfo"][0].Message,
             }
@@ -209,6 +217,7 @@ async function sensorsApi(node) {
         return nodeInfo
       } catch (error) {
         return {
+          status: "failed",
           message: "Sensor API error",
           error: error.message,
         }
@@ -223,6 +232,7 @@ async function sensorsApi(node) {
     }
   } catch (error) {
     return {
+      status: "failed",
       message: "Sensor API error",
       error: error.message,
     }
@@ -285,12 +295,14 @@ async function selApi(node) {
       }
     } else {
       return {
+        status: "failed",
         message: "SEL API error",
         error: json_res.error["@Message.ExtendedInfo"][0].Message,
       }
     }
   } catch (error) {
     return {
+      status: "failed",
       message: "SEL API error",
       error: error.message,
     }
@@ -307,6 +319,7 @@ async function apiRequest(url, http_header) {
     }
   } catch (error) {
     return {
+      status: "failed",
       message: "API error",
       error,
     }
