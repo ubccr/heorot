@@ -32,7 +32,7 @@ const TableC = ({ node }) => {
           setApiData(response.result)
           let arr = Object.values(response.result)
           arr.forEach((val, index) => {
-            if (val.status === "failed") {
+            if (val.status === "failed" && val.message !== "No GPU tag") {
               setError(val.message)
             }
             setLoading(false)
