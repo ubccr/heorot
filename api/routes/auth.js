@@ -4,6 +4,7 @@ const app = express.Router()
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const User = require("../models/User")
+const auth = require("../modules/auth")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -48,7 +49,7 @@ app.post("/signup", async (req, res) => {
   } else res.json({ status: "failed", message: "User already exists" })
 })
 
-app.post("/auth/signin", async (req, res) => {
+app.post("/signin", async (req, res) => {
   const username = req.body.username
   const password = req.body.password
   let query = await User.findOne({ username: username }).exec()
@@ -68,6 +69,18 @@ app.post("/auth/signin", async (req, res) => {
       })
     } else res.json({ status: "failed", message: "Password incorrect" })
   } else res.json({ status: "failed", message: "Username not found" })
+})
+app.post("/setTheme", auth, async (req, res) => {
+  const theme = req.body.theme
+  const userId = req.userId
+
+  let query = await User.updateOne({ id: userId }, { theme: theme }).exec()
+  console.log(query)
+  res.send({
+    status: "success",
+    message: "Theme successfully updated",
+    theme: theme,
+  })
 })
 
 module.exports = app

@@ -1,5 +1,6 @@
 import AuthForm from "./AuthForm"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { signup } from "../../modules/Auth"
 
 const Signup = () => {
   const form = {
@@ -9,7 +10,13 @@ const Signup = () => {
     link: "Login",
   }
   const [submit, setSubmit] = useState()
-  console.log(submit)
+
+  useEffect(async () => {
+    if (submit !== undefined) {
+      let response = await signup(submit.username, submit.password)
+      console.log(response)
+    }
+  }, [submit])
   return <AuthForm form={form} setSubmit={setSubmit} />
 }
 

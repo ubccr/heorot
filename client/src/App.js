@@ -19,7 +19,10 @@ import Rack from "./routes/Rack/Rack"
 import Node from "./routes/Node/Index"
 
 function App() {
-  const [mode, setMode] = useState("light")
+  const user = JSON.parse(localStorage.getItem("user"))
+  let userTheme = "light"
+  if (user) userTheme = user.theme
+  const [mode, setMode] = useState(userTheme)
   const theme = createTheme({
     palette: {
       mode,

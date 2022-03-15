@@ -11,8 +11,27 @@ import { useContext } from "react"
 const AppBarC = () => {
   const [mode, setMode] = useContext(ThemeContext)
   const modeToggle = (e) => {
-    if (mode === "light") setMode("dark")
-    else setMode("light")
+    let newMode = "light"
+    if (mode === "light") newMode = "dark"
+    else newMode = "light"
+
+    setMode(newMode)
+    let user = JSON.parse(localStorage.getItem("user"))
+    if (user !== null) {
+      user.theme = newMode
+      localStorage.setItem("user", JSON.stringify(user))
+      const payload = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "x-access-token": user.accessToken,
+          theme: newMode,
+        }),
+      }
+      fetch(`http://${window.location.hostname}:3030/auth/setTheme`, payload)
+    }
   }
   return (
     <AppBar position="static" id="nav">
