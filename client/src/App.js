@@ -7,6 +7,7 @@ import "./App.css"
 // --- Components ---
 import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
+import PrivateRoute from "./components/PrivateRoute"
 
 import largeTriangles from "./backgrounds/large-triangles.svg"
 import darkTriangles from "./backgrounds/large-triangles-dark.svg"
@@ -95,7 +96,15 @@ function App() {
 
                   <Route path="/FloorPlan" element={<FloorPlan />} />
                   <Route path="/Rack/:rack" element={<Rack />} />
-                  <Route path="/Node/:node" element={<Node />} />
+
+                  <Route
+                    path="/Node/:node"
+                    element={
+                      <PrivateRoute access="user">
+                        <Node />{" "}
+                      </PrivateRoute>
+                    }
+                  />
                 </Routes>
               </Container>
             </Paper>

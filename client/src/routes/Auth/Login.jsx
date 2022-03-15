@@ -3,10 +3,9 @@ import { useState, useEffect, useContext } from "react"
 import { signin } from "../../modules/Auth"
 import { ThemeContext } from "../../contexts/ThemeContext"
 import { UserContext } from "../../contexts/UserContext"
-import { Navigate, useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
-  const { redirect } = useParams()
   const form = {
     name: "Login",
     button: "Login",
@@ -23,8 +22,7 @@ const Login = () => {
       let response = await signin(submit.username, submit.password)
       setMode(response.theme)
       setUser(response)
-      if (redirect === undefined) navigate("/")
-      else navigate({ redirect })
+      navigate(-1)
     }
   }, [submit])
   return <AuthForm form={form} setSubmit={setSubmit} />
