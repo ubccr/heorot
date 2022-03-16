@@ -50,8 +50,9 @@ function App() {
               main: "rgba(255, 255, 255, 1)",
               img: `url(${largeTriangles})`,
               table: {
-                single: "#ffe082",
-                double: "#a5d6a7",
+                single: "#ffe0b2",
+                double: "#c8e6c9",
+                quad: "#bbdefb",
               },
             },
             border: {
