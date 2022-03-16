@@ -91,14 +91,26 @@ const AppBarC = () => {
               <img src="./favicon.ico" width="30" height="30" alt="" />
             </Box>
           </Typography>
-          <Button sx={{ my: 2, color: "white" }}>
-            <Link to={"/"}>Home </Link>
+          <Button
+            sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+            component={Link}
+            to={"/"}
+          >
+            Home
           </Button>
-          <Button sx={{ my: 2, color: "white" }}>
-            <Link to={"/FloorPlan"}>Floor Plan</Link>
+          <Button
+            sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+            component={Link}
+            to={"/FloorPlan"}
+          >
+            Floor Plan
           </Button>
-          <Button sx={{ my: 2, color: "white" }}>
-            <Link to={"/Alerts"}>Alerts</Link>
+          <Button
+            sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+            component={Link}
+            to={"/Alerts"}
+          >
+            Alerts
           </Button>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -130,11 +142,11 @@ const AppBarC = () => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose}>
-          <Link to="/Profile">Profile</Link>
+        <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"}>
+          Profile
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
-          <Link to="/Signout">Sign out</Link>
+        <MenuItem onClick={handleMenuClose} component={Link} to={"/Signout"}>
+          Sign out
         </MenuItem>
       </Menu>
     </Box>

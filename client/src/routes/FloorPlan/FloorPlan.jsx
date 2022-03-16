@@ -120,11 +120,12 @@ const FloorPlan = () => {
                               width: "100%",
                               height: "100%",
                               padding: 0,
+                              textTransform: "lowercase",
                             }}
+                            component={Link}
+                            to={`/Rack/${row.row + col.col}`}
                           >
-                            <Link to={`/Rack/${row.row + col.col}`}>
-                              {row.row + col.col}
-                            </Link>
+                            {row.row + col.col}
                           </Button>
                         )}
                       </TableCell>
