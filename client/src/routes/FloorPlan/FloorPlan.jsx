@@ -68,6 +68,12 @@ const FloorPlan = () => {
         setNodes(response.response)
         setLoading(false)
       })
+    return () => {
+      setRows([])
+      setCols([])
+      setNodes()
+      setLoading(true)
+    }
   }, [])
   return (
     <Box
