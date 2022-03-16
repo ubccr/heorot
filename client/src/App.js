@@ -3,11 +3,13 @@ import { Container, createTheme, Paper, ThemeProvider } from "@mui/material"
 import { useState } from "react"
 
 import "./App.css"
+import "bootstrap-icons/font/bootstrap-icons.css"
 
 // --- Components ---
 import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
 import PrivateRoute from "./components/PrivateRoute"
+import { QueryClient, QueryClientProvider } from "react-query"
 
 import largeTriangles from "./backgrounds/large-triangles.svg"
 import darkTriangles from "./backgrounds/large-triangles-dark.svg"
@@ -21,8 +23,20 @@ import FloorPlan from "./routes/FloorPlan/FloorPlan"
 import Rack from "./routes/Rack/Rack"
 import Node from "./routes/Node/Index"
 import Signout from "./routes/Auth/Signout"
+import Alerts from "./routes/Alerts/Index"
 
 function App() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        refetchOnmount: true,
+        refetchOnReconnect: true,
+        retry: true,
+      },
+    },
+  })
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")))
   let userTheme = "light"
   if (user) userTheme = user.theme
@@ -74,43 +88,46 @@ function App() {
   })
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <UserContext.Provider value={[user, setUser]}>
-          <ThemeContext.Provider value={[mode, setMode]}>
-            <Paper
-              sx={{
-                bgcolor: "background.default",
-                minHeight: "100vh",
-                maxHeight: "max-content",
-                backgroundImage: theme.palette.background.img,
-              }}
-            >
-              <AppBarC />
-              <Container>
-                <Routes>
-                  <Route exact path="/" element={<Home />} />
-                  <Route path="/Login" element={<Login />} />
-                  <Route path="/Signup" element={<Signup />} />
-                  <Route path="/Profile" element={<Profile />} />
-                  <Route path="/Signout" element={<Signout />} />
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <UserContext.Provider value={[user, setUser]}>
+            <ThemeContext.Provider value={[mode, setMode]}>
+              <Paper
+                sx={{
+                  bgcolor: "background.default",
+                  minHeight: "100vh",
+                  maxHeight: "max-content",
+                  backgroundImage: theme.palette.background.img,
+                }}
+              >
+                <AppBarC />
+                <Container>
+                  <Routes>
+                    <Route exact path="/" element={<Home />} />
+                    <Route path="/Login" element={<Login />} />
+                    <Route path="/Signup" element={<Signup />} />
+                    <Route path="/Profile" element={<Profile />} />
+                    <Route path="/Signout" element={<Signout />} />
 
-                  <Route path="/FloorPlan" element={<FloorPlan />} />
-                  <Route path="/Rack/:rack" element={<Rack />} />
+                    <Route path="/FloorPlan" element={<FloorPlan />} />
+                    <Route path="/Rack/:rack" element={<Rack />} />
+                    <Route path="/Alerts" element={<Alerts />} />
 
-                  <Route
-                    path="/Node/:node"
-                    element={
-                      <PrivateRoute access="user">
-                        <Node />{" "}
-                      </PrivateRoute>
-                    }
-                  />
-                </Routes>
-              </Container>
-            </Paper>
-          </ThemeContext.Provider>
-        </UserContext.Provider>
-      </ThemeProvider>
+                    <Route
+                      path="/Node/:node"
+                      element={
+                        <PrivateRoute access="user">
+                          <Node />{" "}
+                        </PrivateRoute>
+                      }
+                    />
+                  </Routes>
+                </Container>
+              </Paper>
+            </ThemeContext.Provider>
+          </UserContext.Provider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </>
   )
 }
