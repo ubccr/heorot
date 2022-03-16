@@ -78,6 +78,47 @@ app.get("/nodes", async (req, res) => {
   }
 })
 
+app.get("/health/:id", async (req, res) => {
+  let json = new Object()
+  const url =
+    omeApiUrl +
+    "/api/DeviceService/Devices(" +
+    req.params.id +
+    ")/SubSystemHealth"
+
+  json = await apiRequest(url, omeHeader)
+  let output = { status: "failed", result: {} }
+  if (json.status === "success") {
+    output.status = "success"
+    let list = json.result
+
+    list.forEach((element) => {
+      let fault = null
+      if (element.FaultList !== undefined) fault = element.FaultList[0].Message
+      output.result[element.SubSystem] = {
+        subSystem: element.SubSystem,
+        status: icons(element.RollupStatus),
+        message: fault,
+      }
+    })
+    res.send(output)
+  } else {
+    res.send(json)
+  }
+})
+
+function icons(status) {
+  if (status === "4000") {
+    return "Critical"
+  } else if (status === "3000") {
+    return "Warning"
+  } else if (status === "1000") {
+    return "Good"
+  } else {
+    return "Unknown"
+  }
+}
+
 async function apiRequest(url, http_header) {
   try {
     let fetch_res = await fetch(url, http_header)

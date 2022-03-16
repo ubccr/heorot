@@ -53,6 +53,32 @@ app.get("/dell/:node", async (req, res) => {
   })
 })
 
-app.get("/:node/sel", async (req, res) => {})
+app.get("/sel/:node", async (req, res) => {
+  const node = req.params.node
+  let bmc = ""
+  let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
+
+  if (
+    grendelRes.grendelResponse === "success" &&
+    grendelRes.response.length !== 0
+  ) {
+    let grendelNode = grendelRes.response[0]
+    grendelNode.interfaces.forEach((element) => {
+      if (element.fqdn.substring(0, 3) === "bmc") bmc = element.fqdn
+    })
+
+    let selRes = await selApi(bmc)
+
+    res.json({
+      status: "success",
+      result: { selRes },
+    })
+  } else {
+    res.json({
+      status: "failed",
+      message: "Node not found",
+    })
+  }
+})
 
 module.exports = app
