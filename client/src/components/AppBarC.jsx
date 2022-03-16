@@ -97,6 +97,9 @@ const AppBarC = () => {
           <Button sx={{ my: 2, color: "white" }}>
             <Link to={"/FloorPlan"}>Floor Plan</Link>
           </Button>
+          <Button sx={{ my: 2, color: "white" }}>
+            <Link to={"/Alerts"}>Alerts</Link>
+          </Button>
 
           <Box sx={{ flexGrow: 1 }} />
           <Switch color="default" size="small" onChange={modeToggle} />
