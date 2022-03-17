@@ -7,7 +7,6 @@ const api_pass = process.env.JS_DELL_BMC_PASSWORD
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
-
 let encoded = Buffer.from(api_user + ":" + api_pass).toString("base64")
 let auth = "Basic " + encoded
 let header = {
@@ -17,6 +16,68 @@ let header = {
     credentials: "include",
   },
   agent,
+}
+
+async function apiClearSEL(node) {
+  const apiUrl = `https://${node}/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Actions/LogService.ClearLog`
+
+  let payload = {
+    method: "POST",
+    headers: {
+      Authorization: auth,
+      "content-type": "application/json",
+    },
+    agent,
+  }
+  try {
+    let fetch_res = await fetch(apiUrl, payload)
+    return {
+      status: "success",
+      message: "System Event Log cleared",
+      color: "success",
+      result: fetch_res,
+    }
+  } catch (error) {
+    return {
+      status: "failed",
+      message: "API error",
+      color: "error",
+      error,
+    }
+  }
+}
+
+async function apiResetBMC(node) {
+  const apiUrl = `https://${node}/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Manager.Reset`
+
+  let payload = {
+    method: "POST",
+    headers: {
+      Authorization: auth,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      ResetType: "GracefulRestart",
+    }),
+    agent,
+  }
+
+  try {
+    let fetch_res = await fetch(apiUrl, payload)
+    return {
+      status: "success",
+      message: "BMC sent reset command",
+      result: fetch_res,
+      color: "success",
+    }
+  } catch (error) {
+    return {
+      status: "failed",
+      message: "API error",
+      color: "error",
+      error,
+    }
+  }
 }
 
 async function biosApi(node) {
@@ -325,4 +386,13 @@ async function apiRequest(url, http_header) {
     }
   }
 }
-module.exports = { biosApi, idracApi, gpuApi, sensorsApi, selApi }
+
+module.exports = {
+  biosApi,
+  idracApi,
+  gpuApi,
+  sensorsApi,
+  selApi,
+  apiClearSEL,
+  apiResetBMC,
+}

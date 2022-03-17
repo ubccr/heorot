@@ -8,6 +8,8 @@ const {
   gpuApi,
   sensorsApi,
   selApi,
+  apiClearSEL,
+  apiResetBMC,
 } = require("../modules/nodeApi")
 
 app.get("/", (req, res) => {
@@ -79,6 +81,18 @@ app.get("/sel/:node", async (req, res) => {
       message: "Node not found",
     })
   }
+})
+
+app.get("/actions/clearSEL/:node", async (req, res) => {
+  let result = await apiClearSEL(req.params.node)
+
+  res.json(result)
+})
+
+app.get("/actions/resetBMC/:node", async (req, res) => {
+  let result = await apiResetBMC(req.params.node)
+
+  res.json(result)
 })
 
 module.exports = app

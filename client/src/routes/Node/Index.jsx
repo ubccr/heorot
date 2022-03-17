@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { Box, Grid, Typography } from "@mui/material"
+import { Alert, Box, Button, Grid, Snackbar, Typography } from "@mui/material"
 
 import GridC from "./GridC"
 import AccordianC from "./AccordianC"
@@ -11,6 +11,12 @@ const Index = () => {
   const { node } = useParams()
   const [apiData, setApiData] = useState()
   const [loading, setLoading] = useState(true)
+  const [openSEL, setOpenSEL] = useState(false)
+  const [messageSEL, setMessageSEL] = useState({
+    status: "",
+    message: "",
+    color: "info",
+  })
 
   useEffect(() => {
     fetch(`http://${window.location.hostname}:3030/client/node/${node}`)
@@ -26,6 +32,44 @@ const Index = () => {
         }
       })
   }, [])
+
+  const handleClearSEL = () => {
+    let bmc = null
+    apiData.interfaces.forEach((val, index) => {
+      if (val.fqdn.substring(0, 3) === "bmc") bmc = val.fqdn
+    })
+    fetch(
+      `http://${window.location.hostname}:3030/redfish/actions/clearSEL/${bmc}`
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        setMessageSEL(result)
+        setOpenSEL(true)
+      })
+  }
+
+  const handleSELSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return
+    }
+
+    setOpenSEL(false)
+  }
+
+  const handleResetBMC = () => {
+    let bmc = null
+    apiData.interfaces.forEach((val, index) => {
+      if (val.fqdn.substring(0, 3) === "bmc") bmc = val.fqdn
+    })
+    fetch(
+      `http://${window.location.hostname}:3030/redfish/actions/resetBMC/${bmc}`
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        setMessageSEL(result)
+        setOpenSEL(true)
+      })
+  }
 
   return (
     <Box>
@@ -68,6 +112,51 @@ const Index = () => {
           <Interfaces data={apiData.interfaces} />
           <GridC heading="Boot Image:" data={apiData.boot_image} />
           <GridC heading="BMC Console:" button="Show" />
+
+          <Grid
+            container
+            sx={{
+              overflow: "hidden",
+              padding: "10px",
+              marginTop: "12px",
+              alignItems: "center",
+              border: 1,
+              borderRadius: "10px",
+              borderColor: "border.main",
+              bgcolor: "background.main",
+              color: "text.primary",
+              boxShadow: 12,
+              height: 60,
+            }}
+          >
+            <Grid item xs>
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "18pt", paddingLeft: 2 }}
+              >
+                Actions:
+              </Typography>
+            </Grid>
+
+            <Grid item xs sx={{ textAlign: "center", textAlign: "end" }}>
+              <Button variant="outlined" onClick={handleClearSEL}>
+                Clear SEL
+              </Button>{" "}
+              <Button variant="outlined" onClick={handleResetBMC}>
+                Reset BMC
+              </Button>
+            </Grid>
+          </Grid>
+          <Snackbar
+            open={openSEL}
+            autoHideDuration={4000}
+            onClose={handleSELSnackbarClose}
+          >
+            <Alert severity={messageSEL.color} onClose={handleSELSnackbarClose}>
+              {messageSEL.message}
+            </Alert>
+          </Snackbar>
+
           <br />
           <TableC node={node} />
           <br />
