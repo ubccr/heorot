@@ -1,12 +1,5 @@
-import {
-  Button,
-  LinearProgress,
-  TableCell,
-  TableRow,
-  Tooltip,
-  Typography,
-} from "@mui/material"
-import { useEffect, useState } from "react"
+import { LinearProgress, TableCell, TableRow, Typography } from "@mui/material"
+import { Link } from "react-router-dom"
 import { useQuery } from "react-query"
 import NodeCellC from "./NodeCellC"
 import SELCustom from "./SELCustom"
@@ -54,7 +47,7 @@ const AlertEntry = ({ data }) => {
         <>
           <TableCell sx={{ borderColor: statusColor }}>
             <Typography variant="h1" sx={{ fontSize: "16pt" }}>
-              {data.deviceName}
+              <Link to={`/Node/${data.deviceName}`}>{data.deviceName}</Link>
             </Typography>
           </TableCell>
           <TableCell>{data.serviceTag}</TableCell>
