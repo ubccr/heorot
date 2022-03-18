@@ -84,12 +84,15 @@ app.get("/add/:tags", async (req, res) => {
             res.json({
               status: "failed",
               message: "An error occured while saving to the DB",
+              color: "error",
               err,
             })
           else
             res.json({
               status: "success",
-              message: "Nodes successfully added to the DB",
+              message:
+                warranty.insertedCount + " Nodes successfully added to the DB",
+              color: "success",
               warranty: warranty,
             })
         })
@@ -98,6 +101,7 @@ app.get("/add/:tags", async (req, res) => {
       res.json({
         status: "failed",
         message: "No new nodes were added to the DB",
+        color: "error",
       })
     }
   }
