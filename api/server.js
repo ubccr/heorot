@@ -28,8 +28,12 @@ app.use("/redfish", auth, redfishRouter)
 
 const grendelRouter = require("./routes/grendel.js")
 app.use("/grendel", auth, grendelRouter)
+
 const openmanageRouter = require("./routes/openmanage.js")
 app.use("/openmanage", auth, openmanageRouter)
+
+const warrantyRouter = require("./routes/warranty.js")
+app.use("/warranty", auth, warrantyRouter)
 
 app.get("/all", async function (req, res) {
   let query = await User.find().exec()
