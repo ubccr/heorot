@@ -36,7 +36,7 @@ app.post("/signup", async (req, res) => {
       if (err)
         res.json({
           status: "failed",
-          message: "An error occuered while saving to the DB",
+          message: "An error occured while saving to the DB",
           err,
         })
       else
