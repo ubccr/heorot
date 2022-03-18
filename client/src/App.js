@@ -24,6 +24,7 @@ import Rack from "./routes/Rack/Rack"
 import Node from "./routes/Node/Index"
 import Signout from "./routes/Auth/Signout"
 import Alerts from "./routes/Alerts/Index"
+import Warranty from "./routes/Admin/Warranty"
 
 function App() {
   const queryClient = new QueryClient({
@@ -36,7 +37,7 @@ function App() {
       },
     },
   })
-
+  // TODO: verify user token validity on page load
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")))
   let userTheme = "light"
   if (user) userTheme = user.theme
@@ -119,6 +120,14 @@ function App() {
                       element={
                         <PrivateRoute access="user">
                           <Node />{" "}
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/Admin/Warranty"
+                      element={
+                        <PrivateRoute access="admin">
+                          <Warranty />{" "}
                         </PrivateRoute>
                       }
                     />

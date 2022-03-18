@@ -16,6 +16,7 @@ import { Link } from "react-router-dom"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { useContext, useEffect, useState } from "react"
+import AdminMenu from "./AppBar/AdminMenu"
 
 const AppBarC = () => {
   const [user, setUser] = useContext(UserContext)
@@ -112,6 +113,7 @@ const AppBarC = () => {
           >
             Alerts
           </Button>
+          {user !== null && user.privileges === "admin" && <AdminMenu />}
 
           <Box sx={{ flexGrow: 1 }} />
           <Switch color="default" size="small" onChange={modeToggle} />
