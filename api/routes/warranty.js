@@ -72,7 +72,7 @@ app.get("/add/:tags", async (req, res) => {
               nodeName: arrData.nodeName,
               bmcFqdn: arrData.bmcFqdn,
               serviceTag: val.serviceTag,
-              shipData: val.shipDate,
+              shipDate: val.shipDate,
               productLineDescription: val.productLineDescription,
               entitlements: val.entitlements,
             })
