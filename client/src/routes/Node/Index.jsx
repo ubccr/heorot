@@ -9,11 +9,13 @@ import TableC from "./TableC"
 import WarrantyDisplay from "./WarrantyDisplay"
 import Provision from "./Provision"
 import Tags from "./Tags"
+import Console from "./Console"
 
 const Index = () => {
   const { node } = useParams()
   const [apiData, setApiData] = useState()
   const [refetch, setRefetch] = useState(false)
+  const [BMC, setBMC] = useState("")
 
   const [loading, setLoading] = useState(true)
   const [openSEL, setOpenSEL] = useState(false)
@@ -64,6 +66,7 @@ const Index = () => {
     let bmc = null
     apiData.interfaces.forEach((val, index) => {
       if (val.fqdn.substring(0, 3) === "bmc") bmc = val.fqdn
+      setBMC(val.fqdn)
     })
     fetch(
       `http://${window.location.hostname}:3030/redfish/actions/resetBMC/${bmc}`
@@ -120,7 +123,7 @@ const Index = () => {
           <GridC heading="Firmware:" data={apiData.firmware} />
           <Interfaces data={apiData.interfaces} />
           <GridC heading="Boot Image:" data={apiData.boot_image} />
-          <GridC heading="BMC Console:" button="Show" />
+          <Console node={node} />
 
           <Grid
             container
@@ -157,7 +160,7 @@ const Index = () => {
             </Grid>
           </Grid>
 
-          <WarrantyDisplay node={node} />
+          <WarrantyDisplay node={node} bmc={BMC} />
 
           <Snackbar
             open={openSEL}
