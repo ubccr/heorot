@@ -6,6 +6,7 @@ import GridC from "./GridC"
 import AccordianC from "./AccordianC"
 import Interfaces from "./Interfaces"
 import TableC from "./TableC"
+import WarrantyDisplay from "./WarrantyDisplay"
 
 const Index = () => {
   const { node } = useParams()
@@ -147,6 +148,9 @@ const Index = () => {
               </Button>
             </Grid>
           </Grid>
+
+          <WarrantyDisplay node={node} />
+
           <Snackbar
             open={openSEL}
             autoHideDuration={4000}

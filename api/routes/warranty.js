@@ -119,7 +119,41 @@ app.get("/get/:node", async (req, res) => {
         err,
       })
     } else {
-      res.json({ status: "success", result: node })
+      if (node !== null) {
+        let result = {}
+        node.entitlements.forEach((val, index) => {
+          if (val.serviceLevelCode === "ND") {
+            let date = new Date(val.endDate)
+            let currentDate = new Date()
+
+            if (date > currentDate) {
+              result = {
+                status: "success",
+                result: {
+                  warranty: "valid",
+                  endDate: date,
+                  entitlementType: val.entitlementType,
+                },
+              }
+            } else {
+              result = {
+                status: "success",
+                result: {
+                  warranty: "invalid",
+                  endDate: date,
+                  entitlementType: val.entitlementType,
+                },
+              }
+            }
+          }
+        })
+        res.json(result)
+      } else {
+        res.json({
+          status: "failed",
+          message: "Warranty information for node not found",
+        })
+      }
     }
   })
 })
