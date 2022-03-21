@@ -44,7 +44,12 @@ const Interfaces = ({ data }) => {
                   FQDN:
                 </Grid>
                 <Grid xs item sx={{ textAlign: "end" }}>
-                  {val.fqdn}
+                  {name !== "BMC:" && val.fqdn}
+                  {name === "BMC:" && (
+                    <a target="_blank" href={`https://${val.fqdn}`}>
+                      {val.fqdn}
+                    </a>
+                  )}
                 </Grid>
                 <Divider
                   sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }}
