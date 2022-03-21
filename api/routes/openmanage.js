@@ -128,7 +128,7 @@ async function apiRequest(url, http_header) {
       result: json_res.value,
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return {
       status: "failed",
       message: "API Request error",
