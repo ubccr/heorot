@@ -1,5 +1,8 @@
 import { Alert, Snackbar } from "@mui/material"
 
+// import { useState } from "react"
+// const [openAlert, setOpenAlert] = useState(false)
+
 const AlertC = ({ color, message, openAlert, setOpenAlert }) => {
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
