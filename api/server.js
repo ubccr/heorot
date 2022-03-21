@@ -52,7 +52,6 @@ const consoleMessage =
 io.on("connection", function (socket) {
   socket.on("auth", function (token) {
     jwt.verify(token, process.env.API_JWT_SECRET, (err, decoded) => {
-      console.log(token)
       if (!err) {
         socket.emit("auth", "authenticated")
         socket.on("node", function (data) {
