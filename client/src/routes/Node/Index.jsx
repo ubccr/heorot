@@ -8,6 +8,7 @@ import Interfaces from "./Interfaces"
 import TableC from "./TableC"
 import WarrantyDisplay from "./WarrantyDisplay"
 import Provision from "./Provision"
+import Tags from "./Tags"
 
 const Index = () => {
   const { node } = useParams()
@@ -29,7 +30,6 @@ const Index = () => {
         if (response.status === "success") {
           let data = response.result[0]
           data.provision = response.result[0].provision.toString()
-          data.tags = response.result[0].tags.join(", ")
 
           setApiData(data)
           setLoading(false)
@@ -111,8 +111,12 @@ const Index = () => {
             refetch={refetch}
             setRefetch={setRefetch}
           />
-
-          <GridC heading="Tags:" data={apiData.tags} button="Submit" />
+          <Tags
+            node={node}
+            data={apiData.tags}
+            refetch={refetch}
+            setRefetch={setRefetch}
+          />
           <GridC heading="Firmware:" data={apiData.firmware} />
           <Interfaces data={apiData.interfaces} />
           <GridC heading="Boot Image:" data={apiData.boot_image} />

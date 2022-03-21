@@ -16,7 +16,8 @@ const NewGridC = ({ heading, children }) => {
         bgcolor: "background.main",
         color: "text.primary",
         boxShadow: 12,
-        height: 60,
+        height: "auto",
+        minHeight: 60,
       }}
     >
       <Grid item xs>
