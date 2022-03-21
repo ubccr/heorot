@@ -54,13 +54,13 @@ const WarrantyDisplay = ({ node }) => {
               >
                 {query.data.result.warranty === "invalid" && (
                   <i
-                    class="bi bi-exclamation-square"
+                    className="bi bi-exclamation-square"
                     style={{ color: "#f44336", marginRight: "5px" }}
                   />
                 )}
                 {query.data.result.warranty === "valid" && (
                   <i
-                    class="bi bi-check2-square"
+                    className="bi bi-check2-square"
                     style={{ color: "#4caf50", marginRight: "5px" }}
                   />
                 )}{" "}

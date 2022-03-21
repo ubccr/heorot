@@ -7,10 +7,13 @@ import AccordianC from "./AccordianC"
 import Interfaces from "./Interfaces"
 import TableC from "./TableC"
 import WarrantyDisplay from "./WarrantyDisplay"
+import Provision from "./Provision"
 
 const Index = () => {
   const { node } = useParams()
   const [apiData, setApiData] = useState()
+  const [refetch, setRefetch] = useState(false)
+
   const [loading, setLoading] = useState(true)
   const [openSEL, setOpenSEL] = useState(false)
   const [messageSEL, setMessageSEL] = useState({
@@ -32,7 +35,7 @@ const Index = () => {
           setLoading(false)
         }
       })
-  }, [])
+  }, [refetch])
 
   const handleClearSEL = () => {
     let bmc = null
@@ -102,12 +105,13 @@ const Index = () => {
               {node}
             </Typography>
           </Box>
-
-          <GridC
-            heading="Provision:"
+          <Provision
+            node={node}
             data={apiData.provision}
-            button="Toggle"
+            refetch={refetch}
+            setRefetch={setRefetch}
           />
+
           <GridC heading="Tags:" data={apiData.tags} button="Submit" />
           <GridC heading="Firmware:" data={apiData.firmware} />
           <Interfaces data={apiData.interfaces} />
