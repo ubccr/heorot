@@ -74,7 +74,7 @@ app.get("/rack/:rack", async (req, res) => {
           } else nodes[resNode.u] = resNode
         }
       } else if (nodeset[0] === "swi" || nodeset[0] === "swe") {
-        resSwitch = switchFormat(element, nodeset)
+        resSwitch = switchFormat(element, nodeset, resGrendel)
       } else if (nodeset[0] === "pdu") {
         resPdu = pduFormat(element, nodeset)
       }

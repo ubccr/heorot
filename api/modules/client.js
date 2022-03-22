@@ -1,5 +1,32 @@
 function pduFormat(grendel, nodeset) {}
-function switchFormat(grendel, nodeset) {}
+function switchFormat(grendel, nodeset, rackGrendel) {
+  let ip = grendel.interfaces[0].ip.split(".")
+  let vlan = ip[2]
+  let ports = []
+
+  rackGrendel.forEach((val, index) => {
+    val.interfaces.forEach((element, index) => {
+      let ip = element.ip.split(".")
+      if (element.ip === vlan)
+        interfaceIps[ip[3]].push({
+          node: val.name,
+          interface: element.fqdn,
+          ip: element.ip,
+          port: ip[3],
+          index: index,
+        })
+    })
+  })
+  return {
+    u: parseInt(nodeset[2]),
+    node: grendel.name,
+    ports: ports,
+    tags: grendel.tags,
+    height: 1,
+    width: 1,
+    type: "switch",
+  }
+}
 
 function nodeFormat(grendel, nodeset) {
   let height = 1
