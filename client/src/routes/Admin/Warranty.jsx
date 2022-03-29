@@ -10,12 +10,12 @@ import { useQuery } from "react-query"
 
 import Header from "../../components/Header"
 import BgContainer from "../../components/BgContainer"
-import AlertC from "../../components/AlertC"
 import { useState } from "react"
+import { useSnackbar } from "notistack"
 
 const Warranty = () => {
   const [tags, setTags] = useState("")
-  const [openAlert, setOpenAlert] = useState(false)
+  const { enqueueSnackbar } = useSnackbar()
 
   const query = useQuery(["warranty", tags], queryFunction, {
     enabled: !!tags,
@@ -24,7 +24,6 @@ const Warranty = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setOpenAlert(false)
     setTags(e.currentTarget.tags.value)
   }
 
@@ -34,7 +33,7 @@ const Warranty = () => {
         `http://${window.location.hostname}:3030/warranty/add/${queryKey[1]}`
       )
     ).json()
-    setOpenAlert(true)
+    enqueueSnackbar(res.message, { variant: res.color })
     return res
   }
 
@@ -60,14 +59,6 @@ const Warranty = () => {
           <Box sx={{ margin: "20px" }}>
             <LinearProgress />
           </Box>
-        )}
-        {query.isFetched && (
-          <AlertC
-            color={query.data.color}
-            message={query.data.message}
-            openAlert={openAlert}
-            setOpenAlert={setOpenAlert}
-          />
         )}
       </BgContainer>
     </Box>
