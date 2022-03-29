@@ -33,6 +33,9 @@ const Index = () => {
           let data = response.result[0]
           data.provision = response.result[0].provision.toString()
 
+          data.interfaces.forEach((val, index) => {
+            if (val.fqdn.substring(0, 3) === "bmc") setBMC(val.fqdn)
+          })
           setApiData(data)
           setLoading(false)
         }
@@ -63,13 +66,8 @@ const Index = () => {
   }
 
   const handleResetBMC = () => {
-    let bmc = null
-    apiData.interfaces.forEach((val, index) => {
-      if (val.fqdn.substring(0, 3) === "bmc") bmc = val.fqdn
-      setBMC(val.fqdn)
-    })
     fetch(
-      `http://${window.location.hostname}:3030/redfish/actions/resetBMC/${bmc}`
+      `http://${window.location.hostname}:3030/redfish/actions/resetBMC/${BMC}`
     )
       .then((res) => res.json())
       .then((result) => {
@@ -123,7 +121,7 @@ const Index = () => {
           <GridC heading="Firmware:" data={apiData.firmware} />
           <Interfaces data={apiData.interfaces} />
           <GridC heading="Boot Image:" data={apiData.boot_image} />
-          <Console node={node} />
+          <Console node={node} BMC={BMC} />
 
           <Grid
             container

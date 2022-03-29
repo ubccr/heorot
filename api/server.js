@@ -66,7 +66,8 @@ io.on("connection", function (socket) {
           var conn = new SSHClient()
           conn
             .on("ready", function () {
-              socket.emit("data", "\r\n Connected to SSH Session: \r\n")
+              socket.emit("clear", true)
+              socket.emit("data", "\r\n Connected to SSH Session: \r\n \r\n")
               conn.shell(function (err, stream) {
                 if (err)
                   return socket.emit(

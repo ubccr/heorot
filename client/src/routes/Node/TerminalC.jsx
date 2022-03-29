@@ -37,6 +37,9 @@ const TerminalC = ({ node, BMC }) => {
           socket.on("data", function (data) {
             terminal.write(data)
           })
+          socket.on("clear", function (data) {
+            if (data === true) terminal.clear()
+          })
 
           socket.on("disconnect", function () {
             terminal.write("\r\n Disconnected from WebSocket.. \r\n")
