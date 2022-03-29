@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { Alert, Box, Button, Grid, Snackbar, Typography } from "@mui/material"
+import { Box, Button, Grid, Typography } from "@mui/material"
+import { useSnackbar } from "notistack"
 
 import GridC from "./GridC"
-import AccordianC from "./AccordianC"
 import Interfaces from "./Interfaces"
 import TableC from "./TableC"
 import WarrantyDisplay from "./WarrantyDisplay"
@@ -18,12 +18,7 @@ const Index = () => {
   const [BMC, setBMC] = useState("")
 
   const [loading, setLoading] = useState(true)
-  const [openSEL, setOpenSEL] = useState(false)
-  const [messageSEL, setMessageSEL] = useState({
-    status: "",
-    message: "",
-    color: "info",
-  })
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     fetch(`http://${window.location.hostname}:3030/client/node/${node}`)
@@ -52,17 +47,9 @@ const Index = () => {
     )
       .then((res) => res.json())
       .then((result) => {
-        setMessageSEL(result)
-        setOpenSEL(true)
+        console.log(result)
+        enqueueSnackbar(result.message, { variant: result.color })
       })
-  }
-
-  const handleSELSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return
-    }
-
-    setOpenSEL(false)
   }
 
   const handleResetBMC = () => {
@@ -71,8 +58,7 @@ const Index = () => {
     )
       .then((res) => res.json())
       .then((result) => {
-        setMessageSEL(result)
-        setOpenSEL(true)
+        enqueueSnackbar(result.message, { variant: result.color })
       })
   }
 
@@ -159,16 +145,6 @@ const Index = () => {
           </Grid>
 
           <WarrantyDisplay node={node} bmc={BMC} />
-
-          <Snackbar
-            open={openSEL}
-            autoHideDuration={4000}
-            onClose={handleSELSnackbarClose}
-          >
-            <Alert severity={messageSEL.color} onClose={handleSELSnackbarClose}>
-              {messageSEL.message}
-            </Alert>
-          </Snackbar>
 
           <br />
           <TableC node={node} />
