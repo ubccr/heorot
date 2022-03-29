@@ -68,7 +68,7 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
           })
         else
           enqueueSnackbar(
-            method + " tags failed. Response: " + result.response.message + " ",
+            method + " tags error. Response: " + result.response.message + " ",
             { variant: "error" }
           )
       }

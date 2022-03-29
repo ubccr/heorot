@@ -8,12 +8,12 @@ function auth(req, res, next) {
     if (!token) {
       return res
         .status(403)
-        .send({ status: "failed", message: "No auth token provided" })
+        .send({ status: "error", message: "No auth token provided" })
     }
     jwt.verify(token, process.env.API_JWT_SECRET, (err, decoded) => {
       if (err) {
         return res.status(401).send({
-          status: "failed",
+          status: "error",
           message: "Authorization failed. Please login again",
         })
       }

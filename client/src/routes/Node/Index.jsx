@@ -47,7 +47,6 @@ const Index = () => {
     )
       .then((res) => res.json())
       .then((result) => {
-        console.log(result)
         enqueueSnackbar(result.message, { variant: result.color })
       })
   }

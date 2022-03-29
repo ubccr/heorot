@@ -82,7 +82,7 @@ app.get("/add/:tags", async (req, res) => {
         Warranty.collection.insertMany(data, function (err, warranty) {
           if (err)
             res.json({
-              status: "failed",
+              status: "error",
               message: "An error occured while saving to the DB",
               color: "error",
               err,
@@ -99,7 +99,7 @@ app.get("/add/:tags", async (req, res) => {
       }
     } else {
       res.json({
-        status: "failed",
+        status: "error",
         message: "No new nodes were added to the DB",
         color: "error",
       })
@@ -113,7 +113,7 @@ app.get("/get/:node", async (req, res) => {
   Warranty.findOne({ nodeName: node }, function (err, node) {
     if (err) {
       res.json({
-        status: "failed",
+        status: "error",
         message: "An error occured while accessing the DB",
         color: "error",
         err,
@@ -150,7 +150,7 @@ app.get("/get/:node", async (req, res) => {
         res.json(result)
       } else {
         res.json({
-          status: "failed",
+          status: "error",
           message: "Warranty information for node not found",
         })
       }

@@ -18,7 +18,7 @@ const Provision = ({ node, data, refetch, setRefetch }) => {
       enqueueSnackbar(`${node} successfully updated`, { variant: "success" })
     } else {
       enqueueSnackbar(
-        `Node provision change Failed. Response: ${result.response.message}`,
+        `Node provision change error. Response: ${result.response.message}`,
         { variant: "error" }
       )
     }

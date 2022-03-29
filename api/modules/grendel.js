@@ -25,13 +25,13 @@ async function grendelRequest(path, method = "GET", body = {}) {
   } catch (err) {
     if (err.code === "ENOENT" && err.response === undefined) {
       return {
-        grendelResponse: "failed",
+        grendelResponse: "error",
         response: { message: "Connection to API failed" },
         code: err.code,
       }
     } else {
       return {
-        grendelResponse: "failed",
+        grendelResponse: "error",
         response: JSON.parse(err.response.body),
         code: err.code,
       }

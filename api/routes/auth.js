@@ -35,7 +35,7 @@ app.post("/signup", async (req, res) => {
       // send status with err
       if (err)
         res.json({
-          status: "failed",
+          status: "error",
           message: "An error occured while saving to the DB",
           err,
         })
@@ -46,7 +46,7 @@ app.post("/signup", async (req, res) => {
           user: user.username,
         })
     })
-  } else res.json({ status: "failed", message: "User already exists" })
+  } else res.json({ status: "error", message: "User already exists" })
 })
 
 app.post("/signin", async (req, res) => {
@@ -61,14 +61,14 @@ app.post("/signin", async (req, res) => {
       })
       res.send({
         status: "success",
-        message: "User successfully logged in",
+        message: `Welcome ${username}, Successfully logged in`,
         privileges: query.privileges,
         accessToken: token,
         background: query.background,
         theme: query.theme,
       })
-    } else res.json({ status: "failed", message: "Password incorrect" })
-  } else res.json({ status: "failed", message: "Username not found" })
+    } else res.json({ status: "error", message: "Password incorrect" })
+  } else res.json({ status: "error", message: "Username not found" })
 })
 app.post("/setTheme", auth, async (req, res) => {
   const theme = req.body.theme
@@ -83,7 +83,7 @@ app.post("/setTheme", auth, async (req, res) => {
     })
   } catch (err) {
     res.json({
-      status: "failed",
+      status: "error",
       message: "DB connection error",
       error,
     })

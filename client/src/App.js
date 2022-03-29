@@ -93,7 +93,7 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
-          <SnackbarProvider maxStack={3}>
+          <SnackbarProvider maxSnack={3}>
             <UserContext.Provider value={[user, setUser]}>
               <ThemeContext.Provider value={[mode, setMode]}>
                 <Paper

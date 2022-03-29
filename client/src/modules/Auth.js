@@ -18,7 +18,7 @@ export async function signin(username, password) {
       localStorage.setItem("user", JSON.stringify(data))
     return data
   } catch (error) {
-    return { status: "failed", message: "API call failed", error }
+    return { status: "error", message: "API call failed", error }
   }
 }
 
@@ -39,7 +39,7 @@ export async function signup(username, password) {
     let data = await response.json()
     return data
   } catch (error) {
-    return { status: "failed", message: "API call failed", error }
+    return { status: "error", message: "API call failed", error }
   }
 }
 

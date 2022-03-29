@@ -70,8 +70,8 @@ app.get("/nodes", async (req, res) => {
     res.json({ status: "success", result: { warningNodes, criticalNodes } })
   } else {
     res.json({
-      status: "failed",
-      message: "OME API call failed",
+      status: "error",
+      message: "OME API call error",
       error: warningRes,
       criticalRes,
     })
@@ -87,7 +87,7 @@ app.get("/health/:id", async (req, res) => {
     ")/SubSystemHealth"
 
   json = await apiRequest(url, omeHeader)
-  let output = { status: "failed", result: {} }
+  let output = { status: "error", result: {} }
   if (json.status === "success") {
     output.status = "success"
     let list = json.result
@@ -130,7 +130,7 @@ async function apiRequest(url, http_header) {
   } catch (error) {
     console.error(error)
     return {
-      status: "failed",
+      status: "error",
       message: "API Request error",
       error,
     }

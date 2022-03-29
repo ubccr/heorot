@@ -31,7 +31,7 @@ const SELCustom = ({ data, node, type, icon }) => {
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success") setSel(result.result)
-          else if (result.status === "failed") setSelError(result.message)
+          else if (result.status === "error") setSelError(result.message)
 
           setSelLoading(false)
         })
