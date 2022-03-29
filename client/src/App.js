@@ -10,6 +10,7 @@ import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
 import PrivateRoute from "./components/PrivateRoute"
 import { QueryClient, QueryClientProvider } from "react-query"
+import { SnackbarProvider } from "notistack"
 
 import largeTriangles from "./backgrounds/large-triangles.svg"
 import darkTriangles from "./backgrounds/large-triangles-dark.svg"
@@ -92,50 +93,52 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
-          <UserContext.Provider value={[user, setUser]}>
-            <ThemeContext.Provider value={[mode, setMode]}>
-              <Paper
-                sx={{
-                  bgcolor: "background.default",
-                  minHeight: "100vh",
-                  maxHeight: "max-content",
-                  backgroundImage: theme.palette.background.img,
-                }}
-              >
-                <AppBarC />
-                <Container>
-                  <Routes>
-                    <Route exact path="/" element={<Home />} />
-                    <Route path="/Login" element={<Login />} />
-                    <Route path="/Signup" element={<Signup />} />
-                    <Route path="/Profile" element={<Profile />} />
-                    <Route path="/Signout" element={<Signout />} />
+          <SnackbarProvider maxStack={3}>
+            <UserContext.Provider value={[user, setUser]}>
+              <ThemeContext.Provider value={[mode, setMode]}>
+                <Paper
+                  sx={{
+                    bgcolor: "background.default",
+                    minHeight: "100vh",
+                    maxHeight: "max-content",
+                    backgroundImage: theme.palette.background.img,
+                  }}
+                >
+                  <AppBarC />
+                  <Container>
+                    <Routes>
+                      <Route exact path="/" element={<Home />} />
+                      <Route path="/Login" element={<Login />} />
+                      <Route path="/Signup" element={<Signup />} />
+                      <Route path="/Profile" element={<Profile />} />
+                      <Route path="/Signout" element={<Signout />} />
 
-                    <Route path="/FloorPlan" element={<FloorPlan />} />
-                    <Route path="/Rack/:rack" element={<Rack />} />
-                    <Route path="/Alerts" element={<Alerts />} />
+                      <Route path="/FloorPlan" element={<FloorPlan />} />
+                      <Route path="/Rack/:rack" element={<Rack />} />
+                      <Route path="/Alerts" element={<Alerts />} />
 
-                    <Route
-                      path="/Node/:node"
-                      element={
-                        <PrivateRoute access="user">
-                          <Node />{" "}
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/Admin/Warranty"
-                      element={
-                        <PrivateRoute access="admin">
-                          <Warranty />{" "}
-                        </PrivateRoute>
-                      }
-                    />
-                  </Routes>
-                </Container>
-              </Paper>
-            </ThemeContext.Provider>
-          </UserContext.Provider>
+                      <Route
+                        path="/Node/:node"
+                        element={
+                          <PrivateRoute access="user">
+                            <Node />{" "}
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/Admin/Warranty"
+                        element={
+                          <PrivateRoute access="admin">
+                            <Warranty />{" "}
+                          </PrivateRoute>
+                        }
+                      />
+                    </Routes>
+                  </Container>
+                </Paper>
+              </ThemeContext.Provider>
+            </UserContext.Provider>
+          </SnackbarProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </>
