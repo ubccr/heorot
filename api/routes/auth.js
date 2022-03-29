@@ -74,13 +74,20 @@ app.post("/setTheme", auth, async (req, res) => {
   const theme = req.body.theme
   const userId = req.userId
 
-  let query = await User.updateOne({ id: userId }, { theme: theme }).exec()
-  console.log(query)
-  res.send({
-    status: "success",
-    message: "Theme successfully updated",
-    theme: theme,
-  })
+  try {
+    let query = await User.updateOne({ id: userId }, { theme: theme }).exec()
+    res.send({
+      status: "success",
+      message: "Theme successfully updated",
+      theme: theme,
+    })
+  } catch (err) {
+    res.json({
+      status: "failed",
+      message: "DB connection error",
+      error,
+    })
+  }
 })
 
 module.exports = app
