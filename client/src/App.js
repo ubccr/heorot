@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom"
 import { Container, createTheme, Paper, ThemeProvider } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import "./App.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -38,8 +38,32 @@ function App() {
       },
     },
   })
-  // TODO: verify user token validity on page load
+
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")))
+
+  useEffect(() => {
+    if (user !== null) {
+      const payload = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          "x-access-token": user.accessToken,
+        }),
+      }
+      fetch(`http://${window.location.hostname}:3030/auth/verifyToken`, payload)
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.status === "error") {
+            console.log("token cleared")
+            setUser(null)
+            localStorage.clear("user")
+          }
+        })
+    }
+  }, [])
+
   let userTheme = "light"
   if (user) userTheme = user.theme
   const [mode, setMode] = useState(userTheme)

@@ -70,6 +70,11 @@ app.post("/signin", async (req, res) => {
     } else res.json({ status: "error", message: "Password incorrect" })
   } else res.json({ status: "error", message: "Username not found" })
 })
+
+app.post("/verifyToken", auth, async (req, res) => {
+  res.json({ status: "success", message: "Token is valid" })
+})
+
 app.post("/setTheme", auth, async (req, res) => {
   const theme = req.body.theme
   const userId = req.userId
