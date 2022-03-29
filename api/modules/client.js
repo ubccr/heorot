@@ -7,14 +7,19 @@ function switchFormat(grendel, nodeset, rackGrendel) {
   rackGrendel.forEach((val, index) => {
     val.interfaces.forEach((element, index) => {
       let ip = element.ip.split(".")
-      if (element.ip === vlan)
-        interfaceIps[ip[3]].push({
+      if (ip[2] === vlan && val.name !== grendel.name) {
+        if (ports[ip[3]] == null) ports[ip[3]] = []
+        let bmc = false
+        if (element.fqdn.substring(0, 3) === "bmc") bmc = true
+        ports[ip[3]].push({
           node: val.name,
           interface: element.fqdn,
           ip: element.ip,
-          port: ip[3],
+          port: parseInt(ip[3]),
           index: index,
+          bmc: bmc,
         })
+      }
     })
   })
   return {

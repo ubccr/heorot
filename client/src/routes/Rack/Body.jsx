@@ -1,9 +1,70 @@
-import { TableRow, TableCell, Table, TableBody } from "@mui/material"
+import {
+  TableRow,
+  TableCell,
+  Table,
+  TableBody,
+  TableContainer,
+  Button,
+  Tooltip,
+  Zoom,
+} from "@mui/material"
 import { Link } from "react-router-dom"
+
 const Body = ({ array }) => {
   let html = []
   let style = {}
 
+  const switchGen = (element, index, pos) => {
+    if (element !== null) {
+      let interfaceDisplay = ""
+      let tmp = element.find((el) => {
+        if (el.bmc === false && element.length > 1) return true
+      })
+      let bmcName = element[0].interface.split(".")
+      if (tmp === undefined) interfaceDisplay = bmcName[0]
+      else interfaceDisplay = tmp.node
+
+      return (
+        <TableCell
+          key={index}
+          style={{
+            width: "30px",
+            padding: "3px",
+          }}
+        >
+          <Tooltip
+            arrow
+            title={`${interfaceDisplay}`}
+            placement={pos}
+            TransitionComponent={Zoom}
+          >
+            <Button
+              variant="outlined"
+              component={Link}
+              to={`/Node/${element[0].node}`}
+              sx={{ minWidth: "30px", width: "30px" }}
+              size="small"
+            >
+              {index}
+            </Button>
+          </Tooltip>
+        </TableCell>
+      )
+    } else
+      return (
+        <TableCell
+          key={index}
+          align="center"
+          style={{
+            minWidth: "30px",
+            width: "30px",
+            padding: "3px",
+          }}
+        >
+          {index}
+        </TableCell>
+      )
+  }
   array.forEach((val, index) => {
     if (val.type === "rowSpan") {
       html[val.u] = (
@@ -72,6 +133,31 @@ const Body = ({ array }) => {
             <TableCell align={"center"}>{val.u}</TableCell>
             <TableCell align={"center"} sx={{ ...style }} rowSpan={val.height}>
               <Link to={`/Node/${val.node}`}>{val.node}</Link>
+            </TableCell>
+          </TableRow>
+        )
+      }
+    } else if (val.type === "switch") {
+      if (val.ports.length > 0) {
+        let switchHtmlTop = []
+        let switchHtmlBottom = []
+
+        val.ports.forEach((element, index) => {
+          if (index % 2) switchHtmlTop.push(switchGen(element, index, "top"))
+          else switchHtmlBottom.push(switchGen(element, index, "bottom"))
+        })
+        html[val.u] = (
+          <TableRow key={val.u}>
+            <TableCell align={"center"}>{val.u}</TableCell>
+            <TableCell style={{ maxWidth: "200px" }}>
+              <TableContainer>
+                <Table>
+                  <TableBody>
+                    <TableRow>{switchHtmlTop}</TableRow>
+                    <TableRow>{switchHtmlBottom}</TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </TableCell>
           </TableRow>
         )
