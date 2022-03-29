@@ -12,6 +12,8 @@ import {
   Fade,
   Backdrop,
   TableContainer,
+  DialogContent,
+  Dialog,
 } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
@@ -171,56 +173,22 @@ const TableC = ({ node }) => {
             </Table>
           </TableContainer>
           <div>
-            <Modal
-              aria-labelledby="transition-modal-title"
-              aria-describedby="transition-modal-description"
-              open={openSEL}
-              onClose={handleCloseSEL}
-              closeAfterTransition
-              BackdropComponent={Backdrop}
-              BackdropProps={{
-                timeout: 500,
-              }}
-            >
-              <Fade in={openSEL}>
+            <Dialog open={openSEL} onClose={handleCloseSEL} maxWidth="xl">
+              <DialogContent>
+                <SELTable data={apiData.selRes.sel.entries} />
                 <Box
                   sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    bgcolor: "background.default",
-                    color: "text.primary",
-                    borderRadius: "15px",
-                    boxShadow: 24,
-                    width: "85%",
-                    height: "90%",
-                    overflowY: "scroll",
+                    marginTop: "20px",
+                    display: "flex",
+                    justifyContent: "flex-end",
                   }}
                 >
-                  <Box
-                    sx={{
-                      bgcolor: "background.main",
-                      borderRadius: "15px",
-                      p: 4,
-                    }}
-                  >
-                    <SELTable data={apiData.selRes.sel.entries} />
-                    <Box
-                      sx={{
-                        marginTop: "20px",
-                        display: "flex",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <Button onClick={handleCloseSEL} variant="outlined">
-                        Close
-                      </Button>
-                    </Box>
-                  </Box>
+                  <Button onClick={handleCloseSEL} variant="outlined">
+                    Close
+                  </Button>
                 </Box>
-              </Fade>
-            </Modal>
+              </DialogContent>
+            </Dialog>
           </div>
         </>
       )}

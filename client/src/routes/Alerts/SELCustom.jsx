@@ -8,6 +8,8 @@ import {
   Box,
   LinearProgress,
   Alert,
+  Dialog,
+  DialogContent,
 } from "@mui/material"
 import { useEffect, useState } from "react"
 import { useQuery } from "react-query"
@@ -66,62 +68,30 @@ const SELCustom = ({ data, node, type, icon }) => {
           </Tooltip>
         </Button>
       </TableCell>
-      <Modal
-        open={openSEL}
-        onClose={handleCloseSEL}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
-      >
-        <Fade in={openSEL}>
+      <Dialog open={openSEL} onClose={handleCloseSEL} maxWidth="xl">
+        <DialogContent>
+          {selLoading && <LinearProgress />}
+          {!selLoading && selError === "" && (
+            <SELTable data={sel.selRes.sel.entries} />
+          )}
+          {!selLoading && selError !== "" && (
+            <Alert variant="outlined" severity="error">
+              {selError}
+            </Alert>
+          )}
           <Box
             sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              bgcolor: "background.default",
-              color: "text.primary",
-              borderRadius: "15px",
-              boxShadow: 24,
-              width: "85%",
-              height: "90%",
-              overflowY: "scroll",
+              marginTop: "20px",
+              display: "flex",
+              justifyContent: "flex-end",
             }}
           >
-            <Box
-              sx={{
-                bgcolor: "background.main",
-                borderRadius: "15px",
-                p: 4,
-              }}
-            >
-              {selLoading && <LinearProgress />}
-              {!selLoading && selError === "" && (
-                <SELTable data={sel.selRes.sel.entries} />
-              )}
-              {!selLoading && selError !== "" && (
-                <Alert variant="outlined" severity="error">
-                  {selError}
-                </Alert>
-              )}
-              <Box
-                sx={{
-                  marginTop: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <Button onClick={handleCloseSEL} variant="outlined">
-                  Close
-                </Button>
-              </Box>
-            </Box>
+            <Button onClick={handleCloseSEL} variant="outlined">
+              Close
+            </Button>
           </Box>
-        </Fade>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
