@@ -77,8 +77,9 @@ app.get("/rack/:rack", async (req, res) => {
         resSwitch = switchFormat(element, nodeset, resGrendel)
         nodes[resSwitch.u] = resSwitch
       } else if (nodeset[0] === "swi") {
-        nodes[nodeset[2]] = {
-          u: nodeset[2],
+        let u = parseInt(nodeset[2])
+        nodes[u] = {
+          u: u,
           node: element.name,
           ports: [],
           tags: [],

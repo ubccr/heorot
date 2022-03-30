@@ -27,6 +27,7 @@ const Body = ({ array }) => {
       return (
         <TableCell
           key={index}
+          align={"center"}
           style={{
             width: "30px",
             padding: "3px",
@@ -42,7 +43,7 @@ const Body = ({ array }) => {
               variant="outlined"
               component={Link}
               to={`/Node/${element[0].node}`}
-              sx={{ minWidth: "30px", width: "30px" }}
+              sx={{ minWidth: "35px", width: "35px" }}
               size="small"
             >
               {index}
