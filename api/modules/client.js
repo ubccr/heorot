@@ -3,11 +3,11 @@ function switchFormat(grendel, nodeset, rackGrendel) {
   let ip = grendel.interfaces[0].ip.split(".")
   let vlan = ip[2]
   let ports = []
-
   rackGrendel.forEach((val, index) => {
     val.interfaces.forEach((element, index) => {
       let ip = element.ip.split(".")
-      if (ip[2] === vlan && val.name !== grendel.name) {
+      const types = ["swi", "swe"]
+      if (ip[2] === vlan && !types.includes(val.name.substring(0, 3))) {
         if (ports[ip[3]] == null) ports[ip[3]] = []
         let bmc = false
         if (element.fqdn.substring(0, 3) === "bmc") bmc = true
@@ -22,6 +22,7 @@ function switchFormat(grendel, nodeset, rackGrendel) {
       }
     })
   })
+  if (ports.length > 0 && ports[47] === undefined) ports[47] = null
   return {
     u: parseInt(nodeset[2]),
     node: grendel.name,
