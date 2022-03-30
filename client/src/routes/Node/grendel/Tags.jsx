@@ -10,9 +10,9 @@ import { Box } from "@mui/system"
 import { useState, useContext } from "react"
 import { useSnackbar } from "notistack"
 
-import NewGridC from "./NewGridC"
+import NewGridC from "../components/NewGridC"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import { UserContext } from "../../contexts/UserContext"
+import { UserContext } from "../../../contexts/UserContext"
 
 const Tags = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()

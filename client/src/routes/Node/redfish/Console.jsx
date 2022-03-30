@@ -10,7 +10,7 @@ import {
 import { useState } from "react"
 
 import TerminalC from "./TerminalC"
-import NewGridC from "./NewGridC"
+import NewGridC from "../components/NewGridC"
 
 const Console = ({ node, BMC }) => {
   const [openDialog, setShowDialog] = useState(false)

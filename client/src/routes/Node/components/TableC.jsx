@@ -14,9 +14,9 @@ import {
 } from "@mui/material"
 import { useEffect, useState, useContext } from "react"
 import SELTable from "./SELTable"
-import IconC from "../../components/IconC"
-import ErrorC from "../../components/ErrorC"
-import { UserContext } from "../../contexts/UserContext"
+import IconC from "../../../components/IconC"
+import ErrorC from "../../../components/ErrorC"
+import { UserContext } from "../../../contexts/UserContext"
 
 const TableC = ({ node }) => {
   const [apiData, setApiData] = useState({})

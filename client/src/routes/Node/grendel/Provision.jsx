@@ -2,8 +2,8 @@ import { Button } from "@mui/material"
 import { Box } from "@mui/system"
 
 import { useSnackbar } from "notistack"
-import NewGridC from "./NewGridC"
-import { UserContext } from "../../contexts/UserContext"
+import NewGridC from "../components/NewGridC"
+import { UserContext } from "../../../contexts/UserContext"
 import { useContext } from "react"
 
 const Provision = ({ node, data, refetch, setRefetch }) => {

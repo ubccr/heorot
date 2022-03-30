@@ -4,13 +4,13 @@ import { Box, Button, Grid, Typography } from "@mui/material"
 import { useSnackbar } from "notistack"
 import { UserContext } from "../../contexts/UserContext"
 
-import GridC from "./GridC"
-import Interfaces from "./Interfaces"
-import TableC from "./TableC"
-import WarrantyDisplay from "./WarrantyDisplay"
-import Provision from "./Provision"
-import Tags from "./Tags"
-import Console from "./Console"
+import Interfaces from "./grendel/Interfaces"
+import TableC from "./components/TableC"
+import WarrantyDisplay from "./redfish/WarrantyDisplay"
+import Provision from "./grendel/Provision"
+import Tags from "./grendel/Tags"
+import Console from "./redfish/Console"
+import NewGridC from "./components/NewGridC"
 
 const Index = () => {
   const { node } = useParams()
@@ -130,9 +130,17 @@ const Index = () => {
             refetch={refetch}
             setRefetch={setRefetch}
           />
-          <GridC heading="Firmware:" data={apiData.firmware} />
+          <NewGridC heading="Firmware:">
+            <Box sx={{ textAlign: "end", marginRight: "10px" }}>
+              {apiData.firmware}
+            </Box>
+          </NewGridC>
           <Interfaces data={apiData.interfaces} />
-          <GridC heading="Boot Image:" data={apiData.boot_image} />
+          <NewGridC heading="Boot Image:">
+            <Box sx={{ textAlign: "end", marginRight: "10px" }}>
+              {apiData.boot_image}
+            </Box>
+          </NewGridC>
 
           {simple && (
             <>

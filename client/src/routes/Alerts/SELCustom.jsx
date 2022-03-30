@@ -15,7 +15,7 @@ import { useEffect, useState, useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
 
 // FIXME: This is temporary
-import SELTable from "../Node/SELTable"
+import SELTable from "../Node/components/SELTable"
 
 const SELCustom = ({ data, node, type, icon }) => {
   const [openSEL, setOpenSEL] = useState(false)

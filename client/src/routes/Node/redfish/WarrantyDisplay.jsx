@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import { useQuery } from "react-query"
 import { Grid, Typography } from "@mui/material"
-import { UserContext } from "../../contexts/UserContext"
+import { UserContext } from "../../../contexts/UserContext"
 
 const WarrantyDisplay = ({ node }) => {
   const [user, setUser] = useContext(UserContext)
