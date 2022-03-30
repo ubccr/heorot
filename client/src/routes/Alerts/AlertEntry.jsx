@@ -3,16 +3,25 @@ import { Link } from "react-router-dom"
 import { useQuery } from "react-query"
 import NodeCellC from "./NodeCellC"
 import SELCustom from "./SELCustom"
+import { useContext } from "react"
+import { UserContext } from "../../contexts/UserContext"
 
 const AlertEntry = ({ data }) => {
   //   const [systemHealth, setSystemHealth] = useState()
   //   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useContext(UserContext)
 
   let id = data.id
   const result = useQuery(["alert", id], async () => {
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
     const res = await (
       await fetch(
-        `http://${window.location.hostname}:3030/openmanage/health/${id}`
+        `http://${window.location.hostname}:3030/openmanage/health/${id}`,
+        payload
       )
     ).json()
     return res

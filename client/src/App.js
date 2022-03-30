@@ -54,7 +54,6 @@ function App() {
       fetch(`http://${window.location.hostname}:3030/auth/verifyToken`, payload)
         .then((res) => res.json())
         .then((result) => {
-          console.log(result)
           if (result.status === "error") {
             setUser(null)
             setMode("light")

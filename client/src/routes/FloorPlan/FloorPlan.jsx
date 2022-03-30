@@ -11,8 +11,9 @@ import {
   Button,
   LinearProgress,
 } from "@mui/material"
-import React, { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { Link } from "react-router-dom"
+import { UserContext } from "../../contexts/UserContext"
 
 const FloorPlan = () => {
   const floorX = [..."defghijklmnopqrstuvw"]
@@ -57,12 +58,19 @@ const FloorPlan = () => {
   const [cols, setCols] = useState([])
   const [Nodes, setNodes] = useState()
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useContext(UserContext)
 
   useEffect(() => {
     setRows(createRows(floorX))
     setCols(createCols(floorY))
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+      allowUnauthorized: true,
+    }
     const url = `http://${window.location.hostname}:3030/grendel/host/list`
-    fetch(url, { allowUnauthorized: true })
+    fetch(url, payload)
       .then((res) => res.json())
       .then((response) => {
         setNodes(response.response)

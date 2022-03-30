@@ -3,16 +3,23 @@ import { Box } from "@mui/system"
 
 import { useSnackbar } from "notistack"
 import NewGridC from "./NewGridC"
+import { UserContext } from "../../contexts/UserContext"
+import { useContext } from "react"
 
 const Provision = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()
+  const [user, setUser] = useContext(UserContext)
 
   const handleClick = async () => {
     let url = `http://${window.location.hostname}:3030/grendel/provision/${node}`
     if (data === "true")
       url = `http://${window.location.hostname}:3030/grendel/unprovision/${node}`
-
-    let result = await (await fetch(url)).json()
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
+    let result = await (await fetch(url, payload)).json()
 
     if (result.grendelResponse === "success" && result.response.hosts === 1) {
       enqueueSnackbar(`${node} successfully updated`, { variant: "success" })

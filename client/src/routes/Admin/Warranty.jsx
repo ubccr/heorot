@@ -10,12 +10,14 @@ import { useQuery } from "react-query"
 
 import Header from "../../components/Header"
 import BgContainer from "../../components/BgContainer"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { useSnackbar } from "notistack"
+import { UserContext } from "../../contexts/UserContext"
 
 const Warranty = () => {
   const [tags, setTags] = useState("")
   const { enqueueSnackbar } = useSnackbar()
+  const [user, setUser] = useContext(UserContext)
 
   const query = useQuery(["warranty", tags], queryFunction, {
     enabled: !!tags,
@@ -28,9 +30,15 @@ const Warranty = () => {
   }
 
   async function queryFunction({ queryKey }) {
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
     const res = await (
       await fetch(
-        `http://${window.location.hostname}:3030/warranty/add/${queryKey[1]}`
+        `http://${window.location.hostname}:3030/warranty/add/${queryKey[1]}`,
+        payload
       )
     ).json()
     enqueueSnackbar(res.message, { variant: res.color })

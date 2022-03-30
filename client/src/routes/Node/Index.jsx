@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
 import { useSnackbar } from "notistack"
+import { UserContext } from "../../contexts/UserContext"
 
 import GridC from "./GridC"
 import Interfaces from "./Interfaces"
@@ -16,12 +17,21 @@ const Index = () => {
   const [apiData, setApiData] = useState()
   const [refetch, setRefetch] = useState(false)
   const [BMC, setBMC] = useState("")
+  const [user, setUser] = useContext(UserContext)
 
   const [loading, setLoading] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:3030/client/node/${node}`)
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
+    fetch(
+      `http://${window.location.hostname}:3030/client/node/${node}`,
+      payload
+    )
       .then((res) => res.json())
       .then((response) => {
         if (response.status === "success") {
@@ -42,8 +52,14 @@ const Index = () => {
     apiData.interfaces.forEach((val, index) => {
       if (val.fqdn.substring(0, 3) === "bmc") bmc = val.fqdn
     })
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
     fetch(
-      `http://${window.location.hostname}:3030/redfish/actions/clearSEL/${bmc}`
+      `http://${window.location.hostname}:3030/redfish/actions/clearSEL/${bmc}`,
+      payload
     )
       .then((res) => res.json())
       .then((result) => {
@@ -52,8 +68,14 @@ const Index = () => {
   }
 
   const handleResetBMC = () => {
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
     fetch(
-      `http://${window.location.hostname}:3030/redfish/actions/resetBMC/${BMC}`
+      `http://${window.location.hostname}:3030/redfish/actions/resetBMC/${BMC}`,
+      payload
     )
       .then((res) => res.json())
       .then((result) => {

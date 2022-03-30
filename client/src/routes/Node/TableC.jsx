@@ -8,26 +8,32 @@ import {
   TableBody,
   LinearProgress,
   Typography,
-  Modal,
-  Fade,
-  Backdrop,
   TableContainer,
   DialogContent,
   Dialog,
 } from "@mui/material"
-import { DataGrid } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import SELTable from "./SELTable"
 import IconC from "../../components/IconC"
 import ErrorC from "../../components/ErrorC"
+import { UserContext } from "../../contexts/UserContext"
 
 const TableC = ({ node }) => {
   const [apiData, setApiData] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [user, setUser] = useContext(UserContext)
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:3030/redfish/dell/${node}`)
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
+    fetch(
+      `http://${window.location.hostname}:3030/redfish/dell/${node}`,
+      payload
+    )
       .then((res) => res.json())
       .then((response) => {
         if (response.status === "success") {

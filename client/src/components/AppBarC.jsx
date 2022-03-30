@@ -36,9 +36,9 @@ const AppBarC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-access-token": userD.accessToken,
         },
         body: JSON.stringify({
-          "x-access-token": userD.accessToken,
           theme: newMode,
         }),
       }

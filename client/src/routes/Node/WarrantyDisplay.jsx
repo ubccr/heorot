@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from "react"
-import GridC from "./GridC"
+import { useContext } from "react"
 import { useQuery } from "react-query"
-import { Divider, Grid, Typography } from "@mui/material"
+import { Grid, Typography } from "@mui/material"
+import { UserContext } from "../../contexts/UserContext"
 
 const WarrantyDisplay = ({ node }) => {
+  const [user, setUser] = useContext(UserContext)
+
   const query = useQuery(
     "warranty",
     async () => {
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+      }
       const res = await (
         await fetch(
-          `http://${window.location.hostname}:3030/warranty/get/${node}`
+          `http://${window.location.hostname}:3030/warranty/get/${node}`,
+          payload
         )
       ).json()
       return res

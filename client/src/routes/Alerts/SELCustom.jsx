@@ -11,8 +11,8 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material"
-import { useEffect, useState } from "react"
-import { useQuery } from "react-query"
+import { useEffect, useState, useContext } from "react"
+import { UserContext } from "../../contexts/UserContext"
 
 // FIXME: This is temporary
 import SELTable from "../Node/SELTable"
@@ -24,10 +24,19 @@ const SELCustom = ({ data, node, type, icon }) => {
   const [sel, setSel] = useState(null)
   const [selLoading, setSelLoading] = useState(true)
   const [selError, setSelError] = useState("")
+  const [user, setUser] = useContext(UserContext)
 
   useEffect(() => {
     if (node !== undefined) {
-      fetch(`http://${window.location.hostname}:3030/redfish/sel/${node}`)
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+      }
+      fetch(
+        `http://${window.location.hostname}:3030/redfish/sel/${node}`,
+        payload
+      )
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success") setSel(result.result)

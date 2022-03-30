@@ -1,5 +1,7 @@
 import { useParams } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import { UserContext } from "../../contexts/UserContext"
+
 import {
   Container,
   Paper,
@@ -17,12 +19,21 @@ import Body from "./Body.jsx"
 
 const Rack = () => {
   const { rack } = useParams()
+  const [user, setUser] = useContext(UserContext)
 
   const [isRackLoading, setIsRackLoading] = useState(true)
   const [rows, setRows] = useState()
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:3030/client/rack/${rack}`)
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
+    fetch(
+      `http://${window.location.hostname}:3030/client/rack/${rack}`,
+      payload
+    )
       .then((res) => res.json())
       .then((response) => {
         setRows(response.result.nodes)

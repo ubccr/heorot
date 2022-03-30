@@ -7,16 +7,18 @@ import {
   TextField,
 } from "@mui/material"
 import { Box } from "@mui/system"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { useSnackbar } from "notistack"
 
 import NewGridC from "./NewGridC"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import { UserContext } from "../../contexts/UserContext"
 
 const Tags = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()
   const [tags, setTags] = useState(data)
   const [addTag, setAddTag] = useState("")
+  const [user, setUser] = useContext(UserContext)
 
   const handleDelete = (removedTag) => () => {
     setTags((chips) => chips.filter((chip) => chip !== removedTag))
@@ -61,7 +63,12 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
             window.location.hostname
           }:3030/grendel/untag/${node}/${tags.join(",")}`
         }
-        let result = await (await fetch(url)).json()
+        let payload = {
+          headers: {
+            "x-access-token": user.accessToken,
+          },
+        }
+        let result = await (await fetch(url, payload)).json()
         if (result.grendelResponse === "success")
           enqueueSnackbar(method + "ed: [" + result.response.tags + "] ", {
             variant: "success",

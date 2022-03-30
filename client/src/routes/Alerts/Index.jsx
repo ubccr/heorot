@@ -11,11 +11,23 @@ import {
 } from "@mui/material"
 import AlertEntry from "./AlertEntry"
 import { useQuery } from "react-query"
+import { useContext } from "react"
+import { UserContext } from "../../contexts/UserContext"
 
 const Index = () => {
+  const [user, setUser] = useContext(UserContext)
+
   const query = useQuery("nodes", async () => {
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+    }
     const res = await (
-      await fetch(`http://${window.location.hostname}:3030/openmanage/nodes`)
+      await fetch(
+        `http://${window.location.hostname}:3030/openmanage/nodes`,
+        payload
+      )
     ).json()
     return res
   })
