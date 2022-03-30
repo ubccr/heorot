@@ -47,17 +47,17 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
           "x-access-token": user.accessToken,
-        }),
+        },
+        body: JSON.stringify({}),
       }
       fetch(`http://${window.location.hostname}:3030/auth/verifyToken`, payload)
         .then((res) => res.json())
         .then((result) => {
+          console.log(result)
           if (result.status === "error") {
-            console.log("token cleared")
             setUser(null)
+            setMode("light")
             localStorage.clear("user")
           }
         })

@@ -57,7 +57,7 @@ app.post("/signin", async (req, res) => {
   if (query !== null) {
     if (bcrypt.compareSync(password, query.password)) {
       let token = jwt.sign({ id: query.id }, process.env.API_JWT_SECRET, {
-        expiresIn: 14400, // 4 hours
+        expiresIn: 28800, // 8 hours
       })
       res.send({
         status: "success",
