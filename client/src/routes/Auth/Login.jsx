@@ -22,10 +22,12 @@ const Login = () => {
   useEffect(async () => {
     if (submit !== undefined && submit.password !== "") {
       let response = await signin(submit.username, submit.password)
-      setMode(response.theme)
-      setUser(response)
+      if (response.status === "success") {
+        setMode(response.theme)
+        setUser(response)
+        navigate(-1)
+      }
       enqueueSnackbar(response.message, { variant: response.status })
-      navigate(-1)
     }
   }, [submit])
   return <AuthForm form={form} setSubmit={setSubmit} />
