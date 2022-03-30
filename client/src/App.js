@@ -23,7 +23,6 @@ import Signup from "./routes/Auth/Signup"
 import FloorPlan from "./routes/FloorPlan/FloorPlan"
 import Rack from "./routes/Rack/Rack"
 import Node from "./routes/Node/Index"
-import Signout from "./routes/Auth/Signout"
 import Alerts from "./routes/Alerts/Index"
 import Warranty from "./routes/Admin/Warranty"
 
@@ -134,7 +133,6 @@ function App() {
                       <Route path="/Login" element={<Login />} />
                       <Route path="/Signup" element={<Signup />} />
                       <Route path="/Profile" element={<Profile />} />
-                      <Route path="/Signout" element={<Signout />} />
 
                       <Route path="/FloorPlan" element={<FloorPlan />} />
                       <Route path="/Rack/:rack" element={<Rack />} />

@@ -9,16 +9,18 @@ import {
   Typography,
 } from "@mui/material"
 import IconButton from "@mui/material/IconButton"
-import MenuIcon from "@mui/icons-material/Menu"
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
 
+import { useSnackbar } from "notistack"
 import { Link } from "react-router-dom"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useState } from "react"
 import AdminMenu from "./AppBar/AdminMenu"
 
 const AppBarC = () => {
+  const { enqueueSnackbar } = useSnackbar()
+
   const [user, setUser] = useContext(UserContext)
   // Theme switching
   const [mode, setMode] = useContext(ThemeContext)
@@ -53,6 +55,13 @@ const AppBarC = () => {
   }
   const handleMenuClose = () => {
     setAnchorEl(null)
+  }
+  const handleSignout = () => {
+    setAnchorEl(null)
+    setUser(null)
+    setMode("light")
+    localStorage.clear("user")
+    enqueueSnackbar("Successfully logged out", { variant: "success" })
   }
   const menuId = "primary-search-account-menu"
 
@@ -147,9 +156,7 @@ const AppBarC = () => {
         <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"}>
           Profile
         </MenuItem>
-        <MenuItem onClick={handleMenuClose} component={Link} to={"/Signout"}>
-          Sign out
-        </MenuItem>
+        <MenuItem onClick={handleSignout}>Sign out</MenuItem>
       </Menu>
     </Box>
   )
