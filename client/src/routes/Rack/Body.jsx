@@ -161,6 +161,15 @@ const Body = ({ array }) => {
             </TableCell>
           </TableRow>
         )
+      } else {
+        html[val.u] = (
+          <TableRow>
+            <TableCell align={"center"}>{val.u}</TableCell>
+            <TableCell align={"center"}>
+              <Link to={`/Node/${val.node}`}>{val.node}</Link>
+            </TableCell>
+          </TableRow>
+        )
       }
     }
   })

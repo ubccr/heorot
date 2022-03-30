@@ -14,6 +14,7 @@ import Console from "./Console"
 
 const Index = () => {
   const { node } = useParams()
+  const [simple, setSimple] = useState(false)
   const [apiData, setApiData] = useState()
   const [refetch, setRefetch] = useState(false)
   const [BMC, setBMC] = useState("")
@@ -23,6 +24,10 @@ const Index = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
+    const types = ["swi", "swe", "pdu"]
+    if (!types.includes(node.substring(0, 3))) {
+      setSimple(true)
+    }
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
@@ -128,48 +133,53 @@ const Index = () => {
           <GridC heading="Firmware:" data={apiData.firmware} />
           <Interfaces data={apiData.interfaces} />
           <GridC heading="Boot Image:" data={apiData.boot_image} />
-          <Console node={node} BMC={BMC} />
 
-          <Grid
-            container
-            sx={{
-              overflow: "hidden",
-              padding: "10px",
-              marginTop: "12px",
-              alignItems: "center",
-              border: 1,
-              borderRadius: "10px",
-              borderColor: "border.main",
-              bgcolor: "background.main",
-              color: "text.primary",
-              boxShadow: 12,
-              height: 60,
-            }}
-          >
-            <Grid item xs>
-              <Typography
-                variant="h2"
-                sx={{ fontSize: "18pt", paddingLeft: 2 }}
+          {simple && (
+            <>
+              <Console node={node} BMC={BMC} />
+
+              <Grid
+                container
+                sx={{
+                  overflow: "hidden",
+                  padding: "10px",
+                  marginTop: "12px",
+                  alignItems: "center",
+                  border: 1,
+                  borderRadius: "10px",
+                  borderColor: "border.main",
+                  bgcolor: "background.main",
+                  color: "text.primary",
+                  boxShadow: 12,
+                  height: 60,
+                }}
               >
-                Actions:
-              </Typography>
-            </Grid>
+                <Grid item xs>
+                  <Typography
+                    variant="h2"
+                    sx={{ fontSize: "18pt", paddingLeft: 2 }}
+                  >
+                    Actions:
+                  </Typography>
+                </Grid>
 
-            <Grid item xs sx={{ textAlign: "center", textAlign: "end" }}>
-              <Button variant="outlined" onClick={handleClearSEL}>
-                Clear SEL
-              </Button>{" "}
-              <Button variant="outlined" onClick={handleResetBMC}>
-                Reset BMC
-              </Button>
-            </Grid>
-          </Grid>
+                <Grid item xs sx={{ textAlign: "center", textAlign: "end" }}>
+                  <Button variant="outlined" onClick={handleClearSEL}>
+                    Clear SEL
+                  </Button>{" "}
+                  <Button variant="outlined" onClick={handleResetBMC}>
+                    Reset BMC
+                  </Button>
+                </Grid>
+              </Grid>
 
-          <WarrantyDisplay node={node} bmc={BMC} />
+              <WarrantyDisplay node={node} bmc={BMC} />
 
-          <br />
-          <TableC node={node} />
-          <br />
+              <br />
+              <TableC node={node} />
+              <br />
+            </>
+          )}
         </>
       )}
     </Box>

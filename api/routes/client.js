@@ -73,9 +73,19 @@ app.get("/rack/:rack", async (req, res) => {
             }
           } else nodes[resNode.u] = resNode
         }
-      } else if (nodeset[0] === "swi" || nodeset[0] === "swe") {
+      } else if (nodeset[0] === "swe") {
         resSwitch = switchFormat(element, nodeset, resGrendel)
         nodes[resSwitch.u] = resSwitch
+      } else if (nodeset[0] === "swi") {
+        nodes[nodeset[2]] = {
+          u: nodeset[2],
+          node: element.name,
+          ports: [],
+          tags: [],
+          height: 1,
+          width: 1,
+          type: "switch",
+        }
       } else if (nodeset[0] === "pdu") {
         resPdu = pduFormat(element, nodeset)
       }
