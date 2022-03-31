@@ -33,14 +33,14 @@ const AlertEntry = ({ data }) => {
       status = result.data.result[subSystem].status
 
     if (status === "Warning") return "#ff9800"
-    else if (status === "Critical") return "#f303036"
+    else if (status === "Critical") return "#f44336"
     else if (status === "Good") return "#4caf50"
     else return "#bdbdbd"
   }
 
   let statusColor = ""
   if (data.status === 3000) statusColor = "#ff9800"
-  else if (data.status === 4000) statusColor = "#f303036"
+  else if (data.status === 4000) statusColor = "#f44336"
 
   if (data.deviceName.length >= 32)
     data.deviceName = data.deviceName.split(".")[0]
