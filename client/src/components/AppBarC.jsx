@@ -44,7 +44,7 @@ const AppBarC = () => {
           theme: newMode,
         }),
       }
-      fetch(`http://${window.location.hostname}:3030/auth/setTheme`, payload)
+      fetch(`https://${window.location.hostname}:3030/auth/setTheme`, payload)
     }
   }
 

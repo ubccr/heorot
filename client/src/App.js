@@ -50,7 +50,10 @@ function App() {
         },
         body: JSON.stringify({}),
       }
-      fetch(`http://${window.location.hostname}:3030/auth/verifyToken`, payload)
+      fetch(
+        `https://${window.location.hostname}:3030/auth/verifyToken`,
+        payload
+      )
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "error") {
@@ -134,10 +137,30 @@ function App() {
                       <Route path="/Signup" element={<Signup />} />
                       <Route path="/Profile" element={<Profile />} />
 
-                      <Route path="/FloorPlan" element={<FloorPlan />} />
-                      <Route path="/Rack/:rack" element={<Rack />} />
-                      <Route path="/Alerts" element={<Alerts />} />
-
+                      <Route
+                        path="/FloorPlan"
+                        element={
+                          <PrivateRoute access="user">
+                            <FloorPlan />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/Rack/:rack"
+                        element={
+                          <PrivateRoute access="user">
+                            <Rack />
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/Alerts"
+                        element={
+                          <PrivateRoute access="user">
+                            <Alerts />{" "}
+                          </PrivateRoute>
+                        }
+                      />
                       <Route
                         path="/Node/:node"
                         element={

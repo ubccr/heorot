@@ -11,7 +11,7 @@ const TerminalC = ({ node, BMC }) => {
     const terminal = new Terminal({ cursorBlink: true })
     const fitAddon = new FitAddon()
     terminal.loadAddon(fitAddon)
-    const socket = io(`ws://${window.location.hostname}:3030`)
+    const socket = io(`wss://${window.location.hostname}:3030`)
 
     terminal.open(term.current)
     fitAddon.fit()

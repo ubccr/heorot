@@ -34,7 +34,7 @@ const SELCustom = ({ data, node, type, icon }) => {
         },
       }
       fetch(
-        `http://${window.location.hostname}:3030/redfish/sel/${node}`,
+        `https://${window.location.hostname}:3030/redfish/sel/${node}`,
         payload
       )
         .then((res) => res.json())
@@ -57,7 +57,7 @@ const SELCustom = ({ data, node, type, icon }) => {
     if (data[subSystem] !== undefined) status = data[subSystem].status
 
     if (status === "Warning") return "#ff9800"
-    else if (status === "Critical") return "#f44336"
+    else if (status === "Critical") return "#f303036"
     else if (status === "Good") return "#4caf50"
     else return "#bdbdbd"
   }

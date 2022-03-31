@@ -55,11 +55,11 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
       if (tags.length > 0) {
         let url = ""
         if (method === "Add") {
-          url = `http://${
+          url = `https://${
             window.location.hostname
           }:3030/grendel/tag/${node}/${tags.join(",")}`
         } else {
-          url = `http://${
+          url = `https://${
             window.location.hostname
           }:3030/grendel/untag/${node}/${tags.join(",")}`
         }

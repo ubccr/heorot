@@ -37,7 +37,7 @@ const Warranty = () => {
     }
     const res = await (
       await fetch(
-        `http://${window.location.hostname}:3030/warranty/add/${queryKey[1]}`,
+        `https://${window.location.hostname}:3030/warranty/add/${queryKey[1]}`,
         payload
       )
     ).json()

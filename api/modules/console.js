@@ -12,10 +12,10 @@ const app = express()
 const http = require("http")
 const server = http.createServer(app)
 const { Server } = require("socket.io")
-const io = new Server(server, { cors: { origin: "http://10.60.7.202:3000" } })
+const io = new Server(server, { cors: { origin: "http://10.60.7.202:3030" } })
 // const io = require("socket.io")(server, {
 //   cors: {
-//     origin: "http://10.60.7.202:3000",
+//     origin: "http://10.60.7.202:3030",
 //   },
 // })
 const SSHClient = require("ssh2").Client

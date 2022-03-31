@@ -31,7 +31,7 @@ const Rack = () => {
       },
     }
     fetch(
-      `http://${window.location.hostname}:3030/client/rack/${rack}`,
+      `https://${window.location.hostname}:3030/client/rack/${rack}`,
       payload
     )
       .then((res) => res.json())

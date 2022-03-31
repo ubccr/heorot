@@ -16,7 +16,7 @@ const WarrantyDisplay = ({ node }) => {
       }
       const res = await (
         await fetch(
-          `http://${window.location.hostname}:3030/warranty/get/${node}`,
+          `https://${window.location.hostname}:3030/warranty/get/${node}`,
           payload
         )
       ).json()
@@ -63,7 +63,7 @@ const WarrantyDisplay = ({ node }) => {
                 {query.data.result.warranty === "invalid" && (
                   <i
                     className="bi bi-exclamation-square"
-                    style={{ color: "#f44336", marginRight: "5px" }}
+                    style={{ color: "#f303036", marginRight: "5px" }}
                   />
                 )}
                 {query.data.result.warranty === "valid" && (

@@ -1,6 +1,7 @@
 const express = require("express")
 const app = express.Router()
 const fetch = require("node-fetch")
+const { exists } = require("../models/Warranty")
 const Warranty = require("../models/Warranty")
 
 require("dotenv")
@@ -36,16 +37,18 @@ app.get("/add/:tags", async (req, res) => {
           let bmc = nodes.interfaces.find((element) => {
             if (element.bmc === true) return true
           })
-          let biosRes = await biosApi(bmc.fqdn)
-          if (biosRes.message === "success") {
-            let st = biosRes.ServiceTag
-            arr.push({
-              nodeName: nodes.name,
-              serviceTag: st,
-              bmcFqdn: bmc.fqdn,
-            })
-          } else {
-            console.error(biosRes)
+          if (bmc !== undefined) {
+            let biosRes = await biosApi(bmc.fqdn)
+            if (biosRes.message === "success") {
+              let st = biosRes.ServiceTag
+              arr.push({
+                nodeName: nodes.name,
+                serviceTag: st,
+                bmcFqdn: bmc.fqdn,
+              })
+            } else {
+              console.error(biosRes)
+            }
           }
         }
       }

@@ -4,8 +4,15 @@ const cors = require("cors")
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+const https = require("https")
 const fs = require("fs")
+const cert = {
+  key: fs.readFileSync("./keys/server.key"),
+  cert: fs.readFileSync("./keys/server.cert"),
+}
 const jwt = require("jsonwebtoken")
+
+app.use(express.static(__dirname + "/build"))
 
 app.use(cors())
 const auth = require("./modules/auth")
@@ -14,8 +21,9 @@ const auth = require("./modules/auth")
 require("./modules/db")
 
 app.get("/", function (req, res) {
-  res.json({ status: "success" })
+  response.sendFile(path.resolve(__dirname, "build", "index.html"))
 })
+
 // --- routes ---
 const authRouter = require("./routes/auth.js")
 app.use("/auth", authRouter)
@@ -41,9 +49,9 @@ app.get("/all", async function (req, res) {
   res.json({ status: "success", query })
 })
 
-const Server = require("http").createServer(app)
+const Server = https.createServer(cert, app)
 const io = require("socket.io")(Server, {
-  cors: { origin: "http://10.60.7.202:3000" },
+  cors: { origin: "http://10.60.7.202:3030" },
 })
 const SSHClient = require("ssh2").Client
 const consoleMessage =

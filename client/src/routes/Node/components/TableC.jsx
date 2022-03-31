@@ -31,7 +31,7 @@ const TableC = ({ node }) => {
       },
     }
     fetch(
-      `http://${window.location.hostname}:3030/redfish/dell/${node}`,
+      `https://${window.location.hostname}:3030/redfish/dell/${node}`,
       payload
     )
       .then((res) => res.json())

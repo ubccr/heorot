@@ -11,9 +11,9 @@ const Provision = ({ node, data, refetch, setRefetch }) => {
   const [user, setUser] = useContext(UserContext)
 
   const handleClick = async () => {
-    let url = `http://${window.location.hostname}:3030/grendel/provision/${node}`
+    let url = `https://${window.location.hostname}:3030/grendel/provision/${node}`
     if (data === "true")
-      url = `http://${window.location.hostname}:3030/grendel/unprovision/${node}`
+      url = `https://${window.location.hostname}:3030/grendel/unprovision/${node}`
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
