@@ -50,10 +50,7 @@ function App() {
         },
         body: JSON.stringify({}),
       }
-      fetch(
-        `https://${window.location.hostname}:3030/auth/verifyToken`,
-        payload
-      )
+      fetch(`https://${window.location.hostname}:443/auth/verifyToken`, payload)
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "error") {

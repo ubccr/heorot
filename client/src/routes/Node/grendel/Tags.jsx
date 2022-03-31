@@ -57,11 +57,11 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
         if (method === "Add") {
           url = `https://${
             window.location.hostname
-          }:3030/grendel/tag/${node}/${tags.join(",")}`
+          }:443/grendel/tag/${node}/${tags.join(",")}`
         } else {
           url = `https://${
             window.location.hostname
-          }:3030/grendel/untag/${node}/${tags.join(",")}`
+          }:443/grendel/untag/${node}/${tags.join(",")}`
         }
         let payload = {
           headers: {

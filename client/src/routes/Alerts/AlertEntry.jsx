@@ -20,7 +20,7 @@ const AlertEntry = ({ data }) => {
     }
     const res = await (
       await fetch(
-        `https://${window.location.hostname}:3030/openmanage/health/${id}`,
+        `https://${window.location.hostname}:443/openmanage/health/${id}`,
         payload
       )
     ).json()

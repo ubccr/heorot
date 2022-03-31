@@ -25,7 +25,7 @@ const Index = () => {
     }
     const res = await (
       await fetch(
-        `https://${window.location.hostname}:3030/openmanage/nodes`,
+        `https://${window.location.hostname}:443/openmanage/nodes`,
         payload
       )
     ).json()

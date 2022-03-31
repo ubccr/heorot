@@ -69,7 +69,7 @@ const FloorPlan = () => {
       },
       allowUnauthorized: true,
     }
-    const url = `https://${window.location.hostname}:3030/grendel/host/list`
+    const url = `https://${window.location.hostname}:443/grendel/host/list`
     fetch(url, payload)
       .then((res) => res.json())
       .then((response) => {

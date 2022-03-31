@@ -34,7 +34,7 @@ const Index = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:3030/client/node/${node}`,
+      `https://${window.location.hostname}:443/client/node/${node}`,
       payload
     )
       .then((res) => res.json())
@@ -65,7 +65,7 @@ const Index = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:3030/redfish/actions/clearSEL/${bmc}`,
+      `https://${window.location.hostname}:443/redfish/actions/clearSEL/${bmc}`,
       payload
     )
       .then((res) => res.json())
@@ -81,7 +81,7 @@ const Index = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:3030/redfish/actions/resetBMC/${BMC}`,
+      `https://${window.location.hostname}:443/redfish/actions/resetBMC/${BMC}`,
       payload
     )
       .then((res) => res.json())

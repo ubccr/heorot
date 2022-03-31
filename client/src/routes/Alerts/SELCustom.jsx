@@ -34,7 +34,7 @@ const SELCustom = ({ data, node, type, icon }) => {
         },
       }
       fetch(
-        `https://${window.location.hostname}:3030/redfish/sel/${node}`,
+        `https://${window.location.hostname}:443/redfish/sel/${node}`,
         payload
       )
         .then((res) => res.json())
