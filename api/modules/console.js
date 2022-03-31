@@ -1,10 +1,3 @@
-// const fs = require("fs")
-// const https = require("https")
-
-// let server = https.createServer({
-//   key: fs.readFileSync("./keys/server.key"),
-//   cert: fs.readFileSync("./keys/server.cert"),
-// })
 const express = require("express")
 
 const app = express()
@@ -12,12 +5,8 @@ const app = express()
 const http = require("http")
 const server = http.createServer(app)
 const { Server } = require("socket.io")
-const io = new Server(server, { cors: { origin: "http://10.60.7.202:3030" } })
-// const io = require("socket.io")(server, {
-//   cors: {
-//     origin: "http://10.60.7.202:3030",
-//   },
-// })
+const io = new Server(server, { cors: { origin: "https://10.60.9.224:3030" } })
+
 const SSHClient = require("ssh2").Client
 const consoleMessage =
   "\r\n KEY MAPPING FOR CONSOLE REDIRECTION: \r\n \r\n Use the <ESC><1> key sequence for <F1> \r\n Use the <ESC><2> key sequence for <F2> \r\n Use the <ESC><3> key sequence for <F3> \r\n Use the <ESC><0> key sequence for <F10> \r\n Use the <ESC><!> key sequence for <F11> \r\n Use the <ESC><@> key sequence for <F12> \r\n \r\n Use the <ESC><Ctrl><M> key sequence for <Ctrl><M> \r\n Use the <ESC><Ctrl><H> key sequence for <Ctrl><H> \r\n Use the <ESC><Ctrl><I> key sequence for <Ctrl><I> \r\n Use the <ESC><Ctrl><J> key sequence for <Ctrl><J> \r\n \r\n Use the <ESC><X><X> key sequence for <Alt><x>, where x is any letter key, and X is the upper case of that key \r\n \r\n Use the <ESC><R><ESC><r><ESC><R> key sequence for <Ctrl><Alt><Del> \r\n"
