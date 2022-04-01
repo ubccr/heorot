@@ -3,6 +3,7 @@ import { Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
 import { io } from "socket.io-client"
 import "xterm/css/xterm.css"
+import { apiPort } from "../../../config"
 
 const TerminalC = ({ node, BMC }) => {
   const term = useRef(null)
@@ -11,7 +12,7 @@ const TerminalC = ({ node, BMC }) => {
     const terminal = new Terminal({ cursorBlink: true })
     const fitAddon = new FitAddon()
     terminal.loadAddon(fitAddon)
-    const socket = io(`wss://${window.location.hostname}:443`)
+    const socket = io(`wss://${window.location.hostname}:${apiPort}`)
 
     terminal.open(term.current)
     fitAddon.fit()

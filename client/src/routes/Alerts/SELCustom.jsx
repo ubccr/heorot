@@ -12,6 +12,7 @@ import {
   DialogContent,
 } from "@mui/material"
 import { useEffect, useState, useContext } from "react"
+import { apiPort } from "../../config"
 import { UserContext } from "../../contexts/UserContext"
 
 // FIXME: This is temporary
@@ -34,7 +35,7 @@ const SELCustom = ({ data, node, type, icon }) => {
         },
       }
       fetch(
-        `https://${window.location.hostname}:443/redfish/sel/${node}`,
+        `https://${window.location.hostname}:${apiPort}/redfish/sel/${node}`,
         payload
       )
         .then((res) => res.json())

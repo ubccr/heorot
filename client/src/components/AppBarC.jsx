@@ -17,6 +17,7 @@ import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { useContext, useState } from "react"
 import AdminMenu from "./AppBar/AdminMenu"
+import { apiPort } from "../config"
 
 const AppBarC = () => {
   const { enqueueSnackbar } = useSnackbar()
@@ -44,7 +45,10 @@ const AppBarC = () => {
           theme: newMode,
         }),
       }
-      fetch(`https://${window.location.hostname}:443/auth/setTheme`, payload)
+      fetch(
+        `https://${window.location.hostname}:${apiPort}/auth/setTheme`,
+        payload
+      )
     }
   }
 

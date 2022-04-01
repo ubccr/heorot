@@ -13,6 +13,7 @@ import AlertEntry from "./AlertEntry"
 import { useQuery } from "react-query"
 import { useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
+import { apiPort } from "../../config"
 
 const Index = () => {
   const [user, setUser] = useContext(UserContext)
@@ -25,7 +26,7 @@ const Index = () => {
     }
     const res = await (
       await fetch(
-        `https://${window.location.hostname}:443/openmanage/nodes`,
+        `https://${window.location.hostname}:${apiPort}/openmanage/nodes`,
         payload
       )
     ).json()

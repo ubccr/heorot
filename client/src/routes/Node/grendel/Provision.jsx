@@ -5,15 +5,16 @@ import { useSnackbar } from "notistack"
 import NewGridC from "../components/NewGridC"
 import { UserContext } from "../../../contexts/UserContext"
 import { useContext } from "react"
+import { apiPort } from "../../../config"
 
 const Provision = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()
   const [user, setUser] = useContext(UserContext)
 
   const handleClick = async () => {
-    let url = `https://${window.location.hostname}:443/grendel/provision/${node}`
+    let url = `https://${window.location.hostname}:${apiPort}/grendel/provision/${node}`
     if (data === "true")
-      url = `https://${window.location.hostname}:443/grendel/unprovision/${node}`
+      url = `https://${window.location.hostname}:${apiPort}/grendel/unprovision/${node}`
     let payload = {
       headers: {
         "x-access-token": user.accessToken,

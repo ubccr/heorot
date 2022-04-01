@@ -1,5 +1,7 @@
+import { apiPort } from "../config"
+
 export async function signin(username, password) {
-  const url = `https://${window.location.hostname}:443/auth/signin`
+  const url = `https://${window.location.hostname}:${apiPort}/auth/signin`
   const payload = {
     method: "POST",
     headers: {
@@ -23,7 +25,7 @@ export async function signin(username, password) {
 }
 
 export async function signup(username, password) {
-  const url = `https://${window.location.hostname}:443/auth/signup`
+  const url = `https://${window.location.hostname}:${apiPort}/auth/signup`
   const payload = {
     method: "POST",
     headers: {

@@ -11,6 +11,7 @@ import Provision from "./grendel/Provision"
 import Tags from "./grendel/Tags"
 import Console from "./redfish/Console"
 import NewGridC from "./components/NewGridC"
+import { apiPort } from "../../config"
 
 const Index = () => {
   const { node } = useParams()
@@ -34,7 +35,7 @@ const Index = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:443/client/node/${node}`,
+      `https://${window.location.hostname}:${apiPort}/client/node/${node}`,
       payload
     )
       .then((res) => res.json())
@@ -65,7 +66,7 @@ const Index = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:443/redfish/actions/clearSEL/${bmc}`,
+      `https://${window.location.hostname}:${apiPort}/redfish/actions/clearSEL/${bmc}`,
       payload
     )
       .then((res) => res.json())
@@ -81,7 +82,7 @@ const Index = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:443/redfish/actions/resetBMC/${BMC}`,
+      `https://${window.location.hostname}:${apiPort}/redfish/actions/resetBMC/${BMC}`,
       payload
     )
       .then((res) => res.json())

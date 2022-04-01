@@ -13,6 +13,7 @@ import {
 } from "@mui/material"
 import { useEffect, useState, useContext } from "react"
 import { Link } from "react-router-dom"
+import { apiPort } from "../../config"
 import { UserContext } from "../../contexts/UserContext"
 
 const FloorPlan = () => {
@@ -69,7 +70,7 @@ const FloorPlan = () => {
       },
       allowUnauthorized: true,
     }
-    const url = `https://${window.location.hostname}:443/grendel/host/list`
+    const url = `https://${window.location.hostname}:${apiPort}/grendel/host/list`
     fetch(url, payload)
       .then((res) => res.json())
       .then((response) => {

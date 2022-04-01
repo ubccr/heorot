@@ -51,7 +51,7 @@ app.get("/all", async function (req, res) {
 
 const Server = https.createServer(cert, app)
 const io = require("socket.io")(Server, {
-  cors: { origin: "https://10.60.9.224" },
+  cors: { origin: "https://10.60.9.224:3000" },
 })
 const SSHClient = require("ssh2").Client
 const consoleMessage =

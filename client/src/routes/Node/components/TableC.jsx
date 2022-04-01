@@ -17,6 +17,7 @@ import SELTable from "./SELTable"
 import IconC from "../../../components/IconC"
 import ErrorC from "../../../components/ErrorC"
 import { UserContext } from "../../../contexts/UserContext"
+import { apiPort } from "../../../config"
 
 const TableC = ({ node }) => {
   const [apiData, setApiData] = useState({})
@@ -31,7 +32,7 @@ const TableC = ({ node }) => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:443/redfish/dell/${node}`,
+      `https://${window.location.hostname}:${apiPort}/redfish/dell/${node}`,
       payload
     )
       .then((res) => res.json())

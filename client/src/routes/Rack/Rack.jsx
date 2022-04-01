@@ -3,8 +3,6 @@ import { useState, useEffect, useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
 
 import {
-  Container,
-  Paper,
   Box,
   TableContainer,
   Table,
@@ -16,6 +14,7 @@ import {
 } from "@mui/material"
 
 import Body from "./Body.jsx"
+import { apiPort } from "../../config"
 
 const Rack = () => {
   const { rack } = useParams()
@@ -31,7 +30,7 @@ const Rack = () => {
       },
     }
     fetch(
-      `https://${window.location.hostname}:443/client/rack/${rack}`,
+      `https://${window.location.hostname}:${apiPort}/client/rack/${rack}`,
       payload
     )
       .then((res) => res.json())

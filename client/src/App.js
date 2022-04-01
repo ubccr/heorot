@@ -11,6 +11,7 @@ import { UserContext } from "./contexts/UserContext"
 import PrivateRoute from "./components/PrivateRoute"
 import { QueryClient, QueryClientProvider } from "react-query"
 import { SnackbarProvider } from "notistack"
+import { apiPort } from "./config"
 
 import largeTriangles from "./backgrounds/large-triangles.svg"
 import darkTriangles from "./backgrounds/large-triangles-dark.svg"
@@ -50,7 +51,10 @@ function App() {
         },
         body: JSON.stringify({}),
       }
-      fetch(`https://${window.location.hostname}:443/auth/verifyToken`, payload)
+      fetch(
+        `https://${window.location.hostname}:${apiPort}/auth/verifyToken`,
+        payload
+      )
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "error") {

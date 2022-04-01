@@ -5,10 +5,9 @@ import NodeCellC from "./NodeCellC"
 import SELCustom from "./SELCustom"
 import { useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
+import { apiPort } from "../../config"
 
 const AlertEntry = ({ data }) => {
-  //   const [systemHealth, setSystemHealth] = useState()
-  //   const [loading, setLoading] = useState(true)
   const [user, setUser] = useContext(UserContext)
 
   let id = data.id
@@ -20,7 +19,7 @@ const AlertEntry = ({ data }) => {
     }
     const res = await (
       await fetch(
-        `https://${window.location.hostname}:443/openmanage/health/${id}`,
+        `https://${window.location.hostname}:${apiPort}/openmanage/health/${id}`,
         payload
       )
     ).json()

@@ -13,6 +13,7 @@ import BgContainer from "../../components/BgContainer"
 import { useState, useContext } from "react"
 import { useSnackbar } from "notistack"
 import { UserContext } from "../../contexts/UserContext"
+import { apiPort } from "../../config"
 
 const Warranty = () => {
   const [tags, setTags] = useState("")
@@ -37,7 +38,7 @@ const Warranty = () => {
     }
     const res = await (
       await fetch(
-        `https://${window.location.hostname}:443/warranty/add/${queryKey[1]}`,
+        `https://${window.location.hostname}:${apiPort}/warranty/add/${queryKey[1]}`,
         payload
       )
     ).json()
