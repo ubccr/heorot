@@ -7,9 +7,11 @@ import {
   MenuItem,
   Menu,
   Typography,
+  InputBase,
 } from "@mui/material"
 import IconButton from "@mui/material/IconButton"
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
+import MenuIcon from "@mui/icons-material/Menu"
 
 import { useSnackbar } from "notistack"
 import { Link } from "react-router-dom"
@@ -18,6 +20,8 @@ import { UserContext } from "../contexts/UserContext"
 import { useContext, useState } from "react"
 import AdminMenu from "./AppBar/AdminMenu"
 import { apiPort } from "../config"
+import SearchC from "./AppBar/SearchC"
+import MainMenuC from "./AppBar/MainMenuC"
 
 const AppBarC = () => {
   const { enqueueSnackbar } = useSnackbar()
@@ -73,15 +77,6 @@ const AppBarC = () => {
     <Box>
       <AppBar position="static" id="nav">
         <Toolbar>
-          {/* <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton> */}
           <Typography
             variant="h6"
             noWrap
@@ -105,30 +100,38 @@ const AppBarC = () => {
               <img src="./favicon.ico" width="30" height="30" alt="" />
             </Box>
           </Typography>
-          <Button
-            sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-            component={Link}
-            to={"/"}
-          >
-            Home
-          </Button>
-          <Button
-            sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-            component={Link}
-            to={"/FloorPlan"}
-          >
-            Floor Plan
-          </Button>
-          <Button
-            sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-            component={Link}
-            to={"/Alerts"}
-          >
-            Alerts
-          </Button>
-          {user !== null && user.privileges === "admin" && <AdminMenu />}
+
+          <MainMenuC user={user} />
+          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Button
+              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+              component={Link}
+              to={"/"}
+            >
+              Home
+            </Button>
+            <Button
+              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+              component={Link}
+              to={"/FloorPlan"}
+            >
+              Floor Plan
+            </Button>
+            <Button
+              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+              component={Link}
+              to={"/Alerts"}
+            >
+              Alerts
+            </Button>
+            {user !== null && user.privileges === "admin" && <AdminMenu />}
+          </Box>
 
           <Box sx={{ flexGrow: 1 }} />
+
+          {(user !== null && user.privileges === "user") ||
+            (user.privileges === "admin" && <SearchC />)}
+
           <Switch color="default" size="small" onChange={modeToggle} />
           {user === null && (
             <Button sx={{ my: 2, color: "white" }}>
