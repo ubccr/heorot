@@ -129,8 +129,7 @@ const AppBarC = () => {
 
           <Box sx={{ flexGrow: 1 }} />
 
-          {(user !== null && user.privileges === "user") ||
-            (user.privileges === "admin" && <SearchC />)}
+          {user !== null && <SearchC />}
 
           <Switch color="default" size="small" onChange={modeToggle} />
           {user === null && (
