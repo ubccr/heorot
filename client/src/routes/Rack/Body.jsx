@@ -89,6 +89,10 @@ const Body = ({ array }) => {
         style.bgcolor = "background.table.double"
         style.border = 2
         style.borderColor = "border.table.double"
+      } else if (val.height === 4 && val.width === 1) {
+        style.bgcolor = "background.table.four"
+        style.border = 2
+        style.borderColor = "border.table.four"
       } else if (val.height === 1 && val.width === 2) {
         style.bgcolor = "background.table.quad"
         style.border = 2
