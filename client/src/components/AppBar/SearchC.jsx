@@ -3,19 +3,15 @@ import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../../contexts/UserContext"
 import { apiPort } from "../../config"
 import { useNavigate } from "react-router-dom"
-
-function sleep(delay = 0) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, delay)
-  })
-}
+import { useSnackbar } from "notistack"
 
 const SearchC = () => {
   const [open, setOpen] = useState(false)
   const [options, setOptions] = useState([])
   const loading = open && options.length === 0
-  const [user, setUser] = useContext(UserContext)
+  const user = useContext(UserContext)
   const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     let active = true
@@ -30,7 +26,6 @@ const SearchC = () => {
           "x-access-token": user.accessToken,
         },
       }
-      await sleep(1e3)
       let query = await (
         await fetch(
           `https://${window.location.hostname}:${apiPort}/grendel/host/list`,
@@ -43,6 +38,8 @@ const SearchC = () => {
           nodes.push({ name: element.name })
         })
         setOptions([...nodes])
+      } else {
+        enqueueSnackbar("Error loading nodes for Search", { variant: "error" })
       }
     })()
 
