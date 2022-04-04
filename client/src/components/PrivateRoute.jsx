@@ -7,7 +7,7 @@ export default function PrivateRoute({ children, access }) {
   return mapping(user.privileges, access) ? children : <Navigate to="/login" />
 }
 
-function mapping({ user, access }) {
+function mapping(user, access) {
   if (toNum(user) >= toNum(access)) return true
 
   return false
