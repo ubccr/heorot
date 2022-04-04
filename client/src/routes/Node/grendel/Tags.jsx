@@ -7,7 +7,7 @@ import {
   TextField,
 } from "@mui/material"
 import { Box } from "@mui/system"
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import { useSnackbar } from "notistack"
 
 import NewGridC from "../components/NewGridC"
@@ -19,6 +19,10 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
   const [tags, setTags] = useState(data)
   const [addTag, setAddTag] = useState("")
   const [user, setUser] = useContext(UserContext)
+
+  useEffect(() => {
+    setTags(data)
+  }, [node, data])
 
   const handleDelete = (removedTag) => () => {
     setTags((chips) => chips.filter((chip) => chip !== removedTag))

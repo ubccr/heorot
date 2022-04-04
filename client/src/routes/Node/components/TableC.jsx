@@ -26,6 +26,8 @@ const TableC = ({ node }) => {
   const [user, setUser] = useContext(UserContext)
 
   useEffect(() => {
+    setLoading(true)
+    setError("")
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
@@ -46,9 +48,11 @@ const TableC = ({ node }) => {
             }
             setLoading(false)
           })
+        } else {
+          setError("SEL API error")
         }
       })
-  }, [])
+  }, [node])
 
   const [openSEL, setOpenSEL] = useState(false)
   const handleOpenSEL = () => setOpenSEL(true)

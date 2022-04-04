@@ -53,7 +53,7 @@ const Index = () => {
           enqueueSnackbar(response.message, { variant: response.status })
         }
       })
-  }, [refetch])
+  }, [refetch, node])
 
   const handleClearSEL = () => {
     let bmc = null

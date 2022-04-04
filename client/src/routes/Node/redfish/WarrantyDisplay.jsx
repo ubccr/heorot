@@ -6,9 +6,8 @@ import { apiPort } from "../../../config"
 
 const WarrantyDisplay = ({ node }) => {
   const [user, setUser] = useContext(UserContext)
-
   const query = useQuery(
-    "warranty",
+    node,
     async () => {
       let payload = {
         headers: {
