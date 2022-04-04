@@ -60,8 +60,8 @@ const SearchC = () => {
   return (
     <Box
       sx={{
-        width: 212,
-        height: 52,
+        width: 214,
+        height: 54,
         marginRight: "20px",
         bgcolor: "background.main",
         borderRadius: 2,
