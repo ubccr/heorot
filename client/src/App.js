@@ -77,18 +77,22 @@ function App() {
             background: {
               main: "rgba(255, 255, 255, 1)",
               img: `url(${largeTriangles})`,
+              // 100 level colors
               table: {
                 single: "#ffe0b2",
                 double: "#c8e6c9",
                 quad: "#bbdefb",
+                four: "#ffcdd2",
               },
             },
             border: {
               main: "#e0e0e0",
+              // 600 level colors
               table: {
                 single: "#ffb300",
                 double: "#43a047",
                 quad: "#2196f3",
+                four: "#e53935",
               },
             },
           }
@@ -102,6 +106,7 @@ function App() {
               table: {
                 single: "",
                 double: "",
+                four: "",
               },
             },
             border: {
@@ -110,6 +115,7 @@ function App() {
                 single: "#ffb300",
                 double: "#43a047",
                 quad: "#2196f3",
+                four: "#e53935",
               },
             },
           }),
