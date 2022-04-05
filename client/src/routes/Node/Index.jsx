@@ -162,7 +162,7 @@ const Index = () => {
                   bgcolor: "background.main",
                   color: "text.primary",
                   boxShadow: 12,
-                  height: 60,
+                  minHeight: 60,
                 }}
               >
                 <Grid item xs>
