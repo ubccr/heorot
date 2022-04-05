@@ -35,7 +35,7 @@ app.get("/dell/:node", async (req, res) => {
   grendelNode.interfaces.forEach((element) => {
     if (element.fqdn.substring(0, 3) === "bmc") bmc = element.fqdn
   })
-
+  if (grendelNode.tags === null) grendelNode.tags = []
   if (grendelNode.tags.includes("gpu")) gpu = true
 
   let biosRes = await biosApi(bmc)
