@@ -79,6 +79,7 @@ const SearchC = () => {
         onClose={() => {
           setOpen(false)
         }}
+        autoHighlight
         isOptionEqualToValue={(option, value) => option.name === value.name}
         getOptionLabel={(option) => option.name}
         options={options}
