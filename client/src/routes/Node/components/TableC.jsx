@@ -46,11 +46,11 @@ const TableC = ({ node }) => {
             if (val.status === "error" && val.message !== "No GPU tag") {
               setError(val.message)
             }
-            setLoading(false)
           })
         } else {
           setError("SEL API error")
         }
+        setLoading(false)
       })
   }, [node])
 
