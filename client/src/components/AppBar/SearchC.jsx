@@ -9,7 +9,7 @@ const SearchC = () => {
   const [open, setOpen] = useState(false)
   const [options, setOptions] = useState([])
   const loading = open && options.length === 0
-  const user = useContext(UserContext)
+  const [user, setUser] = useContext(UserContext)
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -25,6 +25,7 @@ const SearchC = () => {
         headers: {
           "x-access-token": user.accessToken,
         },
+        allowUnauthorized: true,
       }
       let query = await (
         await fetch(

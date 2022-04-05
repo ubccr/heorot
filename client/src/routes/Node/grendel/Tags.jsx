@@ -18,7 +18,7 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()
   const [tags, setTags] = useState(data)
   const [addTag, setAddTag] = useState("")
-  const user = useContext(UserContext)
+  const [user, setUser] = useContext(UserContext)
 
   useEffect(() => {
     setTags(data)
