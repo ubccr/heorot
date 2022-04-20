@@ -48,7 +48,7 @@ app.get("/nodes", async (req, res) => {
     warningRes.result.forEach((element) => {
       warningNodes.push({
         id: element.Id,
-        deviceName: element.DeviceName,
+        deviceName: element.DeviceManagement[0].InstrumentationName,
         serviceTag: element.DeviceServiceTag,
         status: element.Status,
         bmcName: element.DeviceManagement[0].DnsName,
@@ -59,7 +59,7 @@ app.get("/nodes", async (req, res) => {
     criticalRes.result.forEach((element) => {
       criticalNodes.push({
         id: element.Id,
-        deviceName: element.DeviceName,
+        deviceName: element.DeviceManagement[0].InstrumentationName,
         bmcName: element.DeviceManagement[0].DnsName,
         serviceTag: element.DeviceServiceTag,
         status: element.Status,
