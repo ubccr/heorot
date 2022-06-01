@@ -175,7 +175,7 @@ const Index = () => {
                   </Typography>
                 </Grid>
 
-                <Grid item xs sx={{ textAlign: "center", textAlign: "end" }}>
+                <Grid item xs sx={{ textAlign: "end" }}>
                   <Button variant="outlined" onClick={handleClearSEL}>
                     Clear SEL
                   </Button>{" "}
