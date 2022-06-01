@@ -47,6 +47,9 @@ const MainMenuC = ({ user }) => {
         <MenuItem component={Link} to={"/Alerts"}>
           Alerts
         </MenuItem>
+        <MenuItem component={Link} to={"/Grendel"}>
+          Grendel
+        </MenuItem>
         {user !== null && user.privileges === "admin" && (
           <MenuItem component={Link} to={"/Admin/Warranty"}>
             Warranty

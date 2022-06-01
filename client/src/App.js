@@ -26,6 +26,7 @@ import Rack from "./routes/Rack/Rack"
 import Node from "./routes/Node/Index"
 import Alerts from "./routes/Alerts/Index"
 import Warranty from "./routes/Admin/Warranty"
+import Grendel from "./routes/Grendel/Index"
 
 function App() {
   const queryClient = new QueryClient({
@@ -165,6 +166,14 @@ function App() {
                         element={
                           <PrivateRoute access="user">
                             <Alerts />{" "}
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/Grendel"
+                        element={
+                          <PrivateRoute access="user">
+                            <Grendel />{" "}
                           </PrivateRoute>
                         }
                       />

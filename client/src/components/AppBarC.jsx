@@ -124,6 +124,13 @@ const AppBarC = () => {
             >
               Alerts
             </Button>
+            <Button
+              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+              component={Link}
+              to={"/Grendel"}
+            >
+              Grendel
+            </Button>
             {user !== null && user.privileges === "admin" && <AdminMenu />}
           </Box>
 
