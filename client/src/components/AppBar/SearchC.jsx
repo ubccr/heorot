@@ -5,7 +5,7 @@ import { apiPort } from "../../config"
 import { useNavigate } from "react-router-dom"
 import { useSnackbar } from "notistack"
 
-const SearchC = () => {
+const SearchC = ({ action, setOutput }) => {
   const [open, setOpen] = useState(false)
   const [options, setOptions] = useState([])
   const loading = open && options.length === 0
@@ -87,7 +87,12 @@ const SearchC = () => {
         loading={loading}
         clearOnBlur={true}
         onChange={(event, value) => {
-          if (value !== null) navigate(`/Node/${value.name}`)
+          if (action == "value") {
+            if (value == null) setOutput("")
+            else setOutput(value.name)
+          } else if (value !== null) {
+            navigate(`/Node/${value.name}`)
+          }
         }}
         renderInput={(params) => (
           <TextField
