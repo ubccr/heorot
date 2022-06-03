@@ -6,6 +6,7 @@ import {
   Button,
   Grid,
   Box,
+  TextField,
 } from "@mui/material"
 import SearchC from "../../components/AppBar/SearchC"
 import { useSnackbar } from "notistack"
@@ -103,12 +104,13 @@ const EditJson = () => {
         </Button>
       </Box>
       <FormGroup>
-        <TextareaAutosize
-          style={{ padding: "5px", margin: "10px" }}
+        <TextField
           value={nodeJson}
+          multiline
           onChange={(e) => {
             setNodeJson(e.target.value)
           }}
+          sx={{ margin: "10px" }}
         />
       </FormGroup>
     </>
