@@ -50,6 +50,7 @@ const EditJson = () => {
 
   const handleJson = () => {
     try {
+      let a = JSON.parse(nodeJson) // just to generate an error
       let payload = {
         method: "POST",
         headers: {
