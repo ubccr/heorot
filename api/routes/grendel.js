@@ -1,6 +1,7 @@
 const express = require("express")
 const app = express.Router()
 const { spawn } = require("child_process")
+const fs = require("fs")
 
 const grendelRequest = require("../modules/grendel")
 
@@ -57,38 +58,60 @@ app.get("/untag/:nodeset/:tags", async (req, res) => {
     await grendelRequest(`/v1/host/untag/${nodeset}?tags=${tags}`, "PUT")
   )
 })
-app.get("/test", async (req, res) => {
+app.post("/discover", async (req, res) => {
   let output = {}
+  let stdout = ""
   let args = [
     "discover",
     "switch",
     "-c grendel.toml",
-    "-b 10.128.0.0",
     "-m mapping.txt",
-    "--endpoint swe-v07-22.compute.cbls.ccr.buffalo.edu",
-    "--subnet 10.64.0.0",
-    "--domain compute.cbls.ccr.buffalo.edu",
+    `--endpoint ${req.body.sw}.${req.body.domain}`,
+    `--domain ${req.body.domain}`,
+    `--subnet ${req.body.subnet}`,
+    `--bmc-subnet ${req.body.bmcSubnet}`,
   ]
-  const ls = spawn("grendel", args, {
-    cwd: "/home/ubuntu/dcim/grendel",
-    shell: true,
-  })
-  ls.stdout.on("data", (data) => {
-    output.stdout += data
-  })
+  fs.writeFile(
+    "/home/ubuntu/dcim/grendel/mapping.txt",
+    req.body.mapping,
+    (err) => {
+      if (err) {
+        output.status = "error"
+        output.error = err
+        res.json(output)
+        return
+      } else {
+        const grendel = spawn("grendel", args, {
+          cwd: "/home/ubuntu/dcim/grendel",
+          shell: true,
+        })
+        grendel.stdout.on("data", (data) => {
+          stdout += data
+        })
 
-  ls.stderr.on("data", (data) => {
-    output.stderr = `stderr: ${data}`
-  })
+        grendel.stderr.on("data", (data) => {
+          output.error = `stderr: ${data}`
+        })
 
-  ls.on("error", (error) => {
-    output.error = `error: ${error.message}`
-  })
+        grendel.on("error", (error) => {
+          output.error = `error: ${error.message}`
+        })
 
-  ls.on("close", (code) => {
-    output.close = `child process exited with code ${code}`
-    res.json(output.stdout.split("\n"))
-  })
+        grendel.on("close", (code) => {
+          if (output.stderr === undefined) {
+            try {
+              output.node = JSON.parse(stdout)
+              output.status = "success"
+            } catch (e) {
+              output.status = "error"
+              output.message = e
+            }
+          }
+          res.json(output)
+        })
+      }
+    }
+  )
 })
 
 module.exports = app
