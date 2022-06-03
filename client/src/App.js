@@ -126,7 +126,7 @@ function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
-          <SnackbarProvider maxSnack={3}>
+          <SnackbarProvider maxSnack={3} autoHideDuration={7000}>
             <UserContext.Provider value={[user, setUser]}>
               <ThemeContext.Provider value={[mode, setMode]}>
                 <Paper
