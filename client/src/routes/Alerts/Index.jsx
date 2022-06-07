@@ -14,9 +14,11 @@ import { useQuery } from "react-query"
 import { useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useSnackbar } from "notistack"
 
 const Index = () => {
   const [user, setUser] = useContext(UserContext)
+  const { enqueueSnackbar } = useSnackbar()
 
   const query = useQuery("nodes", async () => {
     let payload = {
@@ -27,6 +29,8 @@ const Index = () => {
     const res = await (
       await fetch(`${apiConfig.apiUrl}/openmanage/nodes`, payload)
     ).json()
+    if (res.status === "error")
+      enqueueSnackbar(res.message, { variant: "error" })
     return res
   })
   return (
@@ -72,7 +76,7 @@ const Index = () => {
       >
         <TableContainer>
           {query.isLoading && <LinearProgress />}
-          {query.isFetched && (
+          {query.isFetched && query.data.status !== "error" && (
             <Table>
               <TableHead>
                 <TableRow>
