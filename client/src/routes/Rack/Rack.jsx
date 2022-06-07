@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 
 import Body from "./Body.jsx"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 
 const Rack = () => {
   const { rack } = useParams()
@@ -29,10 +29,7 @@ const Rack = () => {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(
-      `https://${window.location.hostname}:${apiPort}/client/rack/${rack}`,
-      payload
-    )
+    fetch(`${apiConfig.apiUrl}/client/rack/${rack}`, payload)
       .then((res) => res.json())
       .then((response) => {
         setRows(response.result.nodes)

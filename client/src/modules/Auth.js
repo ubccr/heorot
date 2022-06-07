@@ -1,7 +1,7 @@
-import { apiPort } from "../config"
+import { apiConfig } from "../config"
 
 export async function signin(username, password) {
-  const url = `https://${window.location.hostname}:${apiPort}/auth/signin`
+  const url = `${apiConfig.apiUrl}/auth/signin`
   const payload = {
     method: "POST",
     headers: {
@@ -25,7 +25,7 @@ export async function signin(username, password) {
 }
 
 export async function signup(username, password) {
-  const url = `https://${window.location.hostname}:${apiPort}/auth/signup`
+  const url = `${apiConfig.apiUrl}/auth/signup`
   const payload = {
     method: "POST",
     headers: {

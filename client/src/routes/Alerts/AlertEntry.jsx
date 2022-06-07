@@ -5,7 +5,7 @@ import NodeCellC from "./NodeCellC"
 import SELCustom from "./SELCustom"
 import { useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 
 const AlertEntry = ({ data }) => {
   const [user, setUser] = useContext(UserContext)
@@ -18,10 +18,7 @@ const AlertEntry = ({ data }) => {
       },
     }
     const res = await (
-      await fetch(
-        `https://${window.location.hostname}:${apiPort}/openmanage/health/${id}`,
-        payload
-      )
+      await fetch(`${apiConfig.apiUrl}/openmanage/health/${id}`, payload)
     ).json()
     return res
   })

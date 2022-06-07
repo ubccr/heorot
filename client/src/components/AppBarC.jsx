@@ -19,7 +19,7 @@ import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { useContext, useState } from "react"
 import AdminMenu from "./AppBar/AdminMenu"
-import { apiPort } from "../config"
+import { apiConfig } from "../config"
 import SearchC from "./AppBar/SearchC"
 import MainMenuC from "./AppBar/MainMenuC"
 
@@ -49,10 +49,7 @@ const AppBarC = () => {
           theme: newMode,
         }),
       }
-      fetch(
-        `https://${window.location.hostname}:${apiPort}/auth/setTheme`,
-        payload
-      )
+      fetch(`${apiConfig.apiUrl}/auth/setTheme`, payload)
     }
   }
 
@@ -166,7 +163,12 @@ const AppBarC = () => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"}>
+        <MenuItem
+          onClick={handleMenuClose}
+          component={Link}
+          to={"/Profile"}
+          disabled
+        >
           Profile
         </MenuItem>
         <MenuItem onClick={handleSignout}>Sign out</MenuItem>

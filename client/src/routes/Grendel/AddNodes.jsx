@@ -15,7 +15,7 @@ import { useState, useContext } from "react"
 import { useSnackbar } from "notistack"
 
 import { UserContext } from "../../contexts/UserContext"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 const AddNodes = () => {
   const [user, setUser] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
@@ -40,10 +40,7 @@ const AddNodes = () => {
         mapping: form.mapping.value,
       }),
     }
-    fetch(
-      `https://${window.location.hostname}:${apiPort}/grendel/discover`,
-      payload
-    )
+    fetch(`${apiConfig.apiUrl}/grendel/discover`, payload)
       .then((res) => res.json())
       .then((result) => {
         if (result.status === "success") {
@@ -80,10 +77,7 @@ const AddNodes = () => {
         },
         body: nodeJson,
       }
-      fetch(
-        `https://${window.location.hostname}:${apiPort}/grendel/host`,
-        payload
-      )
+      fetch(`${apiConfig.apiUrl}/grendel/host`, payload)
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success") {

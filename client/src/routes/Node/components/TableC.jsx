@@ -17,7 +17,7 @@ import SELTable from "./SELTable"
 import IconC from "../../../components/IconC"
 import ErrorC from "../../../components/ErrorC"
 import { UserContext } from "../../../contexts/UserContext"
-import { apiPort } from "../../../config"
+import { apiConfig } from "../../../config"
 
 const TableC = ({ node }) => {
   const [apiData, setApiData] = useState({})
@@ -33,10 +33,7 @@ const TableC = ({ node }) => {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(
-      `https://${window.location.hostname}:${apiPort}/redfish/dell/${node}`,
-      payload
-    )
+    fetch(`${apiConfig.apiUrl}/redfish/dell/${node}`, payload)
       .then((res) => res.json())
       .then((response) => {
         if (response.status === "success") {

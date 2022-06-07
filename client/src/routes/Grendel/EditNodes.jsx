@@ -13,7 +13,7 @@ import {
 import { useSnackbar } from "notistack"
 
 import { UserContext } from "../../contexts/UserContext"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 
 const EditNodes = () => {
   const [formValues, setFormValues] = useState({ action: "", actionValue: "" })
@@ -45,7 +45,7 @@ const EditNodes = () => {
           "x-access-token": user.accessToken,
         },
       }
-      let url = `https://${window.location.hostname}:${apiPort}/grendel/`
+      let url = `${apiConfig.apiUrl}/grendel/`
       let nodeset = formValues.nodeset
       if (formValues.action === "provision") {
         if (formValues.actionValue === "true") url += `provision/${nodeset}`

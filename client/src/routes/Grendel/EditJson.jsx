@@ -12,7 +12,7 @@ import SearchC from "../../components/AppBar/SearchC"
 import { useSnackbar } from "notistack"
 
 import { UserContext } from "../../contexts/UserContext"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 
 const EditJson = () => {
   const [editNode, setEditNode] = useState("")
@@ -27,10 +27,7 @@ const EditJson = () => {
           "x-access-token": user.accessToken,
         },
       }
-      fetch(
-        `https://${window.location.hostname}:${apiPort}/grendel/host/find/${editNode}`,
-        payload
-      )
+      fetch(`${apiConfig.apiUrl}/grendel/host/find/${editNode}`, payload)
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success")
@@ -60,10 +57,7 @@ const EditJson = () => {
         },
         body: nodeJson,
       }
-      fetch(
-        `https://${window.location.hostname}:${apiPort}/grendel/host`,
-        payload
-      )
+      fetch(`${apiConfig.apiUrl}/grendel/host`, payload)
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success") {

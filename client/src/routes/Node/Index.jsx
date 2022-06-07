@@ -11,7 +11,7 @@ import Provision from "./grendel/Provision"
 import Tags from "./grendel/Tags"
 import Console from "./redfish/Console"
 import NewGridC from "./components/NewGridC"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 
 const Index = () => {
   const { node } = useParams()
@@ -34,10 +34,7 @@ const Index = () => {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(
-      `https://${window.location.hostname}:${apiPort}/client/node/${node}`,
-      payload
-    )
+    fetch(`${apiConfig.apiUrl}/client/node/${node}`, payload)
       .then((res) => res.json())
       .then((response) => {
         if (response.status === "success") {
@@ -66,10 +63,7 @@ const Index = () => {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(
-      `https://${window.location.hostname}:${apiPort}/redfish/actions/clearSEL/${bmc}`,
-      payload
-    )
+    fetch(`${apiConfig.apiUrl}/redfish/actions/clearSEL/${bmc}`, payload)
       .then((res) => res.json())
       .then((result) => {
         enqueueSnackbar(result.message, { variant: result.color })
@@ -82,10 +76,7 @@ const Index = () => {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(
-      `https://${window.location.hostname}:${apiPort}/redfish/actions/resetBMC/${BMC}`,
-      payload
-    )
+    fetch(`${apiConfig.apiUrl}/redfish/actions/resetBMC/${BMC}`, payload)
       .then((res) => res.json())
       .then((result) => {
         enqueueSnackbar(result.message, { variant: result.color })

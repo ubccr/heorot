@@ -12,7 +12,7 @@ import {
   DialogContent,
 } from "@mui/material"
 import { useEffect, useState, useContext } from "react"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 import { UserContext } from "../../contexts/UserContext"
 
 // FIXME: This is temporary
@@ -34,10 +34,7 @@ const SELCustom = ({ data, node, type, icon }) => {
           "x-access-token": user.accessToken,
         },
       }
-      fetch(
-        `https://${window.location.hostname}:${apiPort}/redfish/sel/${node}`,
-        payload
-      )
+      fetch(`${apiConfig.apiUrl}/redfish/sel/${node}`, payload)
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success") setSel(result.result)

@@ -2,7 +2,7 @@ import { useContext } from "react"
 import { useQuery } from "react-query"
 import { Grid, Typography } from "@mui/material"
 import { UserContext } from "../../../contexts/UserContext"
-import { apiPort } from "../../../config"
+import { apiConfig } from "../../../config"
 
 const WarrantyDisplay = ({ node }) => {
   const [user, setUser] = useContext(UserContext)
@@ -15,10 +15,7 @@ const WarrantyDisplay = ({ node }) => {
         },
       }
       const res = await (
-        await fetch(
-          `https://${window.location.hostname}:${apiPort}/warranty/get/${node}`,
-          payload
-        )
+        await fetch(`${apiConfig.apiUrl}/warranty/get/${node}`, payload)
       ).json()
       return res
     },

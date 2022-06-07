@@ -1,7 +1,7 @@
 import { TextField, Autocomplete, CircularProgress, Box } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "../../contexts/UserContext"
-import { apiPort } from "../../config"
+import { apiConfig } from "../../config"
 import { useNavigate } from "react-router-dom"
 import { useSnackbar } from "notistack"
 
@@ -28,10 +28,7 @@ const SearchC = ({ action, setOutput }) => {
         allowUnauthorized: true,
       }
       let query = await (
-        await fetch(
-          `https://${window.location.hostname}:${apiPort}/grendel/host/list`,
-          payload
-        )
+        await fetch(`${apiConfig.apiUrl}/grendel/host/list`, payload)
       ).json()
       if (query.status === "success" && active) {
         let nodes = []
