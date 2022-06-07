@@ -1,97 +1,84 @@
-<div align="center" id="top"> 
-  <img src="./.github/app.gif" alt="React Dcim Master" />
+<h1 align="center">Heorot</h1>
 
-  &#xa0;
+<div align="center">
+  <img alt="Github top language" src="https://img.shields.io/github/languages/top/ubccr/heorot?color=56BEB8">
 
-  <!-- <a href="https://reactdcimmaster.netlify.app">Demo</a> -->
+  <img alt="Github language count" src="https://img.shields.io/github/languages/count/ubccr/heorot?color=56BEB8">
+
+  <img alt="Repository size" src="https://img.shields.io/github/repo-size/ubccr/heorot?color=56BEB8">
+
+  <img alt="License" src="https://img.shields.io/github/license/ubccr/heorot?color=56BEB8">
+
+  <!-- <img alt="Github issues" src="https://img.shields.io/github/issues/ubccr/heorot?color=56BEB8" /> -->
+
+  <!-- <img alt="Github forks" src="https://img.shields.io/github/forks/ubccr/heorot?color=56BEB8" /> -->
+
+  <!-- <img alt="Github stars" src="https://img.shields.io/github/stars/ubccr/heorot?color=56BEB8" /> -->
 </div>
-
-<h1 align="center">React Dcim Master</h1>
-
-<p align="center">
-  <img alt="Github top language" src="https://img.shields.io/github/languages/top/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8">
-
-  <img alt="Github language count" src="https://img.shields.io/github/languages/count/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8">
-
-  <img alt="Repository size" src="https://img.shields.io/github/repo-size/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8">
-
-  <img alt="License" src="https://img.shields.io/github/license/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8">
-
-  <!-- <img alt="Github issues" src="https://img.shields.io/github/issues/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8" /> -->
-
-  <!-- <img alt="Github forks" src="https://img.shields.io/github/forks/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8" /> -->
-
-  <!-- <img alt="Github stars" src="https://img.shields.io/github/stars/{{YOUR_GITHUB_USERNAME}}/react-dcim-master?color=56BEB8" /> -->
-</p>
 
 <!-- Status -->
 
-<!-- <h4 align="center"> 
-	🚧  React Dcim Master 🚀 Under construction...  🚧
-</h4> 
+<!-- <h4 align="center">
+	🚧  Heorot 🚀 Under construction...  🚧
+</h4>
 
 <hr> -->
 
-<p align="center">
-  <a href="#dart-about">About</a> &#xa0; | &#xa0; 
-  <a href="#sparkles-features">Features</a> &#xa0; | &#xa0;
-  <a href="#rocket-technologies">Technologies</a> &#xa0; | &#xa0;
-  <a href="#white_check_mark-requirements">Requirements</a> &#xa0; | &#xa0;
-  <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
-  <a href="#memo-license">License</a> &#xa0; | &#xa0;
-  <a href="https://github.com/{{YOUR_GITHUB_USERNAME}}" target="_blank">Author</a>
-</p>
-
 <br>
 
-## :dart: About ##
+## :dart: About
 
-Describe your project
+Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_blank">Grendel</a> providing a Web-UI for managing a data center worth of nodes
 
-## :sparkles: Features ##
+<!-- ## :sparkles: Features
 
 :heavy_check_mark: Feature 1;\
 :heavy_check_mark: Feature 2;\
-:heavy_check_mark: Feature 3;
+:heavy_check_mark: Feature 3; -->
 
-## :rocket: Technologies ##
+## :white_check_mark: Requirements
 
-The following tools were used in this project:
+Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [Node](https://nodejs.org/en/), [MongoDB](https://www.mongodb.com/docs/manual/installation/), and [Grendel](https://github.com/ubccr/grendel) installed.
 
-- [Expo](https://expo.io/)
-- [Node.js](https://nodejs.org/en/)
-- [React](https://pt-br.reactjs.org/)
-- [React Native](https://reactnative.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
+## :checkered_flag: Build from source
 
-## :white_check_mark: Requirements ##
-
-Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) and [Node](https://nodejs.org/en/) installed.
-
-## :checkered_flag: Starting ##
+<!-- TODO: write source build docs -->
 
 ```bash
+# Install pm2 - a nodejs process manager
+$ npm i -g pm2
+$ pm2 list
+
 # Clone this project
-$ git clone https://github.com/{{YOUR_GITHUB_USERNAME}}/react-dcim-master
+$ git clone https://github.com/ubccr/heorot heorot
 
-# Access
-$ cd react-dcim-master
+# Install the API dependencies
+$ cd ~/heorot/api
+$ npm i
+# Install the Client dependencies
+$ cd ~/heorot/client
+$ npm i
 
-# Install dependencies
-$ yarn
+# Edit the config files
+$ vim ~/heorot/api/config.js
+$ vim ~/heorot/client/config.js
 
-# Run the project
-$ yarn start
+# Allow port 443 binding
+$ sudo setcap cap_net_bind_service=+ep /usr/bin/node
 
-# The server will initialize in the <http://localhost:3000>
+# Use pm2 to start the API and Client
+$ pm2 start --name API ~/heorot/api/server.js --watch
+~/heorot/client$ pm2 start --name client npm -- start
+
+# save processes
+$ pm2 save
+
+
 ```
 
-## :memo: License ##
+## :memo: License
 
-This project is under license from MIT. For more details, see the [LICENSE](LICENSE.md) file.
-
-
-Made with :heart: by <a href="https://github.com/{{YOUR_GITHUB_USERNAME}}" target="_blank">{{YOUR_NAME}}</a>
+This project released under the GPLv3 license . For more details, see the [LICENSE](LICENSE.md) file.
 
 &#xa0;
 
