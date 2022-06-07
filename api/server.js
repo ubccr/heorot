@@ -1,14 +1,18 @@
 const express = require("express")
 const app = express()
 const cors = require("cors")
+require("dotenv").config()
+
+let config = require("./config")
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 const https = require("https")
 const fs = require("fs")
 const cert = {
-  key: fs.readFileSync("./keys/server.key"),
-  cert: fs.readFileSync("./keys/server.cert"),
+  key: fs.readFileSync(config.keys.serverKey),
+  cert: fs.readFileSync(config.keys.serverCert),
 }
 const jwt = require("jsonwebtoken")
 
@@ -17,7 +21,6 @@ app.use(express.static(__dirname + "/build"))
 app.use(cors())
 const auth = require("./modules/auth")
 
-// MongoDB database connection
 require("./modules/db")
 
 app.get("/", function (req, res) {
@@ -51,15 +54,16 @@ app.get("/all", async function (req, res) {
 
 const Server = https.createServer(cert, app)
 const io = require("socket.io")(Server, {
-  cors: { origin: "https://10.60.9.224:3000" },
+  cors: { origin: config.origin },
 })
 const SSHClient = require("ssh2").Client
-const consoleMessage =
-  "\r\n KEY MAPPING FOR CONSOLE REDIRECTION: \r\n \r\n Use the <ESC><1> key sequence for <F1> \r\n Use the <ESC><2> key sequence for <F2> \r\n Use the <ESC><3> key sequence for <F3> \r\n Use the <ESC><0> key sequence for <F10> \r\n Use the <ESC><!> key sequence for <F11> \r\n Use the <ESC><@> key sequence for <F12> \r\n \r\n Use the <ESC><Ctrl><M> key sequence for <Ctrl><M> \r\n Use the <ESC><Ctrl><H> key sequence for <Ctrl><H> \r\n Use the <ESC><Ctrl><I> key sequence for <Ctrl><I> \r\n Use the <ESC><Ctrl><J> key sequence for <Ctrl><J> \r\n \r\n Use the <ESC><X><X> key sequence for <Alt><x>, where x is any letter key, and X is the upper case of that key \r\n \r\n Use the <ESC><R><ESC><r><ESC><R> key sequence for <Ctrl><Alt><Del> \r\n"
+// TODO: Verify key mapping
+// const consoleMessage =
+//   "\r\n KEY MAPPING FOR CONSOLE REDIRECTION: \r\n \r\n Use the <ESC><1> key sequence for <F1> \r\n Use the <ESC><2> key sequence for <F2> \r\n Use the <ESC><3> key sequence for <F3> \r\n Use the <ESC><0> key sequence for <F10> \r\n Use the <ESC><!> key sequence for <F11> \r\n Use the <ESC><@> key sequence for <F12> \r\n \r\n Use the <ESC><Ctrl><M> key sequence for <Ctrl><M> \r\n Use the <ESC><Ctrl><H> key sequence for <Ctrl><H> \r\n Use the <ESC><Ctrl><I> key sequence for <Ctrl><I> \r\n Use the <ESC><Ctrl><J> key sequence for <Ctrl><J> \r\n \r\n Use the <ESC><X><X> key sequence for <Alt><x>, where x is any letter key, and X is the upper case of that key \r\n \r\n Use the <ESC><R><ESC><r><ESC><R> key sequence for <Ctrl><Alt><Del> \r\n"
 
 io.on("connection", function (socket) {
   socket.on("auth", function (token) {
-    jwt.verify(token, process.env.API_JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, config.auth.API_JWT_SECRET, (err, decoded) => {
       if (!err) {
         socket.emit("auth", "authenticated")
         socket.on("node", function (data) {
@@ -68,7 +72,7 @@ io.on("connection", function (socket) {
           let SSHConnection = {
             host: nodeAddr,
             port: 22,
-            username: "ccrbmc",
+            username: config.bmc.DELL_USER,
             privateKey: fs.readFileSync("./keys/bmc.key"),
           }
           var conn = new SSHClient()

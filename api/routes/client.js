@@ -25,8 +25,8 @@ app.get("/", (req, res) => {
 app.get("/rack/:rack", async (req, res) => {
   const rack = req.params.rack
   let rackRes = await grendelRequest(`/v1/host/tags/${rack}`)
-  if (rackRes.grendelResponse === "success") {
-    let resGrendel = rackRes.response
+  if (rackRes.status === "success") {
+    let resGrendel = rackRes.result
     let nodes = new Array(43).fill().map((val, index) => {
       return { u: index, type: "" }
     })
@@ -105,8 +105,8 @@ app.get("/node/:node", async (req, res) => {
   let result = []
 
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
-  if (nodeRes.grendelResponse === "success") {
-    let nodes = nodeRes.response
+  if (nodeRes.status === "success") {
+    let nodes = nodeRes.result
     if (nodes.length > 0) {
       nodes.forEach((element) => {
         result.push(element)
@@ -121,8 +121,8 @@ app.get("/node/:node", async (req, res) => {
     }
   } else {
     res.json({
-      status: nodeRes.grendelResponse,
-      result: nodeRes.response,
+      status: nodeRes.status,
+      result: nodeRes.result,
       code: nodeRes.code,
     })
   }

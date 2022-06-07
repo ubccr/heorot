@@ -1,13 +1,14 @@
 const fetch = require("node-fetch")
 const https = require("https")
 
-const api_user = process.env.JS_DELL_BMC_USERNAME
-const api_pass = process.env.JS_DELL_BMC_PASSWORD
+let config = require("../config")
 
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
-let encoded = Buffer.from(api_user + ":" + api_pass).toString("base64")
+let encoded = Buffer.from(
+  config.bmc.DELL_USER + ":" + config.bmc.DELL_PASS
+).toString("base64")
 let auth = "Basic " + encoded
 let header = {
   headers: {

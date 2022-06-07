@@ -1,15 +1,15 @@
 const fetch = require("node-fetch")
 
-require("dotenv")
+let config = require("../config")
 
 async function warrantyApiReq(serviceTag) {
-  let token = process.env.JS_DELL_WARRANTY_API_TOKEN
+  let token = config.auth.WARRANTY_API_TOKEN
   let warrantyRes = await warrantyAPI(serviceTag, token)
 
   if (warrantyRes.Fault && warrantyRes.Fault.faultcode === "401") {
     let authRes = await authAPI()
     if (authRes.access_token) {
-      process.env.JS_DELL_WARRANTY_API_TOKEN = authRes.access_token
+      config.auth.WARRANTY_API_TOKEN = authRes.access_token
       token = authRes.access_token
     }
     warrantyRes = await warrantyAPI(serviceTag, token)
@@ -19,8 +19,8 @@ async function warrantyApiReq(serviceTag) {
 
 async function authAPI() {
   const url = `https://apigtwb2c.us.dell.com/auth/oauth/v2/token`
-  const clientId = process.env.JS_DELL_WARRANTY_API_ID
-  const clientSecret = process.env.JS_DELL_WARRANTY_API_SECRET
+  const clientId = config.auth.WARRANTY_API_ID
+  const clientSecret = config.auth.WARRANTY_API_SECRET
 
   let params = new URLSearchParams()
 

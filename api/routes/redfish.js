@@ -31,7 +31,7 @@ app.get("/dell/:node", async (req, res) => {
   //   GPU check
   let gpu = false
   let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
-  let grendelNode = grendelRes.response[0]
+  let grendelNode = grendelRes.result[0]
   grendelNode.interfaces.forEach((element) => {
     if (element.fqdn.substring(0, 3) === "bmc") bmc = element.fqdn
   })
@@ -60,11 +60,8 @@ app.get("/sel/:node", async (req, res) => {
   let bmc = ""
   let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
 
-  if (
-    grendelRes.grendelResponse === "success" &&
-    grendelRes.response.length !== 0
-  ) {
-    let grendelNode = grendelRes.response[0]
+  if (grendelRes.status === "success" && grendelRes.result.length !== 0) {
+    let grendelNode = grendelRes.result[0]
     grendelNode.interfaces.forEach((element) => {
       if (element.fqdn.substring(0, 3) === "bmc") bmc = element.fqdn
     })

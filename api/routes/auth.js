@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express.Router()
+let config = require("../config")
 
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
@@ -26,13 +27,10 @@ app.post("/signup", async (req, res) => {
     background: "none",
     theme: "light",
   }
-  // query to check if the username is taken
   let query = await User.findOne({ username: data.username }).exec()
-  // if query is null set newUser to data obj & save to DB
   if (query === null) {
     let newUser = new User({ ...data })
     newUser.save(function (err, user) {
-      // send status with err
       if (err)
         res.json({
           status: "error",
@@ -53,10 +51,10 @@ app.post("/signin", async (req, res) => {
   const username = req.body.username
   const password = req.body.password
   let query = await User.findOne({ username: username }).exec()
-  // TODO: query errors?
+  // TODO: Handle query errors
   if (query !== null) {
     if (bcrypt.compareSync(password, query.password)) {
-      let token = jwt.sign({ id: query.id }, process.env.API_JWT_SECRET, {
+      let token = jwt.sign({ id: query.id }, config.auth.API_JWT_SECRET, {
         expiresIn: 28800, // 8 hours
       })
       res.send({

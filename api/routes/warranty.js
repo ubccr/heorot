@@ -1,10 +1,11 @@
 const express = require("express")
 const app = express.Router()
 const fetch = require("node-fetch")
-const { exists } = require("../models/Warranty")
 const Warranty = require("../models/Warranty")
 
-require("dotenv")
+// TODO: deprecate
+// const { exists } = require("../models/Warranty")
+
 const grendelRequest = require("../modules/grendel")
 const { biosApi } = require("../modules/nodeApi")
 const { warrantyApiReq } = require("../modules/Warranty")
@@ -24,10 +25,10 @@ app.get("/", (req, res) => {
 app.get("/add/:tags", async (req, res) => {
   const tags = req.params.tags
 
-  let result = await grendelRequest(`/v1/host/tags/${tags}`)
-  if (result.grendelResponse === "success") {
+  let response = await grendelRequest(`/v1/host/tags/${tags}`)
+  if (response.status === "success") {
     let arr = []
-    for (const nodes of result.response) {
+    for (const nodes of response.result) {
       if (
         nodes.name.substring(0, 3) === "cpn" ||
         nodes.name.substring(0, 3) === "srv"

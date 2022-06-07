@@ -3,6 +3,8 @@ const app = express.Router()
 const { spawn } = require("child_process")
 const fs = require("fs")
 
+let config = require("../config")
+
 const grendelRequest = require("../modules/grendel")
 
 app.get("/", (req, res) => {
@@ -58,21 +60,22 @@ app.get("/untag/:nodeset/:tags", async (req, res) => {
     await grendelRequest(`/v1/host/untag/${nodeset}?tags=${tags}`, "PUT")
   )
 })
+// TODO: Error testing
 app.post("/discover", async (req, res) => {
   let output = {}
   let stdout = ""
   let args = [
     "discover",
     "switch",
-    "-c grendel.toml",
-    "-m mapping.txt",
+    `-c ${config.grendel.configPath}`,
+    `-m ${config.grendel.mappingName}`,
     `--endpoint ${req.body.sw}.${req.body.domain}`,
     `--domain ${req.body.domain}`,
     `--subnet ${req.body.subnet}`,
     `--bmc-subnet ${req.body.bmcSubnet}`,
   ]
   fs.writeFile(
-    "/home/ubuntu/dcim/grendel/mapping.txt",
+    `${config.grendel.cwd}/${config.grendel.mappingName}`,
     req.body.mapping,
     (err) => {
       if (err) {
@@ -82,7 +85,7 @@ app.post("/discover", async (req, res) => {
         return
       } else {
         const grendel = spawn("grendel", args, {
-          cwd: "/home/ubuntu/dcim/grendel",
+          cwd: config.grendel.cwd,
           shell: true,
         })
         grendel.stdout.on("data", (data) => {

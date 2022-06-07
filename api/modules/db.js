@@ -1,18 +1,11 @@
-require("dotenv").config()
-
+let config = require("../config")
 const mongoose = require("mongoose")
 
-const config = {
-  host: "localhost",
-  database: "dcim",
-  options: {
-    auth: { authSource: "admin" },
-    user: process.env.DB_USER,
-    pass: process.env.DB_PASSWORD,
-  },
-}
 mongoose
-  .connect(`mongodb://${config.host}/${config.database}`, config.options)
+  .connect(
+    `mongodb://${config.db.host}/${config.db.database}`,
+    config.db.options
+  )
   .then(() => {
     console.log("Successfully connected to DB")
   })

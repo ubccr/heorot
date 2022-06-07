@@ -1,38 +1,38 @@
 const { default: got } = require("got")
 
-const grendelSocket = "/home/ubuntu/dcim/grendel/grendel-api.socket"
+let config = require("../config")
 
 async function grendelRequest(path, method = "GET", body = {}) {
   try {
     let response = {}
     switch (method) {
       case "GET":
-        response = await got(`unix:${grendelSocket}:${path}`)
+        response = await got(`unix:${config.grendel.socket}:${path}`)
         break
       case "PUT":
-        response = await got.put(`unix:${grendelSocket}:${path}`)
+        response = await got.put(`unix:${config.grendel.socket}:${path}`)
         break
       case "POST":
-        response = await got.post(`unix:${grendelSocket}:${path}`, {
+        response = await got.post(`unix:${config.grendel.socket}:${path}`, {
           json: body,
         })
         break
       case "DELETE":
-        response = await got.delete(`unix:${grendelSocket}:${path}`)
+        response = await got.delete(`unix:${config.grendel.socket}:${path}`)
         break
     }
-    return { grendelResponse: "success", response: JSON.parse(response.body) }
+    return { status: "success", result: JSON.parse(response.body) }
   } catch (err) {
     if (err.code === "ENOENT" && err.response === undefined) {
       return {
-        grendelResponse: "error",
-        response: { message: "Connection to API failed" },
+        status: "error",
+        result: { message: "Connection to API failed" },
         code: err.code,
       }
     } else {
       return {
-        grendelResponse: "error",
-        response: JSON.parse(err.response.body),
+        status: "error",
+        result: JSON.parse(err.response.body),
         code: err.code,
       }
     }

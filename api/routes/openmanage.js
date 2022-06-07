@@ -3,18 +3,17 @@ const app = express.Router()
 const https = require("https")
 const fetch = require("node-fetch")
 
-const { validate } = require("../models/User")
+// TODO: deprecate
+// const { validate } = require("../models/User")
 
-require("dotenv")
-
-const omeApiUrl = "https://cld-openmanage.cbls.ccr.buffalo.edu"
-const omeApiUser = process.env.OME_API_USERNAME
-const omeApiPass = process.env.OME_API_PASSWORD
+let config = require("../config")
 
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
-let omeEncoded = Buffer.from(omeApiUser + ":" + omeApiPass).toString("base64")
+let omeEncoded = Buffer.from(config.ome.user + ":" + config.ome.pass).toString(
+  "base64"
+)
 let omeAuth = "Basic " + omeEncoded
 let omeHeader = {
   headers: {
@@ -41,9 +40,9 @@ app.get("/nodes", async (req, res) => {
   let warningNodes = []
   let criticalNodes = []
   let url = `/api/DeviceService/Devices?$orderby=DeviceName desc &$filter=Status eq 3000`
-  let warningRes = await apiRequest(omeApiUrl + url, omeHeader)
+  let warningRes = await apiRequest(config.ome.url + url, omeHeader)
   url = `/api/DeviceService/Devices?$orderby=DeviceName desc &$filter=Status eq 4000`
-  let criticalRes = await apiRequest(omeApiUrl + url, omeHeader)
+  let criticalRes = await apiRequest(config.ome.url + url, omeHeader)
   if (warningRes.status === "success") {
     warningRes.result.forEach((element) => {
       warningNodes.push({
@@ -81,7 +80,7 @@ app.get("/nodes", async (req, res) => {
 app.get("/health/:id", async (req, res) => {
   let json = new Object()
   const url =
-    omeApiUrl +
+    config.ome.url +
     "/api/DeviceService/Devices(" +
     req.params.id +
     ")/SubSystemHealth"
