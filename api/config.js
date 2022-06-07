@@ -47,7 +47,7 @@ config.grendel = {
 
 // OpenManage Enterprise
 config.ome = {
-  url: "https://cld-openmanage.cbls.ccr.buffalo.edu",
+  url: process.env.OME_API_URL,
   user: process.env.OME_API_USERNAME,
   pass: process.env.OME_API_PASSWORD,
 }
