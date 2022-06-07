@@ -20,13 +20,13 @@ const Provision = ({ node, data, refetch, setRefetch }) => {
         "x-access-token": user.accessToken,
       },
     }
-    let result = await (await fetch(url, payload)).json()
+    let response = await (await fetch(url, payload)).json()
 
-    if (result.grendelResponse === "success" && result.response.hosts === 1) {
+    if (response.status === "success" && response.result.hosts === 1) {
       enqueueSnackbar(`${node} successfully updated`, { variant: "success" })
     } else {
       enqueueSnackbar(
-        `Node provision change error. Response: ${result.response.message}`,
+        `Node provision change error. Response: ${response.result.message}`,
         { variant: "error" }
       )
     }

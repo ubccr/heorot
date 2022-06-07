@@ -33,11 +33,11 @@ const EditJson = () => {
       )
         .then((res) => res.json())
         .then((result) => {
-          if (result.grendelResponse === "success")
-            setNodeJson(JSON.stringify(result.response, null, 4))
-          else if (result.grendelResponse === "error")
+          if (result.status === "success")
+            setNodeJson(JSON.stringify(result.result, null, 4))
+          else if (result.status === "error")
             enqueueSnackbar(
-              `Failed to fetch node. Response: ${result.response.message}`,
+              `Failed to fetch node. Response: ${result.result.message}`,
               {
                 variant: "error",
               }
@@ -66,13 +66,13 @@ const EditJson = () => {
       )
         .then((res) => res.json())
         .then((result) => {
-          if (result.grendelResponse === "success") {
+          if (result.status === "success") {
             enqueueSnackbar(`Successfully updated host: ${editNode}`, {
               variant: "success",
             })
-          } else if (result.grendelResponse === "error")
+          } else if (result.status === "error")
             enqueueSnackbar(
-              `Failed to edit node. Response: ${result.response.message}`,
+              `Failed to edit node. Response: ${result.result.message}`,
               {
                 variant: "error",
               }

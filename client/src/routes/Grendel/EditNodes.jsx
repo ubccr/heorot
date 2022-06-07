@@ -56,14 +56,14 @@ const EditNodes = () => {
       fetch(url, payload)
         .then((res) => res.json())
         .then((result) => {
-          if (result.grendelResponse === "success")
+          if (result.status === "success")
             enqueueSnackbar(
-              `Successfully edited ${result.response.hosts} host(s)`,
+              `Successfully edited ${result.result.hosts} host(s)`,
               { variant: "success" }
             )
-          else if (result.grendelResponse === "error")
+          else if (result.status === "error")
             enqueueSnackbar(
-              `Failed to fetch node. Response: ${result.response.message}`,
+              `Failed to fetch node. Response: ${result.result.message}`,
               {
                 variant: "error",
               }

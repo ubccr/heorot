@@ -74,7 +74,7 @@ const FloorPlan = () => {
     fetch(url, payload)
       .then((res) => res.json())
       .then((response) => {
-        setNodes(response.response)
+        setNodes(response.result)
         setLoading(false)
       })
     return () => {

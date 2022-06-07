@@ -86,16 +86,16 @@ const AddNodes = () => {
       )
         .then((res) => res.json())
         .then((result) => {
-          if (result.grendelResponse === "success") {
+          if (result.status === "success") {
             enqueueSnackbar(
-              `Successfully added ${result.response.hosts} host(s)`,
+              `Successfully added ${result.result.hosts} host(s)`,
               {
                 variant: "success",
               }
             )
-          } else if (result.grendelResponse === "error")
+          } else if (result.status === "error")
             enqueueSnackbar(
-              `Failed to edit node. Response: ${result.response.message}`,
+              `Failed to edit node. Response: ${result.result.message}`,
               {
                 variant: "error",
               }

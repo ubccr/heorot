@@ -72,14 +72,17 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
             "x-access-token": user.accessToken,
           },
         }
-        let result = await (await fetch(url, payload)).json()
-        if (result.grendelResponse === "success")
-          enqueueSnackbar(method + "ed: [" + result.response.tags + "] ", {
+        let response = await (await fetch(url, payload)).json()
+        if (response.status === "success")
+          enqueueSnackbar(method + "ed: [" + response.result.tags + "] ", {
             variant: "success",
           })
         else
           enqueueSnackbar(
-            method + " tags error. Response: " + result.response.message + " ",
+            method +
+              " tags error. Response: " +
+              response.response.message +
+              " ",
             { variant: "error" }
           )
       }

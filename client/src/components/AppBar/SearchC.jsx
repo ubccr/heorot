@@ -33,9 +33,9 @@ const SearchC = ({ action, setOutput }) => {
           payload
         )
       ).json()
-      if (query.grendelResponse === "success" && active) {
+      if (query.status === "success" && active) {
         let nodes = []
-        query.response.forEach((element) => {
+        query.result.forEach((element) => {
           nodes.push({ name: element.name })
         })
         setOptions([...nodes])
