@@ -7,3 +7,4 @@ server.cert
 bmc.key
 bmc.key.pub
 .env
+config.js
