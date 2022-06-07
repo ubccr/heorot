@@ -1,4 +1,6 @@
+// TODO: pdu integration
 function pduFormat(grendel, nodeset) {}
+
 function switchFormat(grendel, nodeset, rackGrendel) {
   let ip = grendel.interfaces[0].ip.split(".")
   let vlan = ip[2]
