@@ -17,19 +17,12 @@
 </div>
 
 <!-- Status  -->
-<hr>
- <h2 align="center">
+<!-- <hr> -->
+ <!-- <h2 align="center">
 	🚧  Heorot is under construction...  🚧
-</h2>
-
-## TODO:
-
-Upload config files \
-Create Production install docs
+</h2> -->
 
 <hr>
-
-<br>
 
 ## :dart: About
 
@@ -40,7 +33,7 @@ Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_bla
 :heavy_check_mark: Visualizes Floor and Rack layouts \
 :heavy_check_mark: Provides a beautiful UI to manage Grendel \
 :heavy_check_mark: Displays node information from the Redfish API \
-:heavy_check_mark: Integration of OpenMange Enterprise alerts \
+:heavy_check_mark: Integration of OpenMange Enterprise alerts
 
 ## :white_check_mark: Requirements
 
