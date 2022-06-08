@@ -41,6 +41,7 @@ const Index = () => {
           let data = response.result[0]
           data.provision = response.result[0].provision.toString()
           if (data.tags === null) data.tags = []
+          if (data.tags.includes("legacyAPI")) setSimple(false)
 
           data.interfaces.forEach((val, index) => {
             if (val.fqdn.substring(0, 3) === "bmc") setBMC(val.fqdn)
