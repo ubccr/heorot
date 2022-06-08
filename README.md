@@ -16,31 +16,37 @@
   <!-- <img alt="Github stars" src="https://img.shields.io/github/stars/ubccr/heorot?color=56BEB8" /> -->
 </div>
 
-<!-- Status -->
+<!-- Status  -->
+<hr>
+ <h2 align="center">
+	🚧  Heorot is under construction...  🚧
+</h2>
 
-<!-- <h4 align="center">
-	🚧  Heorot 🚀 Under construction...  🚧
-</h4>
+## TODO:
 
-<hr> -->
+Upload config files \
+Create Production install docs
+
+<hr>
 
 <br>
 
 ## :dart: About
 
-Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_blank">Grendel</a> providing a Web-UI for managing a data center worth of nodes
+Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_blank">Grendel</a> providing a Web-UI for managing a data center worth of nodes.
 
-<!-- ## :sparkles: Features
+## :sparkles: Features
 
-:heavy_check_mark: Feature 1;\
-:heavy_check_mark: Feature 2;\
-:heavy_check_mark: Feature 3; -->
+:heavy_check_mark: Visualizes Floor and Rack layouts \
+:heavy_check_mark: Provides a beautiful UI to manage Grendel \
+:heavy_check_mark: Displays node information from the Redfish API \
+:heavy_check_mark: Integration of OpenMange Enterprise alerts \
 
 ## :white_check_mark: Requirements
 
 Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [Node](https://nodejs.org/en/), [MongoDB](https://www.mongodb.com/docs/manual/installation/), and [Grendel](https://github.com/ubccr/grendel) installed.
 
-## :checkered_flag: Build from source
+## :checkered_flag: Dev environment
 
 <!-- TODO: write source build docs -->
 
@@ -63,8 +69,21 @@ $ npm i
 $ vim ~/heorot/api/config.js
 $ vim ~/heorot/client/config.js
 
-# Allow port 443 binding
+# Allow port 443 binding (if applicable)
 $ sudo setcap cap_net_bind_service=+ep /usr/bin/node
+
+# -- DB config --
+# Enable authentication
+$ sudo nano /etc/mongod.conf
+  security:
+    authorization: enabled # <------
+$ sudo systemctl restart mongod.service
+
+$ mongosh
+# Create admin user to change user perms
+$ db.createUser({ user: "{{username}}", pwd: passwordPrompt(), roles: [{ role: "userAdminAnyDatabase", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" }] })
+# Create api user - match the info set in the config files
+$ db.createUser({ user: "api", pwd: passwordPrompt(), roles: [{ role: "readWrite", db: "dcim" }] })
 
 # Use pm2 to start the API and Client
 $ pm2 start --name API ~/heorot/api/server.js --watch
@@ -72,6 +91,8 @@ $ pm2 start --name API ~/heorot/api/server.js --watch
 
 # save processes
 $ pm2 save
+
+# After creating a user in the webUI: Login to the DB and change the privileges in dcim > users to either "user" or "admin"
 
 
 ```
