@@ -1,9 +1,17 @@
 import { Box, Container, Divider, Typography } from "@mui/material"
+import { Link } from "react-router-dom"
 
 function Home() {
   return (
     <>
-      <Container style={{ textAlign: "center" }}>
+      <Container
+        style={{
+          textAlign: "center",
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+        }}
+      >
         <Box
           sx={{
             padding: "20px",
@@ -15,13 +23,11 @@ function Home() {
             color: "text.primary",
           }}
         >
-          <Typography variant="h3">
-            Dev React webpage designed by: Josh Furlani
-          </Typography>
+          <Typography variant="h2">Heorot</Typography>
+          <br />
           <Divider />
-          <Typography variant="h6">
-            Report any feature feature requests and / or bugs to
-            jafurlan@buffalo.edu
+          <Typography variant="body1">
+            New users can signup <Link to="/Signup">here</Link>
           </Typography>
         </Box>
       </Container>
