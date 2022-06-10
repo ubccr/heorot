@@ -36,7 +36,7 @@ $ mongosh
 $ use admin
 
 # Create mongo Admin user
-db.createUser({ user: "admin", pwd: passwordPrompt(), roles: [{ role: "root", db: "admin" }]})
+$ db.createUser({ user: "admin", pwd: passwordPrompt(), roles: [{ role: "root", db: "admin" }]})
 $ exit
 
 # Exit and login with your new user & password

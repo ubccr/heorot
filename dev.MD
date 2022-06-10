@@ -37,7 +37,7 @@ $ sudo systemctl restart mongod.service
 
 $ mongosh
 # Create admin user to change user perms
-$ db.createUser({ user: "{{username}}", pwd: passwordPrompt(), roles: [{ role: "userAdminAnyDatabase", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" }] })
+$ db.createUser({ user: "admin", pwd: passwordPrompt(), roles: [{ role: "root", db: "admin" }]})
 # Create api user - match the info set in the config files
 $ db.createUser({ user: "api", pwd: passwordPrompt(), roles: [{ role: "readWrite", db: "dcim" }] })
 
