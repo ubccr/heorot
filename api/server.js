@@ -122,4 +122,4 @@ io.on("connection", function (socket) {
   })
 })
 
-Server.listen(443)
+Server.listen(config.port)
