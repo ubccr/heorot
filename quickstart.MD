@@ -36,7 +36,7 @@ $ mongosh
 $ use admin
 
 # Create mongo Admin user
-$ db.createUser({user: "admin" , pwd: passwordPrompt() , roles: [{ role: "userAdminAnyDatabase" , db: "admin"}]})
+db.createUser({ user: "admin", pwd: passwordPrompt(), roles: [{ role: "root", db: "admin" }]})
 $ exit
 
 # Exit and login with your new user & password
@@ -57,16 +57,4 @@ Quick nodejs install
 $ curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
 $ sudo bash nodesource_setup.sh
 $ sudo apt install nodejs
-```
-
-## Grendel install
-
-For development purposes (only running the API)
-
-```bash
-$ mkdir grendel
-$ cd grendel
-# wget the .deb file from https://github.com/ubccr/grendel/releases
-$ sudo apt install ./grendel_x.x.x_amd64.deb
-$ grendel serve api &
 ```
