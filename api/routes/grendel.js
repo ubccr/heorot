@@ -68,53 +68,48 @@ app.post("/discover", async (req, res) => {
     "discover",
     "switch",
     `-c ${config.grendel.configPath}`,
-    `-m ${config.grendel.mappingName}`,
+    `-m ${config.grendel.mapping}`,
     `--endpoint ${req.body.sw}.${req.body.domain}`,
     `--domain ${req.body.domain}`,
     `--subnet ${req.body.subnet}`,
     `--bmc-subnet ${req.body.bmcSubnet}`,
   ]
-  fs.writeFile(
-    `${config.grendel.cwd}/${config.grendel.mappingName}`,
-    req.body.mapping,
-    (err) => {
-      if (err) {
-        output.status = "error"
-        output.error = err
-        res.json(output)
-        return
-      } else {
-        const grendel = spawn("grendel", args, {
-          cwd: config.grendel.cwd,
-          shell: true,
-        })
-        grendel.stdout.on("data", (data) => {
-          stdout += data
-        })
+  fs.writeFile(`${config.grendel.mapping}`, req.body.mapping, (err) => {
+    if (err) {
+      output.status = "error"
+      output.error = err
+      res.json(output)
+      return
+    } else {
+      const grendel = spawn("grendel", args, {
+        shell: true,
+      })
+      grendel.stdout.on("data", (data) => {
+        stdout += data
+      })
 
-        grendel.stderr.on("data", (data) => {
-          output.error = `stderr: ${data}`
-        })
+      grendel.stderr.on("data", (data) => {
+        output.error = `stderr: ${data}`
+      })
 
-        grendel.on("error", (error) => {
-          output.error = `error: ${error.message}`
-        })
+      grendel.on("error", (error) => {
+        output.error = `error: ${error.message}`
+      })
 
-        grendel.on("close", (code) => {
-          if (output.stderr === undefined) {
-            try {
-              output.node = JSON.parse(stdout)
-              output.status = "success"
-            } catch (e) {
-              output.status = "error"
-              output.message = e
-            }
+      grendel.on("close", (code) => {
+        if (output.stderr === undefined) {
+          try {
+            output.node = JSON.parse(stdout)
+            output.status = "success"
+          } catch (e) {
+            output.status = "error"
+            output.message = e
           }
-          res.json(output)
-        })
-      }
+        }
+        res.json(output)
+      })
     }
-  )
+  })
 })
 
 module.exports = app

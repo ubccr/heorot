@@ -42,9 +42,8 @@ if (config.environment === "dev") config.db.options.pass = ""
 // Grendel
 config.grendel = {
   socket: "", // path to Grendel UNIX socket **absolute path**
-  cwd: "", // path to grendel config & to write mapping file (ex /home/ubuntu/heorot/grendel)
-  configPath: "grendel.toml", // name of grendel config file (relative to cwd)
-  mappingName: "mapping.txt",
+  configPath: "/etc/grendel/grendel.toml", // path to grendel config file
+  mappingName: "/home/ubuntu/heorot/api/mapping.txt", // path to writable directory for mapping file
 }
 
 // OpenManage Enterprise
