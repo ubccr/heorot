@@ -41,7 +41,7 @@ if (config.environment === "dev") config.db.options.pass = ""
 
 // Grendel
 config.grendel = {
-  socket: "", // path to Grendel UNIX socket **absolute path**
+  socket: "", // path to Grendel UNIX socket **absolute path** (user nodejs is running as needs permissions to access {add to grendel group})
   configPath: "/etc/grendel/grendel.toml", // path to grendel config file
   mappingName: "/home/ubuntu/heorot/api/mapping.txt", // path to writable directory for mapping file
 }
