@@ -1,6 +1,11 @@
-Required keys:
+## Required keys:
 
-bmc.key - for bmc console redirection
-bmc.key.pub - need to upload onto idrac's
-server.cert - https cert for socket.io / console redirection
-server.key - https cert for socket.io / console redirection
+```bash
+# bmc.key - needed for idrac console redirection
+# Can be generated with
+$ ssh-keygen
+
+# server.cert & server.key - needed for https connection
+# Can be generated with
+$ openssl
+```

@@ -39,53 +39,42 @@ Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_bla
 
 Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [Node](https://nodejs.org/en/), [MongoDB](https://www.mongodb.com/docs/manual/installation/), and [Grendel](https://github.com/ubccr/grendel) installed.
 
-## :checkered_flag: Dev environment
-
-<!-- TODO: write source build docs -->
+## :checkered_flag: Production build
 
 ```bash
-# Install pm2 - a nodejs process manager
-$ npm i -g pm2
-$ pm2 list
+### For MongoDB configuration (See quickstart.MD for a sample install & config)
 
-# Clone this project
-$ git clone https://github.com/ubccr/heorot heorot
+$ git clone https://github.com/ubccr/heorot.git
 
-# Install the API dependencies
-$ cd ~/heorot/api
-$ npm i
-# Install the Client dependencies
-$ cd ~/heorot/client
+# Download node packages
+$ cd heorot/api
 $ npm i
 
-# Edit the config files
-$ vim ~/heorot/api/config.js
-$ vim ~/heorot/client/config.js
+# Generate an OpenSSL cert & ssh key (see api/keys/keys.MD)
 
-# Allow port 443 binding (if applicable)
+# Edit the config file
+$ vim config.js
+
+### If binding to port 443:
 $ sudo setcap cap_net_bind_service=+ep /usr/bin/node
 
-# -- DB config --
-# Enable authentication
-$ sudo nano /etc/mongod.conf
-  security:
-    authorization: enabled # <------
-$ sudo systemctl restart mongod.service
+# Run the webserver
+$ node server.js
+# Vist the hostname of your server & create a new account with "Signup"
 
-$ mongosh
-# Create admin user to change user perms
-$ db.createUser({ user: "{{username}}", pwd: passwordPrompt(), roles: [{ role: "userAdminAnyDatabase", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" }] })
-# Create api user - match the info set in the config files
-$ db.createUser({ user: "api", pwd: passwordPrompt(), roles: [{ role: "readWrite", db: "dcim" }] })
+# Don't login yet, open the mongo shell or use Atlas to edit the DB
+$ mongosh -u admin -p
 
-# Use pm2 to start the API and Client
-$ pm2 start --name API ~/heorot/api/server.js --watch
-~/heorot/client$ pm2 start --name client npm -- start
+$ use dcim
+# Ensure your username shows up
+$ db.users.find()
+# Update your user to 'admin' privs
+$ db.users.updateOne({username: 'your_username_here'},{$set:{privileges: 'admin'}})
+$ exit
 
-# save processes
-$ pm2 save
+### Note: all new users will have the default value of privileges: "none", they will need to have their privileges updated to either "user" or "admin" before they can use the webUI.
+# As of the time of writing, "admin" allows access to the "Warranty" page, which is used to query Dell's warranty API.
 
-# After creating a user in the webUI: Login to the DB and change the privileges in dcim > users to either "user" or "admin"
 
 
 ```
