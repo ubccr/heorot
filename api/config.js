@@ -1,7 +1,8 @@
 let config = {}
 
 config.environment = "prod" // dev | prod - disables auth token requirement for api requests
-config.origin = "http://localhost:3000" // set to client address
+config.origin = "https://localhost:443" // set to client address if using separate API & Client
+config.port = 443 // WebUI port
 
 // Keys - see readme in keys api/keys dir
 config.keys = {
@@ -34,15 +35,16 @@ config.db = {
     pass: "",
   },
 }
-if (config.environment === "dev")
-  config.db.options.pass = "" // set if you use a separate dev DB
+
+// Dev environemnt only
+if (config.environment === "dev") config.db.options.pass = ""
 
 // Grendel
 config.grendel = {
   socket: "", // path to Grendel UNIX socket **absolute path**
+  cwd: "", // path to grendel config & to write mapping file (ex /home/ubuntu/heorot/grendel)
   configPath: "grendel.toml", // name of grendel config file (relative to cwd)
   mappingName: "mapping.txt",
-  cwd: "", // path to grendel config & to write mapping file (ex /home/ubuntu/heorot/grendel)
 }
 
 // OpenManage Enterprise
