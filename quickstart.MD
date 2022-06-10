@@ -41,10 +41,32 @@ $ exit
 
 # Exit and login with your new user & password
 $ mongosh -u admin
-
+$ use dcim
 # Create API user - This user & password needs to go into the config.js file in heorot/api/
 $ db.createUser({user: "api" , pwd: passwordPrompt() , roles: [{ role: "readWrite" , db: "dcim"}]})
 $ exit
 
 # Continue to README.md for Heorot config
+```
+
+## Node.js install
+
+Quick nodejs install
+
+```bash
+$ curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
+$ sudo bash nodesource_setup.sh
+$ sudo apt install nodejs
+```
+
+## Grendel install
+
+For development purposes (only running the API)
+
+```bash
+$ mkdir grendel
+$ cd grendel
+# wget the .deb file from https://github.com/ubccr/grendel/releases
+$ sudo apt install ./grendel_x.x.x_amd64.deb
+$ grendel serve api &
 ```

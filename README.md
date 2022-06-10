@@ -42,7 +42,7 @@ Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [
 ## :checkered_flag: Production build
 
 ```bash
-### For MongoDB configuration (See quickstart.MD for a sample install & config)
+### See quickstart.MD for a sample install & config of requirements
 
 $ git clone https://github.com/ubccr/heorot.git
 
