@@ -1,8 +1,8 @@
 let config = {}
 
-config.environment = "prod" // dev | prod - disables auth token requirement for api requests
-config.origin = "https://localhost:443" // set to client address if using separate API & Client
-config.port = 443 // WebUI port
+config.environment = "prod" // dev | prod - allows you to make api requests without auth
+config.origin = "https://localhost:443" // If using separate API & Client change to client addr
+config.port = 443 // API port
 
 // Keys - see readme in keys api/keys dir
 config.keys = {
@@ -36,12 +36,9 @@ config.db = {
   },
 }
 
-// Dev environemnt only
-if (config.environment === "dev") config.db.options.pass = ""
-
 // Grendel
 config.grendel = {
-  socket: "", // path to Grendel UNIX socket **absolute path** (user nodejs is running as needs permissions to access {add to grendel group})
+  socket: "/var/lib/grendel/grendel-api.socket", // path to Grendel UNIX socket **absolute path** (user nodejs is running as needs permissions to access {add to grendel group})
   configPath: "/etc/grendel/grendel.toml", // path to grendel config file
   mappingName: "/home/ubuntu/heorot/api/mapping.txt", // path to writable directory for mapping file
 }
