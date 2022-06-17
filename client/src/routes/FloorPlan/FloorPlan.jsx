@@ -15,6 +15,7 @@ import { useEffect, useState, useContext } from "react"
 import { Link } from "react-router-dom"
 import { apiConfig } from "../../config"
 import { UserContext } from "../../contexts/UserContext"
+import { useSnackbar } from "notistack"
 
 const FloorPlan = () => {
   const floorX = [..."defghijklmnopqrstuvw"]
@@ -60,6 +61,7 @@ const FloorPlan = () => {
   const [Nodes, setNodes] = useState()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useContext(UserContext)
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     setRows(createRows(floorX))
@@ -74,8 +76,12 @@ const FloorPlan = () => {
     fetch(url, payload)
       .then((res) => res.json())
       .then((response) => {
-        setNodes(response.result)
-        setLoading(false)
+        if (response.status === "success") {
+          setNodes(response.result)
+          setLoading(false)
+        } else {
+          enqueueSnackbar(JSON.stringify(response.result), { variant: "error" })
+        }
       })
     return () => {
       setRows([])
