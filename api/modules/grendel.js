@@ -26,13 +26,25 @@ async function grendelRequest(path, method = "GET", body = {}) {
     if (err.code === "ENOENT" && err.response === undefined) {
       return {
         status: "error",
-        result: { message: "Connection to API failed" },
+        result: { message: "Grendel API connection failed" },
+        code: err.code,
+      }
+    } else if (err.code === "EACCES" && err.response === undefined) {
+      return {
+        status: "error",
+        result: { message: "Grendel API socket permission error" },
+        code: err.code,
+      }
+    } else if (err.response !== undefined) {
+      return {
+        status: "error",
+        result: JSON.parse(err.response.body),
         code: err.code,
       }
     } else {
       return {
         status: "error",
-        result: JSON.parse(err.response.body),
+        result: err,
         code: err.code,
       }
     }
