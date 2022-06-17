@@ -68,13 +68,13 @@ app.post("/discover", async (req, res) => {
     "discover",
     "switch",
     `-c ${config.grendel.configPath}`,
-    `-m ${config.grendel.mapping}`,
+    `-m ${config.grendel.mappingName}`,
     `--endpoint ${req.body.sw}.${req.body.domain}`,
     `--domain ${req.body.domain}`,
     `--subnet ${req.body.subnet}`,
     `--bmc-subnet ${req.body.bmcSubnet}`,
   ]
-  fs.writeFile(`${config.grendel.mapping}`, req.body.mapping, (err) => {
+  fs.writeFile(`${config.grendel.mappingName}`, req.body.mapping, (err) => {
     if (err) {
       output.status = "error"
       output.error = err
