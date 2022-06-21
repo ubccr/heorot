@@ -49,6 +49,11 @@ const TableC = ({ node }) => {
         }
         setLoading(false)
       })
+    return () => {
+      setLoading(true)
+      setError("")
+      setApiData({})
+    }
   }, [node])
 
   const [openSEL, setOpenSEL] = useState(false)

@@ -26,7 +26,7 @@ const Index = () => {
 
   useEffect(() => {
     const types = ["swi", "swe", "pdu"]
-    if (!types.includes(node.substring(0, 3))) {
+    if (types.includes(node.substring(0, 3))) {
       setSimple(true)
     }
     let payload = {
@@ -41,19 +41,24 @@ const Index = () => {
           let data = response.result[0]
           data.provision = response.result[0].provision.toString()
           if (data.tags === null) data.tags = []
-          if (data.tags.includes("legacyAPI")) setSimple(false)
+          if (data.tags.includes("legacyAPI")) setSimple(true)
 
           data.interfaces.forEach((val, index) => {
             if (val.fqdn.substring(0, 3) === "bmc") setBMC(val.fqdn)
           })
+          if (response.bmc === false) setSimple(true)
+
           setApiData(data)
           setLoading(false)
         } else {
           enqueueSnackbar(response.message, { variant: response.status })
         }
       })
+    return () => {
+      setSimple(false)
+      setLoading(true)
+    }
   }, [refetch, node])
-
   const handleClearSEL = () => {
     let bmc = null
     apiData.interfaces.forEach((val, index) => {
@@ -138,7 +143,7 @@ const Index = () => {
             </Box>
           </NewGridC>
 
-          {simple && (
+          {!simple && (
             <>
               <Console node={node} BMC={BMC} />
 
