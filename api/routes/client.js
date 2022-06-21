@@ -9,6 +9,7 @@ const {
   nodeFormat,
   quadNodeFormat,
 } = require("../modules/client")
+const config = require("../config")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -111,8 +112,15 @@ app.get("/node/:node", async (req, res) => {
       nodes.forEach((element) => {
         result.push(element)
       })
+      let bmcPlugin = false
+      if (config.bmc.DELL_USER !== "") bmcPlugin = true
 
-      res.json({ status: "success", node: node, result: result })
+      res.json({
+        status: "success",
+        node: node,
+        result: result,
+        bmc: bmcPlugin,
+      })
     } else {
       res.json({
         status: "error",
