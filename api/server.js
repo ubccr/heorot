@@ -46,10 +46,20 @@ app.use("/openmanage", auth, openmanageRouter)
 const warrantyRouter = require("./routes/warranty.js")
 app.use("/warranty", auth, warrantyRouter)
 
-app.get("/all", async function (req, res) {
-  let query = await User.find().exec()
+app.get("/plugins", async function (req, res) {
+  let warranty,
+    ome,
+    bmc = false
+  if (config.auth.WARRANTY_API_ID !== "") warranty = true
+  if (config.ome.url !== "") ome = true
+  if (config.bmc.DELL_USER !== "") bmc = true
 
-  res.json({ status: "success", query })
+  res.json({
+    status: "success",
+    warranty: warranty,
+    ome: ome,
+    bmc: bmc,
+  })
 })
 
 const Server = https.createServer(cert, app)
