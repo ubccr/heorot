@@ -27,7 +27,7 @@
 ## :dart: About
 
 Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_blank">Grendel</a> providing a Web-UI for managing a data center worth of nodes.
-Checkout the <a href="screenshots.MD">Screenshots</a> folder for an example of the UI
+Checkout the <a href="screenshots.MD">Screenshots</a> file for an example of the UI
 
 ## :sparkles: Features
 
