@@ -22,6 +22,7 @@ import AdminMenu from "./AppBar/AdminMenu"
 import { apiConfig } from "../config"
 import SearchC from "./AppBar/SearchC"
 import MainMenuC from "./AppBar/MainMenuC"
+import { useQuery } from "react-query"
 
 const AppBarC = () => {
   const { enqueueSnackbar } = useSnackbar()
@@ -52,6 +53,22 @@ const AppBarC = () => {
       fetch(`${apiConfig.apiUrl}/auth/setTheme`, payload)
     }
   }
+
+  const query = useQuery(
+    "plugins",
+    async () => {
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+      }
+      const res = await (
+        await fetch(`${apiConfig.apiUrl}/plugins`, payload)
+      ).json()
+      return res
+    },
+    { retry: 2 }
+  )
 
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpen = Boolean(anchorEl)
@@ -98,7 +115,7 @@ const AppBarC = () => {
             </Box>
           </Typography>
 
-          <MainMenuC user={user} />
+          <MainMenuC user={user} query={query} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <Button
               sx={{ my: 2, color: "white", textTransform: "capitalize" }}
@@ -114,13 +131,15 @@ const AppBarC = () => {
             >
               Floor Plan
             </Button>
-            <Button
-              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-              component={Link}
-              to={"/Alerts"}
-            >
-              Alerts
-            </Button>
+            {query.isFetched && !query.isError && query.data.ome === true && (
+              <Button
+                sx={{ my: 2, color: "white", textTransform: "capitalize" }}
+                component={Link}
+                to={"/Alerts"}
+              >
+                Alerts
+              </Button>
+            )}
             <Button
               sx={{ my: 2, color: "white", textTransform: "capitalize" }}
               component={Link}
@@ -128,7 +147,9 @@ const AppBarC = () => {
             >
               Grendel
             </Button>
-            {user !== null && user.privileges === "admin" && <AdminMenu />}
+            {user !== null && user.privileges === "admin" && (
+              <AdminMenu query={query} />
+            )}
           </Box>
 
           <Box sx={{ flexGrow: 1 }} />

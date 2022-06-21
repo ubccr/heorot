@@ -2,7 +2,7 @@ import { Button, Menu, MenuItem } from "@mui/material"
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
 
-const AdminMenu = () => {
+const AdminMenu = ({ query }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const openMenu = Boolean(anchorEl)
   const handleOpen = (event) => {
@@ -25,9 +25,15 @@ const AdminMenu = () => {
         open={openMenu}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose} component={Link} to={"/Admin/Warranty"}>
-          Warranty
-        </MenuItem>
+        {query.isFetched && !query.isError && query.data.warranty === true && (
+          <MenuItem
+            onClick={handleClose}
+            component={Link}
+            to={"/Admin/Warranty"}
+          >
+            Warranty
+          </MenuItem>
+        )}
       </Menu>
     </>
   )

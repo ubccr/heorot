@@ -4,7 +4,7 @@ import { Menu, MenuItem } from "@mui/material"
 import { Link } from "react-router-dom"
 import { useState } from "react"
 
-const MainMenuC = ({ user }) => {
+const MainMenuC = ({ user, query }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpen = Boolean(anchorEl)
   const handleMenuOpen = (event) => {
@@ -44,17 +44,23 @@ const MainMenuC = ({ user }) => {
         <MenuItem component={Link} to={"/FloorPlan"}>
           Floor Plan
         </MenuItem>
-        <MenuItem component={Link} to={"/Alerts"}>
-          Alerts
-        </MenuItem>
+        {query.isFetched && !query.isError && query.data.ome === true && (
+          <MenuItem component={Link} to={"/Alerts"}>
+            Alerts
+          </MenuItem>
+        )}
         <MenuItem component={Link} to={"/Grendel"}>
           Grendel
         </MenuItem>
-        {user !== null && user.privileges === "admin" && (
-          <MenuItem component={Link} to={"/Admin/Warranty"}>
-            Warranty
-          </MenuItem>
-        )}
+        {user !== null &&
+          user.privileges === "admin" &&
+          query.isFetched &&
+          !query.isError &&
+          query.data.warranty === true && (
+            <MenuItem component={Link} to={"/Admin/Warranty"}>
+              Warranty
+            </MenuItem>
+          )}
       </Menu>
     </>
   )
