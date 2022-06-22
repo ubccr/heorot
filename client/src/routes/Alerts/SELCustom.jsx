@@ -78,9 +78,11 @@ const SELCustom = ({ data, node, type, icon }) => {
       <Dialog open={openSEL} onClose={handleCloseSEL} maxWidth="xl">
         <DialogContent>
           {selLoading && <LinearProgress />}
-          {!selLoading && selError === "" && (
-            <SELTable data={sel.selRes.sel.entries} />
-          )}
+          {!selLoading &&
+            selError === "" &&
+            sel.selRes.sel.entries !== undefined && (
+              <SELTable data={sel.selRes.sel.entries} />
+            )}
           {!selLoading && selError !== "" && (
             <Alert variant="outlined" severity="error">
               {selError}
