@@ -61,6 +61,9 @@ const MainMenuC = ({ user, query }) => {
               Warranty
             </MenuItem>
           )}
+        <MenuItem component={Link} to={"/Admin/ManageUsers"}>
+          Manage Users
+        </MenuItem>
       </Menu>
     </>
   )

@@ -34,6 +34,13 @@ const AdminMenu = ({ query }) => {
             Warranty
           </MenuItem>
         )}
+        <MenuItem
+          onClick={handleClose}
+          component={Link}
+          to={"/Admin/ManageUsers"}
+        >
+          Manage Users
+        </MenuItem>
       </Menu>
     </>
   )

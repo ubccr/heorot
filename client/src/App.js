@@ -27,6 +27,7 @@ import Node from "./routes/Node/Index"
 import Alerts from "./routes/Alerts/Index"
 import Warranty from "./routes/Admin/Warranty"
 import Grendel from "./routes/Grendel/Index"
+import ManageUsers from "./routes/Admin/ManageUsers"
 
 function App() {
   const queryClient = new QueryClient({
@@ -187,6 +188,14 @@ function App() {
                         element={
                           <PrivateRoute access="admin">
                             <Warranty />{" "}
+                          </PrivateRoute>
+                        }
+                      />
+                      <Route
+                        path="/Admin/ManageUsers"
+                        element={
+                          <PrivateRoute access="admin">
+                            <ManageUsers />{" "}
                           </PrivateRoute>
                         }
                       />
