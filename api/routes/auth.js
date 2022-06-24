@@ -60,6 +60,7 @@ app.post("/signin", async (req, res) => {
       res.send({
         status: "success",
         message: `Welcome ${username}, Successfully logged in`,
+        username: username,
         privileges: query.privileges,
         accessToken: token,
         background: query.background,
@@ -67,6 +68,48 @@ app.post("/signin", async (req, res) => {
       })
     } else res.json({ status: "error", message: "Password incorrect" })
   } else res.json({ status: "error", message: "Username not found" })
+})
+
+app.get("/users", auth, async (req, res) => {
+  let query = await User.find()
+    .select("username privileges createdAt updatedAt")
+    .exec()
+  if (query !== null) {
+    res.send({
+      status: "success",
+      result: query,
+    })
+  } else {
+    res.send({
+      status: "error",
+      message: "DB query error",
+    })
+  }
+})
+
+app.post("/updateUsers", auth, async (req, res) => {
+  console.log(req.body)
+  const action = req.body.action
+  const users = req.body.users.map((x) => {
+    return { username: x }
+  })
+
+  try {
+    let query = await User.updateMany(
+      { $or: users },
+      { $set: { privileges: action } }
+    )
+    res.json({
+      status: "success",
+      message: "Users have been successfully updated",
+    })
+  } catch (err) {
+    res.json({
+      status: "error",
+      message: "DB query error",
+      error: err,
+    })
+  }
 })
 
 app.post("/verifyToken", auth, async (req, res) => {
@@ -78,7 +121,7 @@ app.post("/setTheme", auth, async (req, res) => {
   const userId = req.userId
 
   try {
-    let query = await User.updateOne({ id: userId }, { theme: theme }).exec()
+    await User.updateOne({ id: userId }, { theme: theme }).exec()
     res.send({
       status: "success",
       message: "Theme successfully updated",
@@ -88,7 +131,7 @@ app.post("/setTheme", auth, async (req, res) => {
     res.json({
       status: "error",
       message: "DB connection error",
-      error,
+      error: err,
     })
   }
 })
