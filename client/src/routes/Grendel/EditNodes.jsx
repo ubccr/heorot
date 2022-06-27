@@ -77,7 +77,6 @@ const EditNodes = () => {
           }),
         }
       }
-      console.log(formValues)
       fetch(url, payload)
         .then((res) => res.json())
         .then((result) => {
