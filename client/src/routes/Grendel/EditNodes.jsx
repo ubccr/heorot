@@ -9,14 +9,20 @@ import {
   MenuItem,
   Button,
   FormHelperText,
+  Skeleton,
 } from "@mui/material"
 import { useSnackbar } from "notistack"
 
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useQuery } from "react-query"
 
 const EditNodes = () => {
-  const [formValues, setFormValues] = useState({ action: "", actionValue: "" })
+  const [formValues, setFormValues] = useState({
+    action: "",
+    actionValue: "",
+    value: "",
+  })
   const [formError, setFormError] = useState(false)
 
   const [user, setUser] = useContext(UserContext)
@@ -33,7 +39,6 @@ const EditNodes = () => {
         [field]: null,
       })
   }
-
   const handleSubmit = (event) => {
     event.preventDefault()
 
@@ -47,12 +52,32 @@ const EditNodes = () => {
       }
       let url = `${apiConfig.apiUrl}/grendel/`
       let nodeset = formValues.nodeset
+
       if (formValues.action === "provision") {
         if (formValues.actionValue === "true") url += `provision/${nodeset}`
         else if (formValues.actionValue === "false")
           url += `unprovision/${nodeset}`
-      } else if (formValues.action === "tags")
+      } else if (formValues.action === "tags") {
         url += `tag/${nodeset}/${formValues.tags}`
+      } else if (
+        formValues.action === "firmware" ||
+        formValues.action === "image"
+      ) {
+        url += `edit`
+        payload = {
+          method: "POST",
+          headers: {
+            "x-access-token": user.accessToken,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nodeset: formValues.nodeset,
+            action: formValues.action,
+            value: formValues.value,
+          }),
+        }
+      }
+      console.log(formValues)
       fetch(url, payload)
         .then((res) => res.json())
         .then((result) => {
@@ -71,8 +96,26 @@ const EditNodes = () => {
         })
     }
   }
+  const query = useQuery(
+    "image",
+    async () => {
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+      }
+      const res = await (
+        await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)
+      ).json()
+      if (res.status === "error")
+        enqueueSnackbar(res.message, { variant: "error" })
+      return res
+    },
+    { enabled: false }
+  )
+
   function validateForm() {
-    const { nodeset, action, actionValue, tags } = formValues
+    const { nodeset, action, actionValue, tags, value } = formValues
     const formErrors = {}
 
     if (!nodeset || nodeset === "")
@@ -82,6 +125,7 @@ const EditNodes = () => {
       formErrors.actionValue = "Value cannot be blank"
     else if (!tags && action === "tags")
       formErrors.tags = "Tags cannot be blank"
+    else if (!value) formErrors.value = "Value cannot be blank"
 
     return formErrors
   }
@@ -124,16 +168,20 @@ const EditNodes = () => {
                 label="Action"
                 onChange={(e) => {
                   setField("action", e.target.value)
+                  if (e.target.value === "image") query.refetch()
                 }}
               >
                 <MenuItem value={"provision"}>Set Provision</MenuItem>
                 <MenuItem value={"tags"}>Set Tags</MenuItem>
+                <MenuItem value={"firmware"}>Set Firmware</MenuItem>
+                <MenuItem value={"image"}>Set Boot Image</MenuItem>
               </Select>
               <FormHelperText error>{formError.action}</FormHelperText>
             </FormControl>
           </Grid>
+
           <Grid item xs>
-            {formValues.action == "provision" && (
+            {formValues.action === "provision" && (
               <FormControl sx={{ width: "100%" }}>
                 <InputLabel id="value-select-label">Value</InputLabel>
                 <Select
@@ -151,7 +199,7 @@ const EditNodes = () => {
                 <FormHelperText error>{formError.actionValue}</FormHelperText>
               </FormControl>
             )}
-            {formValues.action !== "provision" && (
+            {formValues.action === "tags" && (
               <TextField
                 error={!!formError.tags}
                 helperText={formError.tags}
@@ -162,6 +210,53 @@ const EditNodes = () => {
                   setField("tags", e.target.value)
                 }}
               ></TextField>
+            )}
+            {formValues.action === "firmware" && (
+              <FormControl sx={{ width: "100%" }}>
+                <InputLabel id="firmware-select-label">Value</InputLabel>
+                <Select
+                  error={!!formError.value}
+                  labelId="firmware-select-label"
+                  value={formValues.value}
+                  label="Value"
+                  onChange={(e) => {
+                    setField("value", e.target.value)
+                  }}
+                >
+                  <MenuItem value={"ipxe-x86_64.efi"}>ipxe-x86_64.efi</MenuItem>
+                  <MenuItem value={"snponly-x86_64.efi"}>
+                    snponly-x86_64.efi
+                  </MenuItem>
+                </Select>
+                <FormHelperText error>{formError.value}</FormHelperText>
+              </FormControl>
+            )}
+            {formValues.action === "image" && query.isFetched && (
+              <FormControl sx={{ width: "100%" }}>
+                <InputLabel id="image-select-label">Value</InputLabel>
+                <Select
+                  error={!!formError.value}
+                  labelId="image-select-label"
+                  value={formValues.value}
+                  label="Value"
+                  onChange={(e) => {
+                    setField("value", e.target.value)
+                  }}
+                >
+                  {query.data.result.map((val, index) => (
+                    <MenuItem value={val.name} key={index}>
+                      {val.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText error>{formError.value}</FormHelperText>
+              </FormControl>
+            )}
+            {formValues.action === "image" && !query.isFetched && (
+              <Skeleton variant="rectangle" height={60} animation="wave" />
+            )}
+            {formValues.action === "" && (
+              <TextField placeholder="Please select an Action" disabled />
             )}
           </Grid>
           <Grid item xs>
