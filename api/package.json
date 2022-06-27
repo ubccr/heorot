@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "dcim client api",
   "main": "server.js",
   "scripts": {
@@ -11,7 +11,6 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "got": "^11.8.3",
     "https": "^1.0.0",
