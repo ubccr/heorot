@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
     availibleRoutes: routes,
   })
 })
-
+// --- hosts ---
 app.get("/host/list", async (req, res) => {
   res.json(await grendelRequest("/v1/host/list"))
 })
@@ -60,6 +60,23 @@ app.get("/untag/:nodeset/:tags", async (req, res) => {
     await grendelRequest(`/v1/host/untag/${nodeset}?tags=${tags}`, "PUT")
   )
 })
+
+// --- images ---
+app.get("/image/list", async (req, res) => {
+  res.json(await grendelRequest(`/v1/bootimage/list`))
+})
+app.get("/image/find/:nodeset", async (req, res) => {
+  const nodeset = req.params.nodeset
+  res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`))
+})
+app.post("/image", async (req, res) => {
+  res.json(await grendelRequest(`/v1/bootimage`, "POST", req.body))
+})
+app.delete("/image/delete/:nodeset", async (req, res) => {
+  const nodeset = req.params.nodeset
+  res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`, "DELETE"))
+})
+
 // TODO: Error testing
 app.post("/discover", async (req, res) => {
   let output = {}
@@ -110,6 +127,30 @@ app.post("/discover", async (req, res) => {
       })
     }
   })
+})
+
+app.post("/edit", async (req, res) => {
+  const nodeset = req.body.nodeset
+  const action = req.body.action
+  const value = req.body.value
+
+  let originalJSON = await grendelRequest(`/v1/host/find/${nodeset}`)
+
+  if (originalJSON.status !== "error") {
+    let updatedJSON = originalJSON.result.map((val, index) => {
+      if (action === "firmware") val.firmware = value
+      else if (action === "image") val.boot_image = value
+      return val
+    })
+
+    let updateNode = await grendelRequest(`/v1/host`, "POST", updatedJSON)
+    res.json(updateNode)
+  } else {
+    res.json({
+      status: "error",
+      message: originalJSON.result.message,
+    })
+  }
 })
 
 module.exports = app
