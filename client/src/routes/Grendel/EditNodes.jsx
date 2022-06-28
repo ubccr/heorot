@@ -43,6 +43,7 @@ const EditNodes = () => {
     event.preventDefault()
 
     const newErrors = validateForm()
+    console.log(newErrors)
     if (Object.keys(newErrors).length > 0) setFormError(newErrors)
     else {
       let payload = {
@@ -57,8 +58,10 @@ const EditNodes = () => {
         if (formValues.actionValue === "true") url += `provision/${nodeset}`
         else if (formValues.actionValue === "false")
           url += `unprovision/${nodeset}`
-      } else if (formValues.action === "tags") {
+      } else if (formValues.action === "tag") {
         url += `tag/${nodeset}/${formValues.tags}`
+      } else if (formValues.action === "untag") {
+        url += `untag/${nodeset}/${formValues.tags}`
       } else if (
         formValues.action === "firmware" ||
         formValues.action === "image"
@@ -122,9 +125,10 @@ const EditNodes = () => {
     else if (action === "") formErrors.action = "Action cannot be blank"
     else if (actionValue === "" && action === "provision")
       formErrors.actionValue = "Value cannot be blank"
-    else if (!tags && action === "tags")
+    else if (!tags && (action === "tag" || action === "untag"))
       formErrors.tags = "Tags cannot be blank"
-    else if (!value) formErrors.value = "Value cannot be blank"
+    else if (!value && (action === "firmware" || action === "image"))
+      formErrors.value = "Value cannot be blank"
 
     return formErrors
   }
@@ -167,11 +171,13 @@ const EditNodes = () => {
                 label="Action"
                 onChange={(e) => {
                   setField("action", e.target.value)
+                  formValues.value = ""
                   if (e.target.value === "image") query.refetch()
                 }}
               >
                 <MenuItem value={"provision"}>Set Provision</MenuItem>
-                <MenuItem value={"tags"}>Set Tags</MenuItem>
+                <MenuItem value={"tag"}>Add Tags</MenuItem>
+                <MenuItem value={"untag"}>Remove Tags</MenuItem>
                 <MenuItem value={"firmware"}>Set Firmware</MenuItem>
                 <MenuItem value={"image"}>Set Boot Image</MenuItem>
               </Select>
@@ -198,7 +204,19 @@ const EditNodes = () => {
                 <FormHelperText error>{formError.actionValue}</FormHelperText>
               </FormControl>
             )}
-            {formValues.action === "tags" && (
+            {formValues.action === "tag" && (
+              <TextField
+                error={!!formError.tags}
+                helperText={formError.tags}
+                label="Value"
+                placeholder="z01,ubhpc,gpu"
+                sx={{ width: "100%" }}
+                onChange={(e) => {
+                  setField("tags", e.target.value)
+                }}
+              ></TextField>
+            )}
+            {formValues.action === "untag" && (
               <TextField
                 error={!!formError.tags}
                 helperText={formError.tags}
@@ -255,7 +273,11 @@ const EditNodes = () => {
               <Skeleton variant="rectangle" height={60} animation="wave" />
             )}
             {formValues.action === "" && (
-              <TextField placeholder="Please select an Action" disabled />
+              <TextField
+                sx={{ width: "100%" }}
+                placeholder="Please select an Action"
+                disabled
+              />
             )}
           </Grid>
           <Grid item xs>
