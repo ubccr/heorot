@@ -10,7 +10,9 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
+  IconButton,
 } from "@mui/material"
+import CloseIcon from "@mui/icons-material/Close"
 import { useState, useContext } from "react"
 import { useSnackbar } from "notistack"
 
@@ -123,7 +125,7 @@ const AddNodes = () => {
               <TextField
                 fullWidth
                 label="Domain"
-                defaultValue={"compute.cbls.ccr.buffalo.edu"}
+                defaultValue={apiConfig.grendelDomain}
                 name="domain"
                 required
               />
@@ -133,7 +135,7 @@ const AddNodes = () => {
                 fullWidth
                 label="Subnet"
                 name="subnet"
-                defaultValue={"10.64.0.0"}
+                defaultValue={apiConfig.grendelSubnet}
                 required
               />
             </Grid>
@@ -141,7 +143,7 @@ const AddNodes = () => {
               <TextField
                 fullWidth
                 label="BMC Subnet"
-                defaultValue={"10.128.0.0"}
+                defaultValue={apiConfig.grendelBmcSubnet}
                 name="bmcSubnet"
                 required
               />
@@ -185,7 +187,20 @@ const AddNodes = () => {
         fullWidth
         scroll="paper"
       >
-        <DialogTitle>Discovered Nodes:</DialogTitle>
+        <DialogTitle>
+          Discovered Nodes:
+          <IconButton
+            aria-label="close"
+            onClick={() => setOpen(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <TextField
           multiline
           value={nodeJson}
