@@ -1,7 +1,7 @@
 {
   "name": "api",
-  "version": "1.1.0",
-  "description": "dcim client api",
+  "version": "1.1.1",
+  "description": "Heorot API",
   "main": "server.js",
   "scripts": {
     "start": "npm run server.js"
