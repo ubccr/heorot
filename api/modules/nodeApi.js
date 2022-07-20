@@ -6,11 +6,11 @@ let config = require("../config")
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
-let encoded = Buffer.from(
+const encoded = Buffer.from(
   config.bmc.DELL_USER + ":" + config.bmc.DELL_PASS
 ).toString("base64")
-let auth = "Basic " + encoded
-let header = {
+const auth = "Basic " + encoded
+const header = {
   headers: {
     method: "GET",
     Authorization: auth,
@@ -376,6 +376,7 @@ async function apiRequest(url, http_header) {
     let fetch_res = await fetch(url, http_header)
     const json_res = await fetch_res.json()
     return {
+      status: "success",
       message: "success",
       json_res,
     }
