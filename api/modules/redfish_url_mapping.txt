@@ -1,0 +1,63 @@
+Dell:
+    14&15th Gen = v1.11.0+
+    13th Gen = v1.4.0-
+    12th Gen = v1.4.0-
+
+    #Model: /redfish/v1/Chassis/System.Embedded.1/ or /redfish/v1/Systems/System.Embedded.1 || /redfish/v1/Systems/System.Embedded.1/Bios
+    Service Tag: /redfish/v1/Systems/System.Embedded.1 || /redfish/v1/Systems/System.Embedded.1/Bios
+    #BIOS version: /redfish/v1/Systems/System.Embedded.1 || /redfish/v1/Systems/System.Embedded.1/Bios
+    BMC version: /redfish/v1/Managers/iDRAC.Embedded.1
+    Vlan: /redfish/v1/Managers/iDRAC.Embedded.1/EthernetInterfaces/NIC.1
+    Boot Order: /redfish/v1/Systems/System.Embedded.1/Bios
+    #Memory Size & status: /redfish/v1/Systems/System.Embedded.1
+    #CPUs: /redfish/v1/Systems/System.Embedded.1 || /redfish/v1/Systems/System.Embedded.1/Bios
+    GPUs: /redfish/v1/Systems/System.Embedded.1/Processors
+    Logs: /redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries
+
+    ---
+    BMC extras: /redfish/v1/Managers/iDRAC.Embedded.1/EthernetInterfaces/NIC.1
+    GPU Temps: /redfish/v1/Systems/System.Embedded.1/Processors/Video.Slot.2-1/Oem/Dell/ThermalMetrics
+    health status: /redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellRollupStatus
+    Storage: /redfish/v1/Systems/System.Embedded.1/SimpleStorage/RAID.SL.3-1
+    BIOS Release date: /redfish/v1/Systems/System.Embedded.1
+    Hostname:/redfish/v1/Systems/System.Embedded.1
+    Possible SEL error list: /redfish/v1/Managers/iDRAC.Embedded.1/LogServices/FaultList/Entries
+    Power Metrics (avg, max, current, efficency): /redfish/v1/Chassis/System.Embedded.1/Power
+    PS FW: ^
+    PS Status: ^
+    Redundancy: ^
+
+    Clear SEL: /redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Actions/LogService.ClearLog
+    Reset BMC: /redfish/v1/Managers/iDRAC.Embedded.1/Actions/Manager.Reset
+    Reboot node: /redfish/v1/Systems/System.Embedded.1/Actions/ComputerSystem.Reset
+HPE:
+    Model: /redfish/v1/Chassis/1/ && status && serial
+    Service Tag ^ (serial)
+    BIOS Version: /redfish/v1/Systems/1/
+    BMC Version: /redfish/v1/Managers/1/
+    Vlan: x?
+    Boot Order: x?
+    Memory Size: && status: /redfish/v1/Systems/1/
+    CPUs: /redfish/v1/Systems/1/
+    GPUs: x 
+    Logs: /redfish/v1/Systems/1/LogServices/IML/Entries/
+
+    Reset BMC: /redfish/v1/Managers/1/Actions/Manager.Reset/
+    Reset system: /redfish/v1/Systems/1/Actions/ComputerSystem.Reset/
+    Clear IML (Logs): /redfish/v1/Systems/1/LogServices/IML/Actions/LogService.ClearLog/
+    PXE boot: /redfish/v1/Systems/1/
+
+SuperMicro:
+    Model: /redfish/v1/Systems/1
+    Service Tag: x
+    BIOS Version: /redfish/v1/Systems/1
+    BMC Version: /redfish/v1/Managers/1
+    Vlan: x
+    Boot Order: x
+    Memory Size: /redfish/v1/Systems/1
+    CPUs:/redfish/v1/Systems/1/Processors/1
+    GPUs: x /redfish/v1/Systems/1/
+    Logs: /redfish/v1/Systems/1/LogServices/Log1/Entries
+
+    Reset sys: /redfish/v1/Systems/1/Actions/ComputerSystem.Reset"
+    Reset BMC: /redfish/v1/Managers/1/Actions/Manager.Reset
