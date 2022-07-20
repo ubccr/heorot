@@ -52,10 +52,11 @@ async function dell_systems(uri) {
     model: res.data.Model,
     serviceTag: res.data.SKU,
     biosVersion: res.data.BiosVersion,
+    manufacturer: res.data.Manufacturer,
     bootOrder: bootOrder,
     hostName: res.data.HostName,
     memoryStatus: res.data.MemorySummary.Status.Health,
-    totalMemory: res.data.MemorySummary.TotalSytemMemoryGiB,
+    totalMemory: res.data.MemorySummary.TotalSystemMemoryGiB,
     processorModel: res.data.ProcessorSummary.Model,
     processorCount: res.data.ProcessorSummary.Count,
     processorCores: res.data.ProcessorSummary.LogicalProcessorCount,
@@ -116,7 +117,7 @@ async function dell_gpu(uri, version) {
       let gpu_res = await api_request(physical_gpus, uri)
       let gpus = gpu_res.data.map((val) => {
         return {
-          GPUStatus: val.Status.Health,
+          GPUStatus: val.Status === null ? "Unknown" : val.Status.Health,
           manufacturer: val.Manufacturer,
           model: val.Model,
           processorType: val.ProcessorType,
@@ -234,23 +235,27 @@ async function dell_storage(uri) {
   }
 }
 
-async function redfishRequest(urls, oem) {
-  if (oem === "Dell") {
-  } else if (oem === "SuperMicro") {
-    return await Promise.all(
-      urls.endpoints.map(async (url) => {
-        return await api_request(urls.uri + url, urls.uri)
-      })
-    )
-  } else if (oem === "HPE") {
-    return await Promise.all(
-      urls.endpoints.map(async (url) => {
-        return await api_request(urls.uri + url, urls.uri)
-      })
-    )
-  } else {
+// SuperMicro
+async function sm_systems(uri) {
+  const url = uri + "/redfish/v1/Systems/1"
+  let res = await api_request(url, uri)
+
+  if (res.status === "success") {
+    return {
+      status: "success",
+      model: res.data.Model,
+      ServiceTag: res.data.SKU,
+      biosVersion: res.data.BiosVersion,
+      manufacturer: res.data.Manufacturer,
+
+      memoryStatus: res.data.MemorySummary.Status.Health,
+      totalMemory: res.data.MemorySummary.TotalSystemMemoryGiB,
+    }
   }
 }
+async function sm_managers(uri) {}
+
+async function sm_storage(uri) {}
 
 async function api_request(url, uri) {
   try {
