@@ -16,7 +16,8 @@ async function fetchOEM(bmcAddr) {
   if (apiRes.status === "success") {
     const resOEM = apiRes.data.Oem ?? { Dell: "" } // Best Guess
 
-    if (Object.keys(resOEM).length === 0) OEM = "SuperMicro"
+    if (Object.keys(resOEM).length === 0 || resOEM.hasOwnProperty("Supermicro"))
+      OEM = "SuperMicro"
     else if (resOEM.hasOwnProperty("Dell")) OEM = "Dell"
     else if (resOEM.hasOwnProperty("Hp")) OEM = "HPE"
 
@@ -49,6 +50,7 @@ async function dell_systems(uri) {
       : bootArr
   return {
     status: res.status,
+    hostStatus: res.data.Status.Health,
     model: res.data.Model,
     serviceTag: res.data.SKU,
     biosVersion: res.data.BiosVersion,
@@ -57,12 +59,13 @@ async function dell_systems(uri) {
     hostName: res.data.HostName,
     memoryStatus: res.data.MemorySummary.Status.Health,
     totalMemory: res.data.MemorySummary.TotalSystemMemoryGiB,
+    memorySpeed: res2.data.Attributes.SysMemSpeed,
+
     processorModel: res.data.ProcessorSummary.Model,
     processorCount: res.data.ProcessorSummary.Count,
     processorCores: res.data.ProcessorSummary.LogicalProcessorCount,
     processorStatus: res.data.ProcessorSummary.Status.Health,
 
-    memorySpeed: res2.data.Attributes.SysMemSpeed,
     logicalProc: res2.data.Attributes.LogicalProc,
     pxeDevice1: res2.data.Attributes.PxeDev1Interface ?? null,
     pxeDevice1Enabled: res2.data.Attributes.PxeDev1EnDis ?? null,
@@ -120,7 +123,6 @@ async function dell_gpu(uri, version) {
           GPUStatus: val.Status === null ? "Unknown" : val.Status.Health,
           manufacturer: val.Manufacturer,
           model: val.Model,
-          processorType: val.ProcessorType,
         }
       })
       return {
@@ -148,10 +150,9 @@ async function dell_gpu(uri, version) {
         .map((val) => {
           if (val.Manufacturer === "NVIDIA Corporation")
             return {
-              gpuStatus: val.Status.Health,
+              GPUStatus: val.Status.Health,
               manufacturer: val.Manufacturer,
               model: val.Name,
-              processorType: "GPU",
             }
         })
         .filter(Boolean)
@@ -237,25 +238,100 @@ async function dell_storage(uri) {
 
 // SuperMicro
 async function sm_systems(uri) {
-  const url = uri + "/redfish/v1/Systems/1"
-  let res = await api_request(url, uri)
+  const urls = [
+    uri + "/redfish/v1/Systems/1",
+    uri + "/redfish/v1/Systems/1/Processors/1",
+    uri + "/redfish/v1/Systems/1/Memory/1",
+  ]
+  let res = await api_request(urls, uri)
 
   if (res.status === "success") {
     return {
       status: "success",
-      model: res.data.Model,
-      ServiceTag: res.data.SKU,
-      biosVersion: res.data.BiosVersion,
-      manufacturer: res.data.Manufacturer,
+      hostStatus: res.data[0].Status.Health,
+      model: res.data[0].Model,
+      serviceTag: res.data[0].SKU,
+      biosVersion: res.data[0].BiosVersion,
+      manufacturer: res.data[0].Manufacturer,
+      bootOrder: null,
+      hostName: null,
+      memoryStatus: res.data[0].MemorySummary.Status.Health,
+      totalMemory: res.data[0].MemorySummary.TotalSystemMemoryGiB,
+      memorySpeed: res.data[2].OperatingSpeedMhz + " Mhz",
 
-      memoryStatus: res.data.MemorySummary.Status.Health,
-      totalMemory: res.data.MemorySummary.TotalSystemMemoryGiB,
+      processorModel: res.data[1].Model,
+      processorCount: res.data[0].ProcessorSummary.Count,
+      processorCores: res.data[1].TotalCores,
+      processorStatus: res.data[0].ProcessorSummary.Status.Health,
+      logicalProc:
+        res.data[1].TotalCores !== res.data[1].TotalThreads
+          ? "Enabled"
+          : "Disabled",
+      pxeDevice1: null,
+      pxeDevice1Enabled: null,
+      powerRecovery: null,
     }
+  } else return res
+}
+async function sm_managers(uri) {
+  const urls = [
+    uri + "/redfish/v1/Managers/1",
+    uri + "/redfish/v1/Managers/1/EthernetInterfaces/1",
+  ]
+  let res = await api_request(urls, uri)
+  if (res.status === "success") {
+    return {
+      status: "success",
+      BMCVersion: res.data[0].FirmwareVersion,
+      BMCStatus: res.data[0].Status.Health,
+      powerState: null,
+
+      hostName: null,
+      addresses: res.data[1].IPv4Addresses,
+      NIC: res.data[1].Id,
+      MAC: res.data[1].MACAddress,
+      DNS: res.data[1].NameServers,
+      VLAN: res.data[1].VLAN,
+    }
+  } else return res
+}
+
+async function sm_gpu(uri) {
+  const url = uri + "/redfish/v1/Chassis/1/PCIeDevices"
+  let res = await api_request(url, uri)
+  if (res.status === "success") {
+    let gpu_urls = res.data.Members.map((val) => {
+      let url_arr = val["@odata.id"].split("/")
+      if (url_arr[6].substring(0, 3) === "GPU")
+        return uri + val["@odata.id"] + "/PCIeFunctions/1"
+    }).filter(Boolean)
+
+    let gpu_res = await api_request(gpu_urls, uri)
+
+    let gpus = gpu_res.data.map((val) => {
+      return {
+        GPUStatus: val.Status.Health,
+        manufacturer: val.Oem.Supermicro.GPUDevice.GPUVendor,
+        model: val.Oem.Supermicro.GPUDevice.GPUModel,
+      }
+    })
+    return {
+      status: "success",
+      vGPU: null,
+      physical: gpu_urls.length,
+      virtual: null,
+      GPUs: gpus,
+    }
+  } else return res
+}
+
+async function sm_storage(uri) {
+  // Cannot implement without a license 😞
+  return {
+    status: "error",
+    message: "Feature not supported on SuperMicro nodes",
   }
 }
-async function sm_managers(uri) {}
-
-async function sm_storage(uri) {}
 
 async function api_request(url, uri) {
   try {
@@ -333,4 +409,8 @@ module.exports = {
   dell_managers,
   dell_gpu,
   dell_storage,
+  sm_systems,
+  sm_storage,
+  sm_managers,
+  sm_gpu,
 }

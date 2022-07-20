@@ -17,6 +17,10 @@ const {
   dell_systems,
   dell_gpu,
   dell_storage,
+  sm_systems,
+  sm_storage,
+  sm_managers,
+  sm_gpu,
 } = require("../modules/redfish")
 
 app.get("/", (req, res) => {
@@ -164,6 +168,8 @@ app.get("/v1/systems/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_systems(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+      api_res = await sm_systems(`https://${bmc.address}`)
 
     res.json(api_res)
   } else res.json(bmc)
@@ -177,6 +183,8 @@ app.get("/v1/managers/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_managers(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+      api_res = await sm_managers(`https://${bmc.address}`)
 
     res.json(api_res)
   } else res.json(bmc)
@@ -191,6 +199,8 @@ app.get("/v1/gpu/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_gpu(`https://${bmc.address}`, oem.version)
+    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+      api_res = await sm_gpu(`https://${bmc.address}`)
 
     res.json(api_res)
   } else res.json(bmc)
@@ -205,6 +215,8 @@ app.get("/v1/storage/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_storage(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+      api_res = await sm_storage(`https://${bmc.address}`)
 
     res.json(api_res)
   } else res.json(bmc)
