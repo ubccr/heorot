@@ -17,7 +17,8 @@ async function fetchOEM(bmcAddr) {
     const resOEM = apiRes.data.Oem ?? { Dell: "" } // Best Guess
 
     if (Object.keys(resOEM).length === 0 || resOEM.hasOwnProperty("Supermicro"))
-      OEM = "SuperMicro"
+      // pesky bugged out SM api
+      OEM = "Supermicro"
     else if (resOEM.hasOwnProperty("Dell")) OEM = "Dell"
     else if (resOEM.hasOwnProperty("Hp")) OEM = "HPE"
 
@@ -63,7 +64,9 @@ async function dell_systems(uri) {
 
     processorModel: res.data.ProcessorSummary.Model,
     processorCount: res.data.ProcessorSummary.Count,
-    processorCores: res.data.ProcessorSummary.LogicalProcessorCount,
+    processorCores:
+      res.data.ProcessorSummary.LogicalProcessorCount /
+      res.data.ProcessorSummary.Count,
     processorStatus: res.data.ProcessorSummary.Status.Health,
 
     logicalProc: res2.data.Attributes.LogicalProc,
@@ -236,7 +239,7 @@ async function dell_storage(uri) {
   }
 }
 
-// SuperMicro
+// Supermicro
 async function sm_systems(uri) {
   const urls = [
     uri + "/redfish/v1/Systems/1",
@@ -329,7 +332,90 @@ async function sm_storage(uri) {
   // Cannot implement without a license 😞
   return {
     status: "error",
-    message: "Feature not supported on SuperMicro nodes",
+    message: "Storage request not implemented on Supermicro nodes",
+  }
+}
+
+async function hpe_systems(uri) {
+  const urls = [
+    uri + "/redfish/v1/Systems/1",
+    uri + "/redfish/v1/Systems/1/Processors/1",
+    uri + "/redfish/v1/Systems/1/Memory/proc1dimm1",
+  ]
+  let res = await api_request(urls, uri)
+
+  if (res.status === "success") {
+    return {
+      status: "success",
+      hostStatus: res.data[0].Status.Health,
+      model: res.data[0].Model,
+      serviceTag: res.data[0].SerialNumber,
+      biosVersion: res.data[0].BiosVersion,
+      manufacturer: res.data[0].Manufacturer,
+      bootOrder: null,
+      hostName: res.data[0].HostName,
+      memoryStatus: res.data[0].MemorySummary.Status.HealthRollUp,
+      totalMemory: res.data[0].MemorySummary.TotalSystemMemoryGiB,
+      memorySpeed: res.data[2].MaximumFrequencyMHz + " Mhz",
+
+      processorModel: res.data[1].Model,
+      processorCount: res.data[0].ProcessorSummary.Count,
+      processorCores: res.data[1].TotalCores,
+      processorStatus: res.data[0].ProcessorSummary.Status.HealthRollUp,
+      logicalProc:
+        res.data[1].TotalCores !== res.data[1].Oem.Hp.CoresEnabled
+          ? "Enabled"
+          : "Disabled",
+      pxeDevice1: null,
+      pxeDevice1Enabled: null,
+      powerRecovery: null,
+    }
+  } else return res
+}
+
+async function hpe_managers(uri) {
+  const urls = [
+    uri + "/redfish/v1/Managers/1",
+    uri + "/redfish/v1/Managers/1/EthernetInterfaces",
+  ]
+  let res = await api_request(urls, uri)
+
+  let active_int = res.data[1].Items.map((val) => {
+    if (val.SpeedMbps !== null) return val
+  }).filter(Boolean)[0] // Limit to first connected interface
+
+  if (res.status === "success") {
+    return {
+      status: "success",
+      BMCVersion: res.data[0].FirmwareVersion,
+      BMCStatus: res.data[0].Status.Health,
+      powerState: null,
+
+      hostName: active_int.HostName,
+      addresses: active_int.IPv4Addresses,
+      NIC: active_int.Id,
+      MAC: active_int.MACAddress,
+      DNS: active_int.NameServers,
+      VLAN: {
+        VLANEnabled: active_int.VLANEnable,
+        VLANId: active_int.VLANId,
+      },
+    }
+  } else return res
+}
+
+async function hpe_gpu(uri) {
+  // We don't have any HPE nodes with GPU's
+  return {
+    status: "error",
+    message: "GPU request not implemented on HPE nodes",
+  }
+}
+
+async function hpe_storage(uri) {
+  return {
+    status: "error",
+    message: "Storage request not implemented on HPE nodes",
   }
 }
 
@@ -413,4 +499,8 @@ module.exports = {
   sm_storage,
   sm_managers,
   sm_gpu,
+  hpe_systems,
+  hpe_managers,
+  hpe_gpu,
+  hpe_storage,
 }
