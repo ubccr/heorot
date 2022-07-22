@@ -21,6 +21,10 @@ const {
   sm_storage,
   sm_managers,
   sm_gpu,
+  hpe_systems,
+  hpe_managers,
+  hpe_gpu,
+  hpe_storage,
 } = require("../modules/redfish")
 
 app.get("/", (req, res) => {
@@ -168,8 +172,15 @@ app.get("/v1/systems/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_systems(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+    else if (oem.status === "success" && oem.OEM === "Supermicro")
       api_res = await sm_systems(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "HPE")
+      api_res = await hpe_systems(`https://${bmc.address}`)
+    else
+      res.json({
+        status: "error",
+        message: "failed to parse OEM from Redfish call",
+      })
 
     res.json(api_res)
   } else res.json(bmc)
@@ -183,8 +194,15 @@ app.get("/v1/managers/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_managers(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+    else if (oem.status === "success" && oem.OEM === "Supermicro")
       api_res = await sm_managers(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "HPE")
+      api_res = await hpe_managers(`https://${bmc.address}`)
+    else
+      res.json({
+        status: "error",
+        message: "failed to parse OEM from Redfish call",
+      })
 
     res.json(api_res)
   } else res.json(bmc)
@@ -199,8 +217,15 @@ app.get("/v1/gpu/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_gpu(`https://${bmc.address}`, oem.version)
-    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+    else if (oem.status === "success" && oem.OEM === "Supermicro")
       api_res = await sm_gpu(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "HPE")
+      api_res = await hpe_gpu(`https://${bmc.address}`)
+    else
+      res.json({
+        status: "error",
+        message: "failed to parse OEM from Redfish call",
+      })
 
     res.json(api_res)
   } else res.json(bmc)
@@ -215,8 +240,15 @@ app.get("/v1/storage/:node", async (req, res) => {
 
     if (oem.status === "success" && oem.OEM === "Dell")
       api_res = await dell_storage(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "SuperMicro")
+    else if (oem.status === "success" && oem.OEM === "Supermicro")
       api_res = await sm_storage(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "HPE")
+      api_res = await hpe_storage(`https://${bmc.address}`)
+    else
+      res.json({
+        status: "error",
+        message: "failed to parse OEM from Redfish call",
+      })
 
     res.json(api_res)
   } else res.json(bmc)
