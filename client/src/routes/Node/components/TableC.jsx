@@ -6,27 +6,26 @@ import {
   TableCell,
   Button,
   TableBody,
-  LinearProgress,
   Typography,
   TableContainer,
   DialogContent,
   Dialog,
+  Skeleton,
 } from "@mui/material"
 import { useEffect, useState, useContext } from "react"
-import SELTable from "./SELTable"
+// import SELTable from "./SELTable"
 import IconC from "../../../components/IconC"
-import ErrorC from "../../../components/ErrorC"
+// import ErrorC from "../../../components/ErrorC"
 import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
 
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
-import { CircularProgress } from "@mui/material"
 
 const TableC = ({ node, refetch }) => {
-  const [apiData, setApiData] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  // const [apiData, setApiData] = useState({})
+  // const [loading, setLoading] = useState(true)
+  // const [error, setError] = useState("")
   const [user, setUser] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
@@ -137,21 +136,21 @@ const TableC = ({ node, refetch }) => {
   const handleOpenSEL = () => setOpenSEL(true)
   const handleCloseSEL = () => setOpenSEL(false)
 
-  function gpuhtml() {
-    let res = []
-    apiData.gpuRes.GPUs.forEach((val, index) => {
-      res.push(
-        <TableRow key={index}>
-          <TableCell>GPU {index + 1}:</TableCell>
-          <TableCell align="right">{val.Name}</TableCell>
-          <TableCell align="center">
-            <IconC icon={val.Health} />
-          </TableCell>
-        </TableRow>
-      )
-    })
-    return res
-  }
+  // function gpuhtml() {
+  //   let res = []
+  //   apiData.gpuRes.GPUs.forEach((val, index) => {
+  //     res.push(
+  //       <TableRow key={index}>
+  //         <TableCell>GPU {index + 1}:</TableCell>
+  //         <TableCell align="right">{val.Name}</TableCell>
+  //         <TableCell align="center">
+  //           <IconC icon={val.Health} />
+  //         </TableCell>
+  //       </TableRow>
+  //     )
+  //   })
+  //   return res
+  // }
   return (
     <Box
       sx={{
@@ -194,7 +193,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Model:</TableCell>
                 <TableCell align="right">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && <Skeleton />}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <>{query_systems.data.model}</>
@@ -205,7 +204,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Service Tag:</TableCell>
                 <TableCell align="right">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && <Skeleton />}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <>{query_systems.data.serviceTag}</>
@@ -216,7 +215,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>BIOS Version:</TableCell>
                 <TableCell align="right">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && <Skeleton />}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <>{query_systems.data.biosVersion}</>
@@ -227,14 +226,16 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>BMC Version:</TableCell>
                 <TableCell align="right">
-                  {query_managers.isLoading && <CircularProgress />}
+                  {query_managers.isLoading && <Skeleton />}
                   {!query_managers.isLoading &&
                     query_managers.data.status === "success" && (
                       <>{query_managers.data.BMCVersion}</>
                     )}
                 </TableCell>
                 <TableCell align="center">
-                  {query_managers.isLoading && <CircularProgress />}
+                  {query_managers.isLoading && (
+                    <Skeleton variant="circular" width={25} height={25} />
+                  )}
                   {!query_managers.isLoading &&
                     query_managers.data.status === "success" && (
                       <IconC icon={query_managers.data.BMCStatus} />
@@ -244,7 +245,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Vlan:</TableCell>
                 <TableCell align="right">
-                  {query_managers.isLoading && <CircularProgress />}
+                  {query_managers.isLoading && <Skeleton />}
                   {!query_managers.isLoading &&
                     query_managers.data.status === "success" && (
                       <>{query_managers.data.VLAN.VLANId}</>
@@ -255,7 +256,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Boot Order:</TableCell>
                 <TableCell align="right">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && <Skeleton />}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <>{query_systems.data.bootOrder}</>
@@ -266,14 +267,16 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Memory Size:</TableCell>
                 <TableCell align="right">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && <Skeleton />}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <>{query_systems.data.totalMemory}</>
                     )}
                 </TableCell>
                 <TableCell align="center">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && (
+                    <Skeleton variant="circular" width={25} height={25} />
+                  )}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <IconC icon={query_systems.data.memoryStatus} />
@@ -283,7 +286,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Processor(s):</TableCell>
                 <TableCell align="right">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && <Skeleton />}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <>
@@ -299,7 +302,9 @@ const TableC = ({ node, refetch }) => {
                     )}
                 </TableCell>
                 <TableCell align="center">
-                  {query_systems.isLoading && <CircularProgress />}
+                  {query_systems.isLoading && (
+                    <Skeleton variant="circular" width={25} height={25} />
+                  )}
                   {!query_systems.isLoading &&
                     query_systems.data.status === "success" && (
                       <IconC icon={query_systems.data.processorStatus} />
@@ -310,7 +315,7 @@ const TableC = ({ node, refetch }) => {
                 <TableRow>
                   <TableCell>GPU(s)</TableCell>
                   <TableCell align="right">
-                    <CircularProgress />
+                    <Skeleton />
                   </TableCell>
                   <TableCell></TableCell>
                 </TableRow>
@@ -339,7 +344,7 @@ const TableC = ({ node, refetch }) => {
               <TableRow>
                 <TableCell>Storage:</TableCell>
                 <TableCell align="right">
-                  {query_storage.isLoading && <CircularProgress />}
+                  {query_storage.isLoading && <Skeleton />}
                   {!query_storage.isLoading &&
                     query_storage.data.status === "success" && (
                       <>{query_storage.data.controller}</>
