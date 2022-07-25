@@ -177,10 +177,10 @@ app.get("/v1/systems/:node", async (req, res) => {
     else if (oem.status === "success" && oem.OEM === "HPE")
       api_res = await hpe_systems(`https://${bmc.address}`)
     else
-      res.json({
+      api_res = {
         status: "error",
         message: "failed to parse OEM from Redfish call",
-      })
+      }
 
     res.json(api_res)
   } else res.json(bmc)
@@ -199,10 +199,10 @@ app.get("/v1/managers/:node", async (req, res) => {
     else if (oem.status === "success" && oem.OEM === "HPE")
       api_res = await hpe_managers(`https://${bmc.address}`)
     else
-      res.json({
+      api_res = {
         status: "error",
         message: "failed to parse OEM from Redfish call",
-      })
+      }
 
     res.json(api_res)
   } else res.json(bmc)
@@ -222,10 +222,10 @@ app.get("/v1/gpu/:node", async (req, res) => {
     else if (oem.status === "success" && oem.OEM === "HPE")
       api_res = await hpe_gpu(`https://${bmc.address}`)
     else
-      res.json({
+      api_res = {
         status: "error",
         message: "failed to parse OEM from Redfish call",
-      })
+      }
 
     res.json(api_res)
   } else res.json(bmc)
@@ -245,10 +245,10 @@ app.get("/v1/storage/:node", async (req, res) => {
     else if (oem.status === "success" && oem.OEM === "HPE")
       api_res = await hpe_storage(`https://${bmc.address}`)
     else
-      res.json({
+      api_res = {
         status: "error",
         message: "failed to parse OEM from Redfish call",
-      })
+      }
 
     res.json(api_res)
   } else res.json(bmc)
