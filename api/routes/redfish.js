@@ -17,14 +17,17 @@ const {
   dell_systems,
   dell_gpu,
   dell_storage,
+  dell_sel,
   sm_systems,
   sm_storage,
   sm_managers,
   sm_gpu,
+  sm_sel,
   hpe_systems,
   hpe_managers,
   hpe_gpu,
   hpe_storage,
+  hpe_sel,
 } = require("../modules/redfish")
 
 app.get("/", (req, res) => {
@@ -250,6 +253,27 @@ app.get("/v1/storage/:node", async (req, res) => {
         message: "failed to parse OEM from Redfish call",
       }
 
+    res.json(api_res)
+  } else res.json(bmc)
+})
+
+app.get("/v1/sel/:node", async (req, res) => {
+  const node = req.params.node
+  let bmc = await getBMC(node)
+  if (bmc.status === "success") {
+    let oem = await fetchOEM(bmc.address)
+
+    if (oem.status === "success" && oem.OEM === "Dell")
+      api_res = await dell_sel(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "Supermicro")
+      api_res = await sm_sel(`https://${bmc.address}`)
+    else if (oem.status === "success" && oem.OEM === "HPE")
+      api_res = await hpe_sel(`https://${bmc.address}`)
+    else
+      api_res = {
+        status: "error",
+        message: "failed to parse OEM from Redfish call",
+      }
     res.json(api_res)
   } else res.json(bmc)
 })

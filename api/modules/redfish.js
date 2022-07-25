@@ -264,6 +264,48 @@ async function dell_storage(uri, version) {
   }
 }
 
+async function dell_sel(uri) {
+  let top = "20"
+  let url =
+    uri +
+    `/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/?$top=${top}`
+
+  let res = await api_request(url, uri)
+  if (res.status === "success") {
+    return {
+      status: res.status,
+      count: res.data["Members@odata.count"],
+      logs: res.data.Members.map((val) => {
+        return {
+          created: val.Created,
+          message: val.Message,
+          severity: val.Severity,
+        }
+      }),
+    }
+  } else {
+    top = res.error["@Message.ExtendedInfo"][0].MessageArgs[2]
+      .replace(")", "")
+      .split("-")[1]
+    url =
+      uri +
+      `/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/?$top=${top}`
+
+    res = await api_request(url, uri)
+    return {
+      status: res.status,
+      count: res.data["Members@odata.count"],
+      logs: res.data.Members.map((val) => {
+        return {
+          created: val.Created,
+          message: val.Message,
+          severity: val.Severity,
+        }
+      }),
+    }
+  }
+}
+
 // Supermicro
 async function sm_systems(uri) {
   const urls = [
@@ -361,6 +403,27 @@ async function sm_storage(uri) {
   }
 }
 
+async function sm_sel(uri) {
+  const url = uri + "/redfish/v1/Systems/1/LogServices/IML/Entries/?$top=20"
+
+  let res = await api_request(url, uri)
+
+  if (res.status === "success") {
+    return {
+      status: res.status,
+      count: res.data["Members@odata.count"],
+      logs: res.data.Members.map((val) => {
+        return {
+          created: val.Created,
+          message: val.Message,
+          severity: val.Severity,
+        }
+      }),
+    }
+  } else return res
+}
+
+// HPE
 async function hpe_systems(uri) {
   const urls = [
     uri + "/redfish/v1/Systems/1",
@@ -444,6 +507,27 @@ async function hpe_storage(uri) {
   }
 }
 
+async function hpe_sel(uri) {
+  const url = uri + "/redfish/v1/Systems/1/LogServices/log1/Entries"
+
+  let res = await api_request(url, uri)
+
+  if (res.status === "success") {
+    return {
+      status: res.status,
+      count: res.data["Members@odata.count"],
+      logs: res.data.Items.map((val) => {
+        return {
+          created: val.Created,
+          message: val.Message,
+          severity: val.Severity,
+        }
+      }),
+    }
+  } else return res
+}
+
+// General
 async function api_request(url, uri) {
   try {
     let auth = await redfish_auth(uri)
@@ -520,12 +604,15 @@ module.exports = {
   dell_managers,
   dell_gpu,
   dell_storage,
+  dell_sel,
   sm_systems,
   sm_storage,
   sm_managers,
   sm_gpu,
+  sm_sel,
   hpe_systems,
   hpe_managers,
   hpe_gpu,
   hpe_storage,
+  hpe_sel,
 }
