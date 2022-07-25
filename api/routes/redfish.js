@@ -239,7 +239,7 @@ app.get("/v1/storage/:node", async (req, res) => {
     let api_res = new String()
 
     if (oem.status === "success" && oem.OEM === "Dell")
-      api_res = await dell_storage(`https://${bmc.address}`)
+      api_res = await dell_storage(`https://${bmc.address}`, oem.version)
     else if (oem.status === "success" && oem.OEM === "Supermicro")
       api_res = await sm_storage(`https://${bmc.address}`)
     else if (oem.status === "success" && oem.OEM === "HPE")
