@@ -170,16 +170,40 @@ async function dell_gpu(uri, version) {
   }
 }
 
-async function dell_storage(uri) {
+async function dell_storage(uri, version) {
   let tmp_url = uri + "/redfish/v1/Systems/System.Embedded.1/Storage"
   let tmp_res = await api_request(tmp_url, uri)
   if (tmp_res.status === "success") {
-    const url = uri + tmp_res.data.Members[0]["@odata.id"]
-    let res = await api_request(url, uri)
-    let storageController = res.data.StorageControllers[0] ?? null
+    const urls = tmp_res.data.Members.map((val) => {
+      return uri + val["@odata.id"]
+    })
+
+    tmp_res = await api_request(urls, uri)
+
+    // Find the Storage Controller containing Drives
+    let res = tmp_res.data
+      .map((val) => {
+        if (val.Drives.length > 0) return val
+      })
+      .filter(Boolean)[0]
+    res.status = tmp_res.status
+    let storageController = res.StorageControllers[0] ?? null
+
+    // Enclosure - Cannot find redfish route on -v1.4.0 nodes 😞
+    // All of this just to get total enclosure disk count
+    let versionArr = version.split(".")
+    if (versionArr[0] > 1 || versionArr[1] > 4) {
+      tmp_url = res.Links.Enclosures.map((val) => {
+        let url_arr = val["@odata.id"].split("/")
+        if (url_arr[4].substring(0, 3) === "Enc") return uri + val["@odata.id"]
+      }).filter(Boolean)[0]
+
+      let enclosure_res = await api_request(tmp_url, uri)
+      res.slotCount = enclosure_res.data.Oem.Dell.DellEnclosure.SlotCount
+    } else res.slotCount = null
 
     // Volumes
-    tmp_url = uri + res.data.Volumes["@odata.id"]
+    tmp_url = uri + res.Volumes["@odata.id"]
     tmp_res = await api_request(tmp_url, uri)
 
     let volume_urls = tmp_res.data.Members.map((val) => uri + val["@odata.id"])
@@ -198,7 +222,7 @@ async function dell_storage(uri) {
     })
 
     // Drives
-    let tmp2_urls = res.data.Drives.map((val) => uri + val["@odata.id"])
+    let tmp2_urls = res.Drives.map((val) => uri + val["@odata.id"])
     let tmp2_res = await api_request(tmp2_urls, uri)
     let drives = tmp2_res.data.map((val) => {
       let capacity =
@@ -226,7 +250,8 @@ async function dell_storage(uri) {
     })
     return {
       status: res.status,
-      driveCount: res.data["Drives@odata.count"],
+      slotCount: res.slotCount,
+      driveCount: res["Drives@odata.count"],
       controller: storageController.Name,
       cardStatus: storageController.Status.Health,
       firmware: storageController.FirmwareVersion,
