@@ -5,10 +5,11 @@ const agent = new https.Agent({
   rejectUnauthorized: false,
 })
 
-async function api_request(url, token) {
+async function api_request(url, token, method = "GET") {
   try {
     let header = {
-      headers: { method: "GET", "X-Auth-Token": token },
+      method: method,
+      headers: { "X-Auth-Token": token, "content-type": "application/json" },
       agent,
     }
     let res = new Object()

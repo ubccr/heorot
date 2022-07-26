@@ -1,6 +1,7 @@
 const express = require("express")
 const app = express.Router()
 
+// TODO: Deprecate
 const grendelRequest = require("../modules/grendel")
 const {
   biosApi,
@@ -30,6 +31,11 @@ const {
   sm_storage,
   hpe_storage,
 } = require("../modules/redfish/storage")
+const {
+  dell_clearSel,
+  sm_clearSel,
+  hpe_clearSel,
+} = require("../modules/redfish/clearSel")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -43,6 +49,7 @@ app.get("/", (req, res) => {
   })
 })
 
+// TODO: Deprecate
 app.get("/dell/:node", async (req, res) => {
   const node = req.params.node
   let bmc = ""
@@ -73,7 +80,7 @@ app.get("/dell/:node", async (req, res) => {
     result: { biosRes, idracRes, gpuRes, sensorsRes, selRes },
   })
 })
-
+// TODO: Deprecate
 app.get("/sel/:node", async (req, res) => {
   const node = req.params.node
   let bmc = ""
@@ -98,13 +105,13 @@ app.get("/sel/:node", async (req, res) => {
     })
   }
 })
-
+// TODO: Deprecate
 app.get("/actions/clearSEL/:node", async (req, res) => {
   let result = await apiClearSEL(req.params.node)
 
   res.json(result)
 })
-
+// TODO: Deprecate
 app.get("/actions/resetBMC/:node", async (req, res) => {
   let result = await apiResetBMC(req.params.node)
 
@@ -227,6 +234,30 @@ app.get("/v1/sel/:node", async (req, res) => {
       else if (auth.oem === "Supermicro")
         api_res = await sm_sel(uri, auth.token)
       else if (auth.oem === "HPE") api_res = await hpe_sel(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
+
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(bmc)
+  } else res.json(bmc)
+})
+
+app.put("/v1/clearSel/:node", async (req, res) => {
+  const node = req.params.node
+
+  let bmc = await getBMC(node)
+  if (bmc.status === "success") {
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      if (auth.oem === "Dell") api_res = await dell_clearSel(uri, auth.token)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_clear(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_clear(uri, auth.token)
       else
         api_res = {
           status: "error",
