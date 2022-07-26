@@ -11,24 +11,25 @@ const {
   apiClearSEL,
   apiResetBMC,
 } = require("../modules/nodeApi")
+
+const { redfish_auth, redfish_logout } = require("../modules/redfish/auth")
 const {
-  fetchOEM,
-  dell_managers,
   dell_systems,
-  dell_gpu,
-  dell_storage,
-  dell_sel,
   sm_systems,
-  sm_storage,
-  sm_managers,
-  sm_gpu,
-  sm_sel,
   hpe_systems,
+} = require("../modules/redfish/systems")
+const {
+  dell_managers,
+  sm_managers,
   hpe_managers,
-  hpe_gpu,
+} = require("../modules/redfish/managers")
+const { dell_sel, sm_sel, hpe_sel } = require("../modules/redfish/sel")
+const { dell_gpu, sm_gpu, hpe_gpu } = require("../modules/redfish/gpu")
+const {
+  dell_storage,
+  sm_storage,
   hpe_storage,
-  hpe_sel,
-} = require("../modules/redfish")
+} = require("../modules/redfish/storage")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -112,102 +113,53 @@ app.get("/actions/resetBMC/:node", async (req, res) => {
 
 // New Routes
 
-app.get("/v1/:node", async (req, res) => {
-  const node = req.params.node
-  let bmc = await getBMC(node)
-  let oem = await fetchOEM(bmc.address)
-  let uri = `https://${bmc.address}`
-
-  if (oem.status === "success") {
-    if (oem.OEM === "Dell") {
-      //Dell
-      let url = {
-        uri: uri,
-        endpoints: [
-          "/redfish/v1/Systems/System.Embedded.1",
-          "/redfish/v1/Managers/iDRAC.Embedded.1",
-          "/redfish/v1/Managers/iDRAC.Embedded.1/EthernetInterfaces/NIC.1",
-          "/redfish/v1/Systems/System.Embedded.1/Bios",
-          "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries",
-          "",
-          "",
-        ],
-      }
-      //call func
-    } else if (oem.OEM === "SuperMicro") {
-      //SM
-      let url = {
-        uri: uri,
-        endpoints: [
-          "/redfish/v1/Systems/1",
-          "/redfish/v1/Managers/1",
-          "/redfish/v1/Chassis/1",
-          "/redfish/v1/Systems/1/LogServices/Log1/Entries",
-        ],
-      }
-      let resAPI = await redfishRequest(url, oem.OEM)
-      res.json(resAPI)
-      //call func
-    } else if (oem.OEM === "HPE") {
-      //HPE
-      let url = {
-        uri: uri,
-        endpoints: [
-          "/redfish/v1/Chassis/1",
-          "/redfish/v1/Managers/1",
-          "/redfish/v1/System/1",
-          "/redfish/v1/LogServices/IML/Entries",
-        ],
-      }
-      let resAPI = await redfishRequest(url, oem.OEM)
-      res.json(resAPI)
-      //call func
-    }
-  }
-})
-
 app.get("/v1/systems/:node", async (req, res) => {
   const node = req.params.node
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
-    let oem = await fetchOEM(bmc.address)
-    let api_res = new String()
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      let api_res = new String()
 
-    if (oem.status === "success" && oem.OEM === "Dell")
-      api_res = await dell_systems(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "Supermicro")
-      api_res = await sm_systems(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "HPE")
-      api_res = await hpe_systems(`https://${bmc.address}`)
-    else
-      api_res = {
-        status: "error",
-        message: "failed to parse OEM from Redfish call",
-      }
+      if (auth.oem === "Dell") api_res = await dell_systems(uri, auth.token)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_systems(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_systems(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
 
-    res.json(api_res)
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(auth)
   } else res.json(bmc)
 })
+
 app.get("/v1/managers/:node", async (req, res) => {
   const node = req.params.node
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
-    let oem = await fetchOEM(bmc.address)
-    let api_res = new String()
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      let api_res = new String()
 
-    if (oem.status === "success" && oem.OEM === "Dell")
-      api_res = await dell_managers(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "Supermicro")
-      api_res = await sm_managers(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "HPE")
-      api_res = await hpe_managers(`https://${bmc.address}`)
-    else
-      api_res = {
-        status: "error",
-        message: "failed to parse OEM from Redfish call",
-      }
+      if (auth.oem === "Dell") api_res = await dell_managers(uri, auth.token)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_managers(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_managers(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
 
-    res.json(api_res)
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(bmc)
   } else res.json(bmc)
 })
 
@@ -215,22 +167,25 @@ app.get("/v1/gpu/:node", async (req, res) => {
   const node = req.params.node
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
-    let oem = await fetchOEM(bmc.address)
-    let api_res = new String()
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      let api_res = new String()
 
-    if (oem.status === "success" && oem.OEM === "Dell")
-      api_res = await dell_gpu(`https://${bmc.address}`, oem.version)
-    else if (oem.status === "success" && oem.OEM === "Supermicro")
-      api_res = await sm_gpu(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "HPE")
-      api_res = await hpe_gpu(`https://${bmc.address}`)
-    else
-      api_res = {
-        status: "error",
-        message: "failed to parse OEM from Redfish call",
-      }
+      if (auth.oem === "Dell")
+        api_res = await dell_gpu(uri, auth.token, auth.version)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_gpu(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_gpu(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
 
-    res.json(api_res)
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(bmc)
   } else res.json(bmc)
 })
 
@@ -238,50 +193,50 @@ app.get("/v1/storage/:node", async (req, res) => {
   const node = req.params.node
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
-    let oem = await fetchOEM(bmc.address)
-    let api_res = new String()
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      let api_res = new String()
 
-    if (oem.status === "success" && oem.OEM === "Dell")
-      api_res = await dell_storage(`https://${bmc.address}`, oem.version)
-    else if (oem.status === "success" && oem.OEM === "Supermicro")
-      api_res = await sm_storage(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "HPE")
-      api_res = await hpe_storage(`https://${bmc.address}`)
-    else
-      api_res = {
-        status: "error",
-        message: "failed to parse OEM from Redfish call",
-      }
+      if (auth.oem === "Dell")
+        api_res = await dell_storage(uri, auth.token, auth.version)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_storage(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_storage(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
 
-    res.json(api_res)
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(bmc)
   } else res.json(bmc)
 })
 
 app.get("/v1/sel/:node", async (req, res) => {
   const node = req.params.node
+
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
-    let oem = await fetchOEM(bmc.address)
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      if (auth.oem === "Dell") api_res = await dell_sel(uri, auth.token)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_sel(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_sel(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
 
-    if (oem.status === "success" && oem.OEM === "Dell")
-      api_res = await dell_sel(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "Supermicro")
-      api_res = await sm_sel(`https://${bmc.address}`)
-    else if (oem.status === "success" && oem.OEM === "HPE")
-      api_res = await hpe_sel(`https://${bmc.address}`)
-    else
-      api_res = {
-        status: "error",
-        message: "failed to parse OEM from Redfish call",
-      }
-    res.json(api_res)
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(bmc)
   } else res.json(bmc)
-})
-
-app.get("/fetchOEM/:node", async (req, res) => {
-  const node = req.params.node
-  let bmc = await getBMC(node)
-  res.json(await fetchOEM(bmc.address))
 })
 
 async function getBMC(node) {
