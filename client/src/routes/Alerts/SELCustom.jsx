@@ -2,18 +2,17 @@ import {
   Button,
   TableCell,
   Tooltip,
-  Modal,
-  Fade,
-  Backdrop,
   Box,
   LinearProgress,
-  Alert,
   Dialog,
   DialogContent,
 } from "@mui/material"
-import { useEffect, useState, useContext } from "react"
+import { useState, useContext } from "react"
 import { apiConfig } from "../../config"
 import { UserContext } from "../../contexts/UserContext"
+
+import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 
 // FIXME: This is temporary
 import SELTable from "../Node/components/SELTable"
@@ -22,33 +21,28 @@ const SELCustom = ({ data, node, type, icon }) => {
   const [openSEL, setOpenSEL] = useState(false)
   const handleOpenSEL = () => setOpenSEL(true)
   const handleCloseSEL = () => setOpenSEL(false)
-  const [sel, setSel] = useState(null)
-  const [selLoading, setSelLoading] = useState(true)
-  const [selError, setSelError] = useState("")
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
+  const { enqueueSnackbar } = useSnackbar()
 
-  useEffect(() => {
-    if (node !== undefined) {
+  const query_sel = useQuery(
+    ["sel"],
+    async () => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
       }
-      fetch(`${apiConfig.apiUrl}/redfish/sel/${node}`, payload)
-        .then((res) => res.json())
-        .then((result) => {
-          if (result.status === "success") setSel(result.result)
-          else if (result.status === "error") setSelError(result.message)
-
-          setSelLoading(false)
-        })
-    }
-    return () => {
-      setSel(null)
-      setSelError("")
-      setSelLoading(true)
-    }
-  }, [])
+      const res = await (
+        await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)
+      ).json()
+      if (res.status === "error") {
+        enqueueSnackbar(res.message, { variant: "error" })
+        setOpenSEL(false)
+      }
+      return res
+    },
+    { retry: 2, enabled: !!openSEL }
+  )
 
   function iconColor(subSystem) {
     let status = null
@@ -77,17 +71,12 @@ const SELCustom = ({ data, node, type, icon }) => {
       </TableCell>
       <Dialog open={openSEL} onClose={handleCloseSEL} maxWidth="xl">
         <DialogContent>
-          {selLoading && <LinearProgress />}
-          {!selLoading &&
-            selError === "" &&
-            sel.selRes.sel.entries !== undefined && (
-              <SELTable data={sel.selRes.sel.entries} />
+          {query_sel.isLoading && <LinearProgress />}
+          {!query_sel.isLoading &&
+            query_sel.status === "success" &&
+            query_sel.data.status === "success" && (
+              <SELTable data={query_sel.data.logs} />
             )}
-          {!selLoading && selError !== "" && (
-            <Alert variant="outlined" severity="error">
-              {selError}
-            </Alert>
-          )}
           <Box
             sx={{
               marginTop: "20px",

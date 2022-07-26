@@ -1,5 +1,4 @@
 import {
-  Hidden,
   Table,
   TableBody,
   TableCell,
@@ -19,12 +18,7 @@ const SELTable = ({ data }) => {
         <TableHead>
           <TableRow>
             <TableCell></TableCell>
-            <Hidden mdDown>
-              <TableCell>Date:</TableCell>
-            </Hidden>
-            <Hidden mdDown>
-              <TableCell>Time:</TableCell>
-            </Hidden>
+            <TableCell>Date and Time:</TableCell>
             <TableCell>Event:</TableCell>
           </TableRow>
         </TableHead>
@@ -43,14 +37,9 @@ const SELTable = ({ data }) => {
                 break
             }
             return (
-              <TableRow key={val.id}>
+              <TableRow key={index}>
                 <TableCell>{icon}</TableCell>
-                <Hidden mdDown>
-                  <TableCell>{val.date}</TableCell>
-                </Hidden>
-                <Hidden mdDown>
-                  <TableCell>{val.time}</TableCell>
-                </Hidden>
+                <TableCell>{new Date(val.created).toLocaleString()}</TableCell>
                 <TableCell>{val.message}</TableCell>
               </TableRow>
             )

@@ -23,11 +23,6 @@ import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const ManageUsers = () => {
-  let rows = [
-    { username: "Test", dateAdded: "2020" },
-    { username: "Test2", dateAdded: "2022" },
-    { username: "Josh", dateAdded: "2022" },
-  ]
   const [checked, setChecked] = useState([])
   const [action, setAction] = useState("")
   const [user, setUser] = useContext(UserContext)

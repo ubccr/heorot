@@ -12,53 +12,19 @@ import {
   Dialog,
   Skeleton,
 } from "@mui/material"
-import { useEffect, useState, useContext } from "react"
-// import SELTable from "./SELTable"
+import { useState, useContext } from "react"
+import SELTable from "./SELTable"
 import IconC from "../../../components/IconC"
-// import ErrorC from "../../../components/ErrorC"
 import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
 
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
-const TableC = ({ node, refetch }) => {
-  // const [apiData, setApiData] = useState({})
-  // const [loading, setLoading] = useState(true)
-  // const [error, setError] = useState("")
-  const [user, setUser] = useContext(UserContext)
+const TableC = ({ node }) => {
+  const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
-
-  // useEffect(() => {
-  //   setLoading(true)
-  //   setError("")
-  //   let payload = {
-  //     headers: {
-  //       "x-access-token": user.accessToken,
-  //     },
-  //   }
-  //   fetch(`${apiConfig.apiUrl}/redfish/dell/${node}`, payload)
-  //     .then((res) => res.json())
-  //     .then((response) => {
-  //       if (response.status === "success") {
-  //         setApiData(response.result)
-  //         let arr = Object.values(response.result)
-  //         arr.forEach((val, index) => {
-  //           if (val.status === "error" && val.message !== "No GPU tag") {
-  //             setError(val.message)
-  //           }
-  //         })
-  //       } else {
-  //         setError("SEL API error")
-  //       }
-  //       setLoading(false)
-  //     })
-  //   return () => {
-  //     setLoading(true)
-  //     setError("")
-  //     setApiData({})
-  //   }
-  // }, [node])
+  const [openSEL, setOpenSEL] = useState(false)
 
   const query_systems = useQuery(
     ["systems", node],
@@ -132,25 +98,27 @@ const TableC = ({ node, refetch }) => {
     { retry: 2 }
   )
 
-  const [openSEL, setOpenSEL] = useState(false)
+  const query_sel = useQuery(
+    ["sel", node],
+    async () => {
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+      }
+      const res = await (
+        await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)
+      ).json()
+      if (res.status === "error")
+        enqueueSnackbar(res.message, { variant: "error" })
+      return res
+    },
+    { retry: 2 }
+  )
+
   const handleOpenSEL = () => setOpenSEL(true)
   const handleCloseSEL = () => setOpenSEL(false)
 
-  // function gpuhtml() {
-  //   let res = []
-  //   apiData.gpuRes.GPUs.forEach((val, index) => {
-  //     res.push(
-  //       <TableRow key={index}>
-  //         <TableCell>GPU {index + 1}:</TableCell>
-  //         <TableCell align="right">{val.Name}</TableCell>
-  //         <TableCell align="center">
-  //           <IconC icon={val.Health} />
-  //         </TableCell>
-  //       </TableRow>
-  //     )
-  //   })
-  //   return res
-  // }
   return (
     <Box
       sx={{
@@ -165,8 +133,6 @@ const TableC = ({ node, refetch }) => {
         boxShadow: 12,
       }}
     >
-      {/* {loading && <LinearProgress />}
-      {error !== "" && <ErrorC message={error} />} */}
       <>
         <TableContainer>
           <Table>
@@ -391,15 +357,22 @@ const TableC = ({ node, refetch }) => {
                     </TableRow>
                   )
                 })}
-
-              {/* {apiData.gpuRes.status === "success" && gpuhtml()} */}
             </TableBody>
           </Table>
         </TableContainer>
         <div>
           <Dialog open={openSEL} onClose={handleCloseSEL} maxWidth="xl">
             <DialogContent>
-              {/* <SELTable data={apiData.selRes.sel.entries} /> */}
+              {query_sel.isLoading && (
+                <>
+                  <Skeleton width={400} />
+                  <Skeleton width={400} />
+                  <Skeleton width={400} />
+                </>
+              )}
+              {!query_sel.isLoading && query_sel.data.status === "success" && (
+                <SELTable data={query_sel.data.logs} />
+              )}
               <Box
                 sx={{
                   marginTop: "20px",
