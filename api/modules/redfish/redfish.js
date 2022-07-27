@@ -5,18 +5,27 @@ const agent = new https.Agent({
   rejectUnauthorized: false,
 })
 
-async function api_request(url, token, method = "GET") {
+async function api_request(
+  url,
+  token,
+  method = "GET",
+  json = true,
+  body = undefined
+) {
   try {
     let header = {
       method: method,
       headers: { "X-Auth-Token": token, "content-type": "application/json" },
+      body,
       agent,
     }
     let res = new Object()
     if (typeof url === "string") {
       // Single request
       let res_promise = await fetch(url, header)
-      res = await res_promise.json()
+
+      if (json === true) res = await res_promise.json()
+      else res = res_promise
       if (res.hasOwnProperty("error")) throw res.error
     } else if (typeof url === "object") {
       // Parallel requests
