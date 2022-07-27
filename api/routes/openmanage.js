@@ -3,9 +3,6 @@ const app = express.Router()
 const https = require("https")
 const fetch = require("node-fetch")
 
-// TODO: deprecate
-// const { validate } = require("../models/User")
-
 let config = require("../config")
 
 const agent = new https.Agent({
@@ -31,7 +28,7 @@ app.get("/", (req, res) => {
   })
   res.json({
     status: "success",
-    currentRoute: "/grendel/",
+    currentRoute: "/openmanage/",
     availibleRoutes: routes,
   })
 })
