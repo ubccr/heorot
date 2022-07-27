@@ -3,42 +3,52 @@ const { api_request } = require("./redfish")
 async function dell_systems(uri, token) {
   const url = uri + "/redfish/v1/Systems/System.Embedded.1"
   const bios_url = url + "/Bios"
+  try {
+    let res = await api_request(url, token)
+    let res2 = await api_request(bios_url, token)
 
-  let res = await api_request(url, token)
-  let res2 = await api_request(bios_url, token)
+    if (res.status === "error") throw res.error
+    if (res2.status === "error") throw res2.error
 
-  let bootArr =
-    res.data.Boot.BootOrder === undefined
-      ? null
-      : res.data.Boot.BootOrder.join(",")
-  let bootOrder =
-    res2.data.Attributes.SetBootOrderEn !== undefined
-      ? res2.data.Attributes.SetBootOrderEn
-      : bootArr
-  return {
-    status: res.status,
-    hostStatus: res.data.Status.Health,
-    model: res.data.Model,
-    serviceTag: res.data.SKU,
-    biosVersion: res.data.BiosVersion,
-    manufacturer: res.data.Manufacturer,
-    bootOrder: bootOrder,
-    hostName: res.data.HostName,
-    memoryStatus: res.data.MemorySummary.Status.Health,
-    totalMemory: res.data.MemorySummary.TotalSystemMemoryGiB,
-    memorySpeed: res2.data.Attributes.SysMemSpeed,
+    let bootArr =
+      res.data.Boot.BootOrder === undefined
+        ? null
+        : res.data.Boot.BootOrder.join(",")
+    let bootOrder =
+      res2.data.Attributes.SetBootOrderEn !== undefined
+        ? res2.data.Attributes.SetBootOrderEn
+        : bootArr
+    return {
+      status: res.status,
+      hostStatus: res.data.Status.Health,
+      model: res.data.Model,
+      serviceTag: res.data.SKU,
+      biosVersion: res.data.BiosVersion,
+      manufacturer: res.data.Manufacturer,
+      bootOrder: bootOrder,
+      hostName: res.data.HostName,
+      memoryStatus: res.data.MemorySummary.Status.Health,
+      totalMemory: res.data.MemorySummary.TotalSystemMemoryGiB,
+      memorySpeed: res2.data.Attributes.SysMemSpeed,
 
-    processorModel: res.data.ProcessorSummary.Model,
-    processorCount: res.data.ProcessorSummary.Count,
-    processorCores:
-      res.data.ProcessorSummary.LogicalProcessorCount /
-      res.data.ProcessorSummary.Count,
-    processorStatus: res.data.ProcessorSummary.Status.Health,
+      processorModel: res.data.ProcessorSummary.Model,
+      processorCount: res.data.ProcessorSummary.Count,
+      processorCores:
+        res.data.ProcessorSummary.LogicalProcessorCount /
+        res.data.ProcessorSummary.Count,
+      processorStatus: res.data.ProcessorSummary.Status.Health,
 
-    logicalProc: res2.data.Attributes.LogicalProc,
-    pxeDevice1: res2.data.Attributes.PxeDev1Interface ?? null,
-    pxeDevice1Enabled: res2.data.Attributes.PxeDev1EnDis ?? null,
-    powerRecovery: res2.data.Attributes.AcPwrRcvry,
+      logicalProc: res2.data.Attributes.LogicalProc,
+      pxeDevice1: res2.data.Attributes.PxeDev1Interface ?? null,
+      pxeDevice1Enabled: res2.data.Attributes.PxeDev1EnDis ?? null,
+      powerRecovery: res2.data.Attributes.AcPwrRcvry,
+    }
+  } catch (error) {
+    return {
+      status: "error",
+      message: "Error calling redfish api",
+      error,
+    }
   }
 }
 

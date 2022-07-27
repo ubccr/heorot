@@ -1,14 +1,22 @@
 const { api_request } = require("./redfish")
 
 async function dell_storage(uri, token, version) {
-  let tmp_url = uri + "/redfish/v1/Systems/System.Embedded.1/Storage"
-  let tmp_res = await api_request(tmp_url, token)
-  if (tmp_res.status === "success") {
+  try {
+    let tmp_url = uri + "/redfish/v1/Systems/System.Embedded.1/Storage"
+    let tmp_res = await api_request(tmp_url, token)
+    if (tmp_res.status === "error")
+      throw tmp_res.error["@Message.ExtendedInfo"][0].Message
+
     const urls = tmp_res.data.Members.map((val) => {
       return uri + val["@odata.id"]
     })
 
     tmp_res = await api_request(urls, token)
+
+    tmp_res.data.forEach((val) => {
+      if (val.hasOwnProperty("error"))
+        throw val.error["@Message.ExtendedInfo"][0].Message
+    })
 
     // Find the Storage Controller containing Drives
     let res = tmp_res.data
@@ -29,15 +37,24 @@ async function dell_storage(uri, token, version) {
       }).filter(Boolean)[0]
 
       let enclosure_res = await api_request(tmp_url, token)
+      if (enclosure_res.status === "error")
+        throw enclosure_res.error["@Message.ExtendedInfo"][0].Message
       res.slotCount = enclosure_res.data.Oem.Dell.DellEnclosure.SlotCount
     } else res.slotCount = null
 
     // Volumes
     tmp_url = uri + res.Volumes["@odata.id"]
     tmp_res = await api_request(tmp_url, token)
+    if (tmp_res.status === "error")
+      throw tmp_res.error["@Message.ExtendedInfo"][0].Message
 
     let volume_urls = tmp_res.data.Members.map((val) => uri + val["@odata.id"])
     let volume_res = await api_request(volume_urls, token)
+    volume_res.data.forEach((val) => {
+      if (val.hasOwnProperty("error"))
+        throw val.error["@Message.ExtendedInfo"][0].Message
+    })
+
     let volumes = volume_res.data.map((val) => {
       let capacity =
         val.CapacityBytes > 1000000000000
@@ -54,6 +71,11 @@ async function dell_storage(uri, token, version) {
     // Drives
     let tmp2_urls = res.Drives.map((val) => uri + val["@odata.id"])
     let tmp2_res = await api_request(tmp2_urls, token)
+    tmp2_res.data.forEach((val) => {
+      if (val.hasOwnProperty("error"))
+        throw val.error["@Message.ExtendedInfo"][0].Message
+    })
+
     let drives = tmp2_res.data.map((val) => {
       let capacity =
         val.CapacityBytes > 1000000000000
@@ -89,8 +111,14 @@ async function dell_storage(uri, token, version) {
       volumes: volumes,
       drives: drives,
     }
-  } else {
-    return tmp_res
+  } catch (error) {
+    let message =
+      typeof error === "string" ? error : "Error calling storage redfish API"
+    return {
+      status: "error",
+      message: message,
+      error,
+    }
   }
 }
 

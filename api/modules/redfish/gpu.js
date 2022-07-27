@@ -5,8 +5,11 @@ async function dell_gpu(uri, token, version) {
   if (versionArr[0] > 1 || versionArr[1] > 4) {
     // Redfish version higher than 1.4
     let tmp_url = uri + "/redfish/v1/Systems/System.Embedded.1/Processors"
-    let tmp_res = await api_request(tmp_url, token)
-    if (tmp_res.status === "success") {
+
+    try {
+      let tmp_res = await api_request(tmp_url, token)
+      if (tmp_res.status === "error")
+        throw tmp_res.error["@Message.ExtendedInfo"][0].Message
       let all_gpus = new Array()
       let physical_gpus = new Array()
 
@@ -20,6 +23,11 @@ async function dell_gpu(uri, token, version) {
           physical_gpus.push(uri + val["@odata.id"])
       })
       let gpu_res = await api_request(physical_gpus, token)
+      gpu_res.data.forEach((val) => {
+        if (val.hasOwnProperty("error"))
+          throw val.error["@Message.ExtendedInfo"][0].Message
+      })
+
       let gpus = gpu_res.data.map((val) => {
         return {
           GPUStatus: val.Status === null ? "Unknown" : val.Status.Health,
@@ -34,45 +42,71 @@ async function dell_gpu(uri, token, version) {
         virtual: all_gpus.length,
         GPUs: gpus,
       }
-    } else {
+    } catch (error) {
+      let message =
+        typeof error === "string" ? error : "Error calling GPU redfish API"
       return {
-        tmp_res,
+        status: "error",
+        message: message,
+        error,
       }
     }
   } else {
     // Redfish version 1.4 and lower
-    let tmp_url = uri + "/redfish/v1/Systems/System.Embedded.1"
-    let tmp_res = await api_request(tmp_url, token)
-    if (tmp_res.status === "success") {
-      let pci_urls = tmp_res.data.PCIeDevices.map((val) => {
-        return uri + val["@odata.id"]
-      })
-      let pci_res = await api_request(pci_urls, token)
-      let gpus = pci_res.data
-        .map((val) => {
-          if (val.Manufacturer === "NVIDIA Corporation")
-            return {
-              GPUStatus: val.Status.Health,
-              manufacturer: val.Manufacturer,
-              model: val.Name,
-            }
+    try {
+      let tmp_url = uri + "/redfish/v1/Systems/System.Embedded.1"
+      let tmp_res = await api_request(tmp_url, token)
+      if (tmp_res.status === "error")
+        throw tmp_res.error["@Message.ExtendedInfo"][0].Message
+
+      if (tmp_res.status === "success") {
+        let pci_urls = tmp_res.data.PCIeDevices.map((val) => {
+          return uri + val["@odata.id"]
         })
-        .filter(Boolean)
+
+        let pci_res = await api_request(pci_urls, token)
+        pci_res.data.forEach((val) => {
+          if (val.hasOwnProperty("error"))
+            throw val.error["@Message.ExtendedInfo"][0].Message
+        })
+
+        let gpus = pci_res.data
+          .map((val) => {
+            if (val.Manufacturer === "NVIDIA Corporation")
+              return {
+                GPUStatus: val.Status.Health,
+                manufacturer: val.Manufacturer,
+                model: val.Name,
+              }
+          })
+          .filter(Boolean)
+        return {
+          status: "success",
+          vGPU: null,
+          physical: gpus.length,
+          virtual: gpus.length,
+          GPUs: gpus,
+        }
+      }
+    } catch (error) {
+      let message =
+        typeof error === "string" ? error : "Error calling GPU redfish API"
       return {
-        status: "success",
-        vGPU: null,
-        physical: gpus.length,
-        virtual: gpus.length,
-        GPUs: gpus,
+        status: "error",
+        message: message,
+        error,
       }
     }
   }
 }
 
 async function sm_gpu(uri, token) {
-  const url = uri + "/redfish/v1/Chassis/1/PCIeDevices"
-  let res = await api_request(url, token)
-  if (res.status === "success") {
+  try {
+    const url = uri + "/redfish/v1/Chassis/1/PCIeDevices"
+    let res = await api_request(url, token)
+    if (res.status === "error")
+      throw res.error["@Message.ExtendedInfo"][0].Message
+
     let gpu_urls = res.data.Members.map((val) => {
       let url_arr = val["@odata.id"].split("/")
       if (url_arr[6].substring(0, 3) === "GPU")
@@ -80,6 +114,8 @@ async function sm_gpu(uri, token) {
     }).filter(Boolean)
 
     let gpu_res = await api_request(gpu_urls, token)
+    if (gpu_res.status === "error")
+      throw gpu_res.error["@Message.ExtendedInfo"][0].Message
 
     let gpus = gpu_res.data.map((val) => {
       return {
@@ -95,7 +131,15 @@ async function sm_gpu(uri, token) {
       virtual: null,
       GPUs: gpus,
     }
-  } else return res
+  } catch (error) {
+    let message =
+      typeof error === "string" ? error : "Error calling GPU redfish API"
+    return {
+      status: "error",
+      message: message,
+      error,
+    }
+  }
 }
 
 async function hpe_gpu(uri, token) {
