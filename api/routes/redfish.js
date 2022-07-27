@@ -36,6 +36,11 @@ const {
   sm_clearSel,
   hpe_clearSel,
 } = require("../modules/redfish/clearSel")
+const {
+  dell_resetBmc,
+  sm_resetBmc,
+  hpe_resetBmc,
+} = require("../modules/redfish/resetBmc")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -166,7 +171,7 @@ app.get("/v1/managers/:node", async (req, res) => {
 
       await redfish_logout(auth.location, uri, auth.token)
       res.json(api_res)
-    } else res.json(bmc)
+    } else res.json(auth)
   } else res.json(bmc)
 })
 
@@ -192,7 +197,7 @@ app.get("/v1/gpu/:node", async (req, res) => {
 
       await redfish_logout(auth.location, uri, auth.token)
       res.json(api_res)
-    } else res.json(bmc)
+    } else res.json(auth)
   } else res.json(bmc)
 })
 
@@ -218,7 +223,7 @@ app.get("/v1/storage/:node", async (req, res) => {
 
       await redfish_logout(auth.location, uri, auth.token)
       res.json(api_res)
-    } else res.json(bmc)
+    } else res.json(auth)
   } else res.json(bmc)
 })
 
@@ -242,7 +247,7 @@ app.get("/v1/sel/:node", async (req, res) => {
 
       await redfish_logout(auth.location, uri, auth.token)
       res.json(api_res)
-    } else res.json(bmc)
+    } else res.json(auth)
   } else res.json(bmc)
 })
 
@@ -256,8 +261,8 @@ app.put("/v1/clearSel/:node", async (req, res) => {
     if (auth.status === "success") {
       if (auth.oem === "Dell") api_res = await dell_clearSel(uri, auth.token)
       else if (auth.oem === "Supermicro")
-        api_res = await sm_clear(uri, auth.token)
-      else if (auth.oem === "HPE") api_res = await hpe_clear(uri, auth.token)
+        api_res = await sm_clearSel(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_clearSel(uri, auth.token)
       else
         api_res = {
           status: "error",
@@ -266,7 +271,31 @@ app.put("/v1/clearSel/:node", async (req, res) => {
 
       await redfish_logout(auth.location, uri, auth.token)
       res.json(api_res)
-    } else res.json(bmc)
+    } else res.json(auth)
+  } else res.json(bmc)
+})
+
+app.put("/v1/resetBmc/:node", async (req, res) => {
+  const node = req.params.node
+
+  let bmc = await getBMC(node)
+  if (bmc.status === "success") {
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      if (auth.oem === "Dell") api_res = await dell_resetBmc(uri, auth.token)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_resetBmc(uri, auth.token)
+      else if (auth.oem === "HPE") api_res = await hpe_resetBmc(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
+
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(auth)
   } else res.json(bmc)
 })
 

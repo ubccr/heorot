@@ -56,32 +56,30 @@ const Index = () => {
       })
   }, [refetch, node])
   const handleClearSEL = () => {
-    let bmc = null
-    apiData.interfaces.forEach((val, index) => {
-      if (val.fqdn.substring(0, 3) === "bmc") bmc = val.fqdn
-    })
     let payload = {
+      method: "PUT",
       headers: {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(`${apiConfig.apiUrl}/redfish/actions/clearSEL/${bmc}`, payload)
+    fetch(`${apiConfig.apiUrl}/redfish/v1/clearSEL/${node}`, payload)
       .then((res) => res.json())
       .then((result) => {
-        enqueueSnackbar(result.message, { variant: result.color })
+        enqueueSnackbar(result.message, { variant: result.status })
       })
   }
 
   const handleResetBMC = () => {
     let payload = {
+      method: "PUT",
       headers: {
         "x-access-token": user.accessToken,
       },
     }
-    fetch(`${apiConfig.apiUrl}/redfish/actions/resetBMC/${BMC}`, payload)
+    fetch(`${apiConfig.apiUrl}/redfish/v1/resetBmc/${node}`, payload)
       .then((res) => res.json())
       .then((result) => {
-        enqueueSnackbar(result.message, { variant: result.color })
+        enqueueSnackbar(result.message, { variant: result.status })
       })
   }
 
