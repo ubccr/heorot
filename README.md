@@ -39,12 +39,11 @@ Checkout the <a href="screenshots.MD">Screenshots</a> file for an example of the
 ## :white_check_mark: Requirements
 
 Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [Node](https://nodejs.org/en/), [MongoDB](https://www.mongodb.com/docs/manual/installation/), and [Grendel](https://github.com/ubccr/grendel) installed.
+See quickstart.MD for a sample install & config of requirements
 
 ## :checkered_flag: Production build
 
 ```bash
-### See quickstart.MD for a sample install & config of requirements
-
 $ git clone https://github.com/ubccr/heorot.git
 
 # Download node packages
