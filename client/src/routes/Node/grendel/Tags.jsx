@@ -13,6 +13,7 @@ import { useSnackbar } from "notistack"
 import NewGridC from "../components/NewGridC"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import { UserContext } from "../../../contexts/UserContext"
+import { apiConfig } from "../../../config"
 
 const Tags = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()
@@ -59,13 +60,9 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
       if (tags.length > 0) {
         let url = ""
         if (method === "Add") {
-          url = `https://${
-            window.location.hostname
-          }:443/grendel/tag/${node}/${tags.join(",")}`
+          url = `${apiConfig.apiUrl}/grendel/tag/${node}/${tags.join(",")}`
         } else {
-          url = `https://${
-            window.location.hostname
-          }:443/grendel/untag/${node}/${tags.join(",")}`
+          url = `${apiConfig.apiUrl}/grendel/untag/${node}/${tags.join(",")}`
         }
         let payload = {
           headers: {
