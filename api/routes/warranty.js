@@ -126,7 +126,7 @@ app.get("/get/:node", async (req, res) => {
       if (node !== null) {
         let result = {}
         node.entitlements.forEach((val, index) => {
-          if (val.serviceLevelCode === "ND") {
+          if (val.serviceLevelCode === "ND" || val.serviceLevelCode === "P+") {
             let date = new Date(val.endDate)
             let currentDate = new Date()
 
