@@ -1,14 +1,17 @@
 import { LinearProgress, TableCell, TableRow, Typography } from "@mui/material"
+
 import { Link } from "react-router-dom"
-import { useQuery } from "react-query"
 import NodeCellC from "./NodeCellC"
 import SELCustom from "./SELCustom"
-import { useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useContext } from "react"
+import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 
 const AlertEntry = ({ data }) => {
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
+  const { enqueueSnackbar } = useSnackbar()
 
   let id = data.id
   const result = useQuery(["alert", id], async ({ signal }) => {
@@ -21,19 +24,10 @@ const AlertEntry = ({ data }) => {
     const res = await (
       await fetch(`${apiConfig.apiUrl}/openmanage/health/${id}`, payload)
     ).json()
+    if (res.status === "error")
+      enqueueSnackbar(res.message, { variant: res.status })
     return res
   })
-
-  function iconColor(subSystem) {
-    let status = null
-    if (result.data.result[subSystem] !== undefined)
-      status = result.data.result[subSystem].status
-
-    if (status === "Warning") return "#ff9800"
-    else if (status === "Critical") return "#f44336"
-    else if (status === "Good") return "#4caf50"
-    else return "#bdbdbd"
-  }
 
   let statusColor = ""
   if (data.status === 3000) statusColor = "#ff9800"
@@ -49,7 +43,7 @@ const AlertEntry = ({ data }) => {
           <LinearProgress />
         </TableCell>
       )}
-      {result.isFetched && (
+      {result.isFetched && result.data.status === "success" && (
         <>
           <TableCell sx={{ borderColor: statusColor }}>
             <Typography variant="h1" sx={{ fontSize: "16pt" }}>

@@ -75,21 +75,22 @@ app.get("/nodes", async (req, res) => {
 })
 
 app.get("/health/:id", async (req, res) => {
-  let json = new Object()
   const url =
     config.ome.url +
     "/api/DeviceService/Devices(" +
     req.params.id +
     ")/SubSystemHealth"
-  // TODO: Fix "Cannot read properties of undefined (reading 'forEach')"
-  json = await apiRequest(url, omeHeader)
-  let output = { status: "error", result: {} }
-  if (json.status === "success") {
-    output.status = "success"
-    let list = json.result
 
-    list.forEach((element) => {
-      // <---
+  try {
+    let api_res = await apiRequest(url, omeHeader)
+
+    if (api_res.status === "error" || api_res.result === undefined)
+      throw {
+        status: "error",
+        message: `Error fetching SubSystemHealth for ID: ${req.params.id}`,
+      }
+    let output = { status: "success", result: {} }
+    api_res.result.forEach((element) => {
       let fault = null
       if (element.FaultList !== undefined) fault = element.FaultList[0].Message
       output.result[element.SubSystem] = {
@@ -98,9 +99,10 @@ app.get("/health/:id", async (req, res) => {
         message: fault,
       }
     })
-    res.send(output)
-  } else {
-    res.send(json)
+    res.json(output)
+  } catch (error) {
+    console.error(error)
+    res.json(error)
   }
 })
 
