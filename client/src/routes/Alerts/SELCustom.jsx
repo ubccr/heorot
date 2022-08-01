@@ -25,7 +25,7 @@ const SELCustom = ({ data, node, type, icon }) => {
   const { enqueueSnackbar } = useSnackbar()
 
   const query_sel = useQuery(
-    ["sel"],
+    ["sel", node],
     async () => {
       let payload = {
         headers: {
