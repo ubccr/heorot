@@ -56,11 +56,12 @@ const AppBarC = () => {
 
   const query = useQuery(
     "plugins",
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/plugins`, payload)

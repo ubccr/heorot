@@ -28,11 +28,12 @@ const ManageUsers = () => {
   const [user, setUser] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
-  const query = useQuery(["users"], async () => {
+  const query = useQuery(["users"], async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
       },
+      signal,
     }
     const res = await (
       await fetch(`${apiConfig.apiUrl}/auth/users`, payload)

@@ -28,11 +28,12 @@ const TableC = ({ node }) => {
 
   const query_systems = useQuery(
     ["systems", node],
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/redfish/v1/systems/${node}`, payload)
@@ -46,11 +47,12 @@ const TableC = ({ node }) => {
 
   const query_managers = useQuery(
     ["managers", node],
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/redfish/v1/managers/${node}`, payload)
@@ -64,11 +66,12 @@ const TableC = ({ node }) => {
 
   const query_gpu = useQuery(
     ["gpu", node],
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/redfish/v1/gpu/${node}`, payload)
@@ -82,11 +85,12 @@ const TableC = ({ node }) => {
 
   const query_storage = useQuery(
     ["storage", node],
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/redfish/v1/storage/${node}`, payload)
@@ -100,11 +104,12 @@ const TableC = ({ node }) => {
 
   const query_sel = useQuery(
     ["sel", node],
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)

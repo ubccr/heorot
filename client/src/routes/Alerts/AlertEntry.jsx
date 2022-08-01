@@ -11,11 +11,12 @@ const AlertEntry = ({ data }) => {
   const [user, setUser] = useContext(UserContext)
 
   let id = data.id
-  const result = useQuery(["alert", id], async () => {
+  const result = useQuery(["alert", id], async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
       },
+      signal,
     }
     const res = await (
       await fetch(`${apiConfig.apiUrl}/openmanage/health/${id}`, payload)

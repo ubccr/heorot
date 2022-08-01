@@ -100,11 +100,12 @@ const EditNodes = () => {
   }
   const query = useQuery(
     "image",
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)

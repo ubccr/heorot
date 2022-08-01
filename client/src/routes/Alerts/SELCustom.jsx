@@ -26,11 +26,12 @@ const SELCustom = ({ data, node, type, icon }) => {
 
   const query_sel = useQuery(
     ["sel", node],
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)

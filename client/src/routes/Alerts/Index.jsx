@@ -20,11 +20,12 @@ const Index = () => {
   const [user, setUser] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
-  const query = useQuery("nodes", async () => {
+  const query = useQuery("nodes", async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
       },
+      signal,
     }
     const res = await (
       await fetch(`${apiConfig.apiUrl}/openmanage/nodes`, payload)

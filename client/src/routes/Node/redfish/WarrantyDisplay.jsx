@@ -8,11 +8,12 @@ const WarrantyDisplay = ({ node }) => {
   const [user, setUser] = useContext(UserContext)
   const query = useQuery(
     node,
-    async () => {
+    async ({ signal }) => {
       let payload = {
         headers: {
           "x-access-token": user.accessToken,
         },
+        signal,
       }
       const res = await (
         await fetch(`${apiConfig.apiUrl}/warranty/get/${node}`, payload)
