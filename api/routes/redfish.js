@@ -235,7 +235,8 @@ app.get("/v1/sel/:node", async (req, res) => {
     const uri = `https://${bmc.address}`
     let auth = await redfish_auth(uri)
     if (auth.status === "success") {
-      if (auth.oem === "Dell") api_res = await dell_sel(uri, auth.token)
+      if (auth.oem === "Dell")
+        api_res = await dell_sel(uri, auth.token, auth.version)
       else if (auth.oem === "Supermicro")
         api_res = await sm_sel(uri, auth.token)
       else if (auth.oem === "HPE") api_res = await hpe_sel(uri, auth.token)
