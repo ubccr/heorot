@@ -1,7 +1,7 @@
 const fetch = require("node-fetch")
 const https = require("https")
 
-let config = require("../../config.example")
+let config = require("../../config")
 
 const agent = new https.Agent({
   rejectUnauthorized: false,

@@ -1,6 +1,6 @@
 const { default: got } = require("got")
 
-let config = require("../config.example")
+let config = require("../config")
 
 async function grendelRequest(path, method = "GET", body = {}) {
   try {
