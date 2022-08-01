@@ -56,6 +56,7 @@ async function dell_storage(uri, token, version) {
     })
 
     let volumes = volume_res.data.map((val) => {
+      let raid = val.RAIDType !== undefined ? val.RAIDType : val.VolumeType
       let capacity =
         val.CapacityBytes > 1000000000000
           ? (val.CapacityBytes / 1100000000000).toPrecision(3) + " TiB"
@@ -63,7 +64,7 @@ async function dell_storage(uri, token, version) {
       return {
         name: val.Name,
         driveStatus: val.Status.Health,
-        RAIDType: val.RAIDType,
+        RAIDType: raid,
         capacity: capacity,
       }
     })
