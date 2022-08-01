@@ -81,7 +81,7 @@ app.get("/health/:id", async (req, res) => {
     "/api/DeviceService/Devices(" +
     req.params.id +
     ")/SubSystemHealth"
-
+  // TODO: Fix "Cannot read properties of undefined (reading 'forEach')"
   json = await apiRequest(url, omeHeader)
   let output = { status: "error", result: {} }
   if (json.status === "success") {
@@ -89,6 +89,7 @@ app.get("/health/:id", async (req, res) => {
     let list = json.result
 
     list.forEach((element) => {
+      // <---
       let fault = null
       if (element.FaultList !== undefined) fault = element.FaultList[0].Message
       output.result[element.SubSystem] = {
