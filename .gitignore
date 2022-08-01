@@ -7,5 +7,5 @@ server.cert
 bmc.key
 bmc.key.pub
 .env
-**config.js
-**docker-compose.yml
+config.js
+docker-compose.yml
