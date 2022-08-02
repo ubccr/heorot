@@ -1,21 +1,21 @@
-import { useState, useContext } from "react"
 import {
-  Typography,
-  Grid,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
+  FormControl,
   FormHelperText,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Skeleton,
+  TextField,
+  Typography,
 } from "@mui/material"
-import { useSnackbar } from "notistack"
+import { useContext, useState } from "react"
 
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
 import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 
 const EditNodes = () => {
   const [formValues, setFormValues] = useState({
@@ -43,7 +43,7 @@ const EditNodes = () => {
     event.preventDefault()
 
     const newErrors = validateForm()
-    console.log(newErrors)
+
     if (Object.keys(newErrors).length > 0) setFormError(newErrors)
     else {
       let payload = {
