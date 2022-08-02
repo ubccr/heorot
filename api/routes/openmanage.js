@@ -101,7 +101,6 @@ app.get("/health/:id", async (req, res) => {
     })
     res.json(output)
   } catch (error) {
-    console.error(error)
     res.json(error)
   }
 })
