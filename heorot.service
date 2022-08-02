@@ -1,0 +1,20 @@
+[unit]
+Description=Heorot Web UI - a companion to Grendel
+Documentation=https://github.com/ubccr/heorot
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=grendel
+ExecStart=/usr/bin/node /opt/heorot/api/server.js
+WorkingDirectory=/opt/heorot/api
+StandardOutput=append:/var/log/heorot.log
+StandardError=append:/var/log/heorot.log
+Restart=on-failure
+
+## uncomment if binding to port 443:
+#CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_RAW
+#AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_RAW
+[Install]
+WantedBy=multi-user.target
