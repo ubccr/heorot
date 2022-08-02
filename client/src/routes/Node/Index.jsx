@@ -1,17 +1,17 @@
-import { useParams } from "react-router-dom"
-import { useEffect, useState, useContext } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
-import { useSnackbar } from "notistack"
-import { UserContext } from "../../contexts/UserContext"
+import { useContext, useEffect, useState } from "react"
 
-import Interfaces from "./grendel/Interfaces"
-import TableC from "./components/TableC"
-import WarrantyDisplay from "./redfish/WarrantyDisplay"
-import Provision from "./grendel/Provision"
-import Tags from "./grendel/Tags"
 import Console from "./redfish/Console"
+import Interfaces from "./grendel/Interfaces"
 import NewGridC from "./components/NewGridC"
+import Provision from "./grendel/Provision"
+import TableC from "./components/TableC"
+import Tags from "./grendel/Tags"
+import { UserContext } from "../../contexts/UserContext"
+import WarrantyDisplay from "./redfish/WarrantyDisplay"
 import { apiConfig } from "../../config"
+import { useParams } from "react-router-dom"
+import { useSnackbar } from "notistack"
 
 const Index = () => {
   const { node } = useParams()
@@ -41,8 +41,7 @@ const Index = () => {
           let data = response.result[0]
           data.provision = response.result[0].provision.toString()
           if (data.tags === null) data.tags = []
-          if (data.tags.includes("legacyAPI")) setSimple(true)
-          // TODO: change to "noAPI"
+          if (data.tags.includes("noAPI")) setSimple(true)
           data.interfaces.forEach((val, index) => {
             if (val.fqdn.substring(0, 3) === "bmc") setBMC(val.fqdn)
           })
