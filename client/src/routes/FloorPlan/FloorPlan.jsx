@@ -1,47 +1,22 @@
-import { valueToPercent } from "@mui/base"
 import {
-  Container,
   Box,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableContainer,
-  Paper,
   Button,
   LinearProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
 } from "@mui/material"
-import { useEffect, useState, useContext } from "react"
+import { useContext, useEffect, useState } from "react"
+
 import { Link } from "react-router-dom"
-import { apiConfig } from "../../config"
 import { UserContext } from "../../contexts/UserContext"
+import { apiConfig } from "../../config"
 import { useSnackbar } from "notistack"
 
 const FloorPlan = () => {
-  const floorX = [..."defghijklmnopqrstuvw"]
-  const floorY = [
-    "28",
-    "27",
-    "26",
-    "25",
-    "24",
-    "23",
-    "22",
-    "21",
-    "17",
-    "16",
-    "15",
-    "14",
-    "13",
-    "12",
-    "11",
-    "10",
-    "09",
-    "08",
-    "07",
-    "06",
-    "05",
-  ]
   function createRows(row) {
     let res = []
     row.forEach((el) => {
@@ -60,12 +35,12 @@ const FloorPlan = () => {
   const [cols, setCols] = useState([])
   const [Nodes, setNodes] = useState()
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    setRows(createRows(floorX))
-    setCols(createCols(floorY))
+    setRows(createRows(apiConfig.floorplan.floorX))
+    setCols(createCols(apiConfig.floorplan.floorY))
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
