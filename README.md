@@ -44,7 +44,11 @@ See quickstart.MD for a sample install & config of requirements
 ## :checkered_flag: Production build
 
 ```bash
-$ git clone https://github.com/ubccr/heorot.git
+# Preferred install directory is /opt/heorot
+# User who owns the node process will need to be in Grendel group
+$ mkdir /opt/heorot
+$ cd /opt/heorot
+$ git clone https://github.com/ubccr/heorot.git .
 
 # Download node packages
 $ cd heorot/api
@@ -53,16 +57,29 @@ $ npm i
 # Generate an OpenSSL cert & ssh key (see api/keys/keys.MD)
 
 # Edit the config file
+$ cp config.example.js config.js
 $ vim config.js
 
 ### If binding to port 443:
 $ sudo setcap cap_net_bind_service=+ep /usr/bin/node
 
-# Run the webserver
+# Run the webserver (you can also use the heorot.service file)
 $ node server.js
-# Vist the hostname of your server & create a new account with "Signup"
+# Vist the hostname of your server & create and "Signup"
 
-# Don't login yet, open the mongo shell or use Atlas to edit the DB
+
+# Don't login yet, open the mongo shell or use Compass to edit the DB
+### As of writing: Ubuntu 22.04 does not have a mongosh install repo, I suggest using MongoDB's Compass app
+
+# Go to the dcim table, then "users" collection, then edit the "privileges" line from "none" to "admin"
+# Allowed values are "none", "admin", "user"
+# admin: allows access to manage users from the UI & query Dell's Warranty API
+# user: general access to all grendel functions
+# none: can login but will not be able to get any node information
+
+
+
+# Mongosh command line reference:
 $ mongosh -u admin -p
 
 $ use dcim
@@ -72,8 +89,7 @@ $ db.users.find()
 $ db.users.updateOne({username: 'your_username_here'},{$set:{privileges: 'admin'}})
 $ exit
 
-### Note: all new users will have the default value of privileges: "none", they will need to have their privileges updated to either "user" or "admin" before they can use the webUI.
-# As of the time of writing, "admin" allows access to the "Warranty" page, which is used to query Dell's warranty API.
+
 
 
 

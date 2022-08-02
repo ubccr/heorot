@@ -1,3 +1,5 @@
+## TODO: Deprecated install type
+
 ## MongoDB install on Ubuntu 22.04
 
 See https://www.mongodb.com/docs/manual/installation/ for other linux distro instructions
