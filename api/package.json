@@ -4,7 +4,8 @@
   "description": "Heorot API",
   "main": "server.js",
   "scripts": {
-    "start": "npm run server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "author": "Josh Furlani",
   "license": "ISC",
@@ -19,5 +20,8 @@
     "node-fetch": "^2.6.7",
     "socket.io": "^4.4.1",
     "ssh2": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
   }
 }
