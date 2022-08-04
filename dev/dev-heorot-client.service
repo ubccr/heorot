@@ -1,0 +1,17 @@
+[unit]
+Description=Dev Heorot Client
+Documentation=https://github.com/ubccr/heorot
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=grendel
+ExecStart=/usr/bin/npm start
+WorkingDirectory=/opt/heorot/client
+StandardOutput=append:/var/log/dev-heorot-client.log
+StandardError=append:/var/log/dev-heorot-client.log
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

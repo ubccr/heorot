@@ -1,0 +1,20 @@
+[unit]
+Description=Dev Heorot API
+Documentation=https://github.com/ubccr/heorot
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=grendel
+ExecStart=/usr/bin/npm run dev
+WorkingDirectory=/opt/heorot/api
+StandardOutput=append:/var/log/dev-heorot-api.log
+StandardError=append:/var/log/dev-heorot-api.log
+Restart=on-failure
+
+## Comment out if binding to unprivileged port:
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_RAW
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_RAW
+[Install]
+WantedBy=multi-user.target
