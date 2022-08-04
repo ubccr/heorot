@@ -88,7 +88,6 @@ app.get("/users", auth, async (req, res) => {
 })
 
 app.post("/updateUsers", auth, async (req, res) => {
-  console.log(req.body)
   const action = req.body.action
   const users = req.body.users.map((x) => {
     return { username: x }
