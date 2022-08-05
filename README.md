@@ -26,73 +26,112 @@
 
 ## :dart: About
 
-Heorot is a companion to <a href="https://github.com/ubccr/grendel" target="_blank">Grendel</a> providing a Web-UI for managing a data center worth of nodes.
-Checkout the <a href="screenshots.MD">Screenshots</a> file for an example of the UI
+Heorot is a companion to [Grendel](https://github.com/ubccr/grendel) providing a Web-UI for managing a data center worth of nodes. It's focus is on improving the workflow of hardware lifecycle management, everything from importing and configuring nodes to hardware maintenance.\
+Checkout the [Screenshots](screenshots.MD) file for an example of the UI.
 
 ## :sparkles: Features
 
 :heavy_check_mark: Visualizes Floor and Rack layouts \
-:heavy_check_mark: Provides a beautiful UI to manage Grendel \
+:heavy_check_mark: Provides an easy to use UI to manage Grendel \
 :heavy_check_mark: Displays node information from the Redfish API \
 :heavy_check_mark: Integration of OpenMange Enterprise alerts
 
 ## :white_check_mark: Requirements
 
-Before starting :checkered_flag:, you need to have [Git](https://git-scm.com), [Node](https://nodejs.org/en/), [MongoDB](https://www.mongodb.com/docs/manual/installation/), and [Grendel](https://github.com/ubccr/grendel) installed.
-See quickstart.MD for a sample install & config of requirements
+- Git: [git-scm.com](https://git-scm.com)
+- Node: [nodejs.org](https://nodejs.org/en/)
+- MongoDB: [mongodb.com](https://mongodb.com/docs/manual/installation/)
+- Grendel: [github.com/ubccr/grendel](https://github.com/ubccr/grendel)
 
 ## :checkered_flag: Production build
 
+This is an opinionated, reference guide to installing Heorot, please follow security best practices.
+
+### Heorot setup:
+
+> This guide will assume Heorot will be run as the Grendel user
+
 ```bash
-# Preferred install directory is /opt/heorot
-# User who owns the node process will need to be in Grendel group
 $ mkdir /opt/heorot
-$ cd /opt/heorot
-$ git clone https://github.com/ubccr/heorot.git .
+$ git clone https://github.com/ubccr/heorot.git /opt/heorot
 
-# Download node packages
-$ cd heorot/api
+# Ensure directory is accessable to the node user
+$ chown ubuntu:grendel -R /opt/heorot
+$ chmod g+s -R /opt/heorot
+```
+
+### Install node Packages:
+
+```bash
+$ cd /opt/heorot/api
 $ npm i
+```
 
-# Generate an OpenSSL cert & ssh key (see api/keys/keys.MD)
+### Configure and start Mongo container:
 
-# Edit the config file
-$ cp config.example.js config.js
-$ vim config.js
+```bash
+$ cp /opt/heorot/docker-compose.example.yml /opt/heorot/docker-compose.yml
+# Change the default password:
+$ nano /opt/heorot/docker-compose.yml
 
-### If binding to port 443:
-$ sudo setcap cap_net_bind_service=+ep /usr/bin/node
+$ docker compose up -d
+```
 
-# Run the webserver (you can also use the heorot.service file)
-$ node server.js
-# Vist the hostname of your server & create and "Signup"
+### Setup the configuration file:
 
+```bash
+$ cp /opt/heorot/api/config.example.js /opt/heorot/api/config.js
+$ nano /opt/heorot/api/config.js
+```
 
-# Don't login yet, open the mongo shell or use Compass to edit the DB
-### As of writing: Ubuntu 22.04 does not have a mongosh install repo, I suggest using MongoDB's Compass app
+### Generate Certs & Keys:
 
-# Go to the dcim table, then "users" collection, then edit the "privileges" line from "none" to "admin"
-# Allowed values are "none", "admin", "user"
-# admin: allows access to manage users from the UI & query Dell's Warranty API
-# user: general access to all grendel functions
-# none: can login but will not be able to get any node information
+The /opt/heorot/api/keys directory needs the following:
 
+1. server.cert
+2. server.key
+3. bmc.key
 
+```bash
+$ cd /opt/heorot/api/keys
+# Change localhost to your server's IP & region info
+$ openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
 
-# Mongosh command line reference:
-$ mongosh -u admin -p
+$ ssh-keygen -f bmc.key
 
-$ use dcim
-# Ensure your username shows up
-$ db.users.find()
-# Update your user to 'admin' privs
-$ db.users.updateOne({username: 'your_username_here'},{$set:{privileges: 'admin'}})
-$ exit
+# Ensure keys are readable by grendel user
+$ ls -l
+$ chmod 640 *
+```
 
+### Setup the service file:
 
+```bash
+# Copy the service files & edit it if necessary
+$ cp /opt/heorot/heorot.service /etc/systemd/system/
 
+$ sudo systemctl enable heorot.service
+$ sudo systemctl start heorot.service
+```
 
+---
 
+## :tada: Heorot should now be running!
+
+You can access the dev Web UI at https://_your_ip_here_
+
+### MongoDB Initialization:
+
+> :warning: Ubuntu 22.04 does not have a mongosh install candidate, I advise using [MongoDB Compass](https://www.mongodb.com/products/compass) instead
+
+1. Head to https://_your_ip_here_/#/Signup and create an Account
+2. Login to MongoDB and set your user's privileges to "admin"
+
+### Log files:
+
+```bash
+ tail -f /var/log/dev-heorot-api.log
+ tail -f /var/log/dev-heorot-client.log
 ```
 
 ## :memo: License

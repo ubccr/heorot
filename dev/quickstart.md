@@ -42,6 +42,7 @@ $ npm i
 #### Configure and start Mongo container:
 
 ```bash
+$ cp /opt/heorot/docker-compose.example.yml /opt/heorot/docker-compose.yml
 # Change the default password:
 $ nano /opt/heorot/docker-compose.yml
 
@@ -82,11 +83,11 @@ $ chmod 640 *
 $ cp /opt/heorot/dev/dev-heorot-api.service /etc/systemd/system/
 $ cp /opt/heorot/dev/dev-heorot-client.service /etc/systemd/system/
 
-$ sudo systemctl enable dev-heorot-api
-$ sudo systemctl enable dev-heorot-client
+$ sudo systemctl enable dev-heorot-api.service
+$ sudo systemctl enable dev-heorot-client.service
 
-$ sudo systemctl start dev-heorot-api
-$ sudo systemctl start dev-heorot-client
+$ sudo systemctl start dev-heorot-api.service
+$ sudo systemctl start dev-heorot-client.service
 ```
 
 ---
