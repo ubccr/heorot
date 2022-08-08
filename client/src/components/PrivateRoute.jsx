@@ -4,7 +4,7 @@ export default function PrivateRoute({ children, access }) {
   const user = JSON.parse(localStorage.getItem("user"))
   if (user === null) return <Navigate to="/login" />
 
-  return mapping(user.privileges, access) ? children : <Navigate to="/login" />
+  return mapping(user.privileges, access) ? children : <Navigate to="/" />
 }
 
 function mapping(user, access) {
