@@ -1,28 +1,26 @@
+import {
+  Button,
+  Menu,
+  MenuItem,
+  Switch,
+  Toolbar,
+  Typography,
+} from "@mui/material"
+import { useContext, useState } from "react"
+
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
+import AdminMenu from "./AppBar/AdminMenu"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
-import {
-  Toolbar,
-  Button,
-  Switch,
-  MenuItem,
-  Menu,
-  Typography,
-  InputBase,
-} from "@mui/material"
 import IconButton from "@mui/material/IconButton"
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
-import MenuIcon from "@mui/icons-material/Menu"
-
-import { useSnackbar } from "notistack"
 import { Link } from "react-router-dom"
+import MainMenuC from "./AppBar/MainMenuC"
+import SearchC from "./AppBar/SearchC"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
-import { useContext, useState } from "react"
-import AdminMenu from "./AppBar/AdminMenu"
 import { apiConfig } from "../config"
-import SearchC from "./AppBar/SearchC"
-import MainMenuC from "./AppBar/MainMenuC"
 import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 
 const AppBarC = () => {
   const { enqueueSnackbar } = useSnackbar()
@@ -55,7 +53,7 @@ const AppBarC = () => {
   }
 
   const query = useQuery(
-    "plugins",
+    ["plugins", user],
     async ({ signal }) => {
       let payload = {
         headers: {
@@ -68,7 +66,7 @@ const AppBarC = () => {
       ).json()
       return res
     },
-    { retry: 2 }
+    { retry: 2, enabled: !!user }
   )
 
   const [anchorEl, setAnchorEl] = useState(null)
