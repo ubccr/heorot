@@ -129,23 +129,44 @@ app.post("/discover", async (req, res) => {
   })
 })
 
-app.get("/status/:tags?", async (req, res) => {
+app.get("/status/:value/:tags?", async (req, res) => {
   let tags = req.params.tags === undefined ? "" : req.params.tags
-  exec(`grendel status ${tags}`, (error, stdout, stderr) => {
-    if (error || stderr) {
-      console.error(
-        "exec error | routes/grendel.js | error executing 'grendel status'"
-      )
+  let args = ["status"]
+
+  if (req.params.value === "nodes") args.push("nodes", `${tags}`)
+  else if (req.params.value === "long") args.push("nodes", `${tags}`, "--long")
+  else args.push(`${tags}`)
+
+  const status = spawn("grendel", args)
+  let stdout = "",
+    stderr = "",
+    error = ""
+  status.stdout.on("data", (data) => {
+    stdout += data
+  })
+  status.stderr.on("data", (data) => {
+    stderr += data
+  })
+  status.on("error", (err) => {
+    error = err
+    res.json({
+      status: "error",
+      message: err,
+    })
+  })
+  status.on("close", (code) => {
+    if (stderr === "" && error === "") {
       res.json({
+        status: "success",
+        result: stdout,
+      })
+    } else {
+      console.error({
         status: "error",
-        message: "error executing 'grendel status'",
-        error: stderr,
+        stderr,
+        error,
       })
     }
-    res.json({
-      status: "success",
-      result: stdout,
-    })
   })
 })
 
