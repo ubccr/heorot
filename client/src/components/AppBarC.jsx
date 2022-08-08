@@ -13,9 +13,11 @@ import AdminMenu from "./AppBar/AdminMenu"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
+import InfoOutlined from "@mui/icons-material/InfoOutlined"
 import { Link } from "react-router-dom"
 import MainMenuC from "./AppBar/MainMenuC"
 import SearchC from "./AppBar/SearchC"
+import Status from "./Status"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
@@ -70,6 +72,7 @@ const AppBarC = () => {
   )
 
   const [anchorEl, setAnchorEl] = useState(null)
+  const [statusOpen, setStatusOpen] = useState(false)
   const isMenuOpen = Boolean(anchorEl)
   const handleAccountOpen = (event) => {
     setAnchorEl(event.currentTarget)
@@ -160,6 +163,14 @@ const AppBarC = () => {
             <Button sx={{ my: 2, color: "white" }}>
               <Link to={"/Login"}>Login</Link>
             </Button>
+          )}
+          {user !== null && (
+            <>
+              <IconButton size="large" onClick={() => setStatusOpen(true)}>
+                <InfoOutlined sx={{ color: "white" }} />
+              </IconButton>
+              <Status open={statusOpen} setOpen={setStatusOpen} />
+            </>
           )}
           {user !== null && (
             <IconButton size="large" onClick={handleAccountOpen}>
