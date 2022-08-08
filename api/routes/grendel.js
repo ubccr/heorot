@@ -1,6 +1,6 @@
 const express = require("express")
 const app = express.Router()
-const { spawn } = require("child_process")
+const { spawn, exec } = require("child_process")
 const fs = require("fs")
 
 let config = require("../config")
@@ -126,6 +126,26 @@ app.post("/discover", async (req, res) => {
         res.json(output)
       })
     }
+  })
+})
+
+app.get("/status/:tags?", async (req, res) => {
+  let tags = req.params.tags === undefined ? "" : req.params.tags
+  exec(`grendel status ${tags}`, (error, stdout, stderr) => {
+    if (error || stderr) {
+      console.error(
+        "exec error | routes/grendel.js | error executing 'grendel status'"
+      )
+      res.json({
+        status: "error",
+        message: "error executing 'grendel status'",
+        error: stderr,
+      })
+    }
+    res.json({
+      status: "success",
+      result: stdout,
+    })
   })
 })
 
