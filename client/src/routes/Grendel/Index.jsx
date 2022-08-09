@@ -1,11 +1,11 @@
-import React from "react"
-import { useState } from "react"
 import { Box, Typography } from "@mui/material"
 
-import BgContainer from "../../components/BgContainer"
-import EditNodes from "./EditNodes"
-import EditJson from "./EditJson"
 import AddNodes from "./AddNodes"
+import BgContainer from "../../components/BgContainer"
+import EditJson from "./EditJson"
+import EditNodes from "./EditNodes"
+import General from "./General"
+import React from "react"
 
 const Index = () => {
   return (
@@ -37,6 +37,7 @@ const Index = () => {
         </Typography>
       </Box>
       <BgContainer sx={{ alignItems: "Center" }}>
+        {/* <General /> */}
         <EditNodes />
         <EditJson />
         <AddNodes />

@@ -1,6 +1,6 @@
 const express = require("express")
 const app = express.Router()
-const { spawn } = require("child_process")
+const { spawn, exec } = require("child_process")
 const fs = require("fs")
 
 let config = require("../config")
@@ -124,6 +124,47 @@ app.post("/discover", async (req, res) => {
           }
         }
         res.json(output)
+      })
+    }
+  })
+})
+
+app.get("/status/:value/:tags?", async (req, res) => {
+  let tags = req.params.tags === undefined ? "" : req.params.tags
+  let args = ["status"]
+
+  if (req.params.value === "nodes") args.push("nodes", `${tags}`)
+  else if (req.params.value === "long") args.push("nodes", `${tags}`, "--long")
+  else args.push(`${tags}`)
+
+  const status = spawn("grendel", args)
+  let stdout = "",
+    stderr = "",
+    error = ""
+  status.stdout.on("data", (data) => {
+    stdout += data
+  })
+  status.stderr.on("data", (data) => {
+    stderr += data
+  })
+  status.on("error", (err) => {
+    error = err
+    res.json({
+      status: "error",
+      message: err,
+    })
+  })
+  status.on("close", (code) => {
+    if (stderr === "" && error === "") {
+      res.json({
+        status: "success",
+        result: stdout,
+      })
+    } else {
+      console.error({
+        status: "error",
+        stderr,
+        error,
       })
     }
   })
