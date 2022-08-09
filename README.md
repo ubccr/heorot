@@ -38,6 +38,8 @@ Checkout the [Screenshots](screenshots.MD) file for an example of the UI.
 
 ## :white_check_mark: Requirements
 
+> Installation of requirements will not be covered in this guide
+
 - Git: [git-scm.com](https://git-scm.com)
 - Node: [nodejs.org](https://nodejs.org/en/)
 - MongoDB: [mongodb.com](https://mongodb.com/docs/manual/installation/)
@@ -49,15 +51,16 @@ This is an opinionated, reference guide to installing Heorot, please follow secu
 
 ### Heorot setup:
 
-> This guide will assume Heorot will be run as the Grendel user
+> This guide will assume Heorot will be run as the grendel user
 
 ```bash
-$ mkdir /opt/heorot
-$ git clone https://github.com/ubccr/heorot.git /opt/heorot
+$ sudo mkdir /opt/heorot
 
-# Ensure directory is accessable to the node user
-$ chown ubuntu:grendel -R /opt/heorot
+# Ensure directory is accessable to the grendel user
+$ sudo chown ubuntu:grendel -R /opt/heorot
 $ chmod g+s -R /opt/heorot
+
+$ git clone https://github.com/ubccr/heorot.git /opt/heorot
 ```
 
 ### Install node Packages:
@@ -108,7 +111,8 @@ $ chmod 640 *
 
 ```bash
 # Copy the service files & edit it if necessary
-$ cp /opt/heorot/heorot.service /etc/systemd/system/
+$ sudo cp /opt/heorot/heorot.service /etc/systemd/system/
+$ nano /etc/systemd/system/heorot.service
 
 $ sudo systemctl enable heorot.service
 $ sudo systemctl start heorot.service
@@ -130,8 +134,7 @@ You can access the dev Web UI at https://_your_ip_here_
 ### Log files:
 
 ```bash
- tail -f /var/log/dev-heorot-api.log
- tail -f /var/log/dev-heorot-client.log
+ tail -f /var/log/dev-heorot.log
 ```
 
 ## :memo: License
