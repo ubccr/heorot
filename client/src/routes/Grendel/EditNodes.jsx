@@ -117,6 +117,24 @@ const EditNodes = () => {
     { enabled: false }
   )
 
+  const firmwareQuery = useQuery(
+    "firmware",
+    async ({ signal }) => {
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+        signal,
+      }
+      const res = await (
+        await fetch(`${apiConfig.apiUrl}/grendel/firmware/list`, payload)
+      ).json()
+      if (res.status === "error")
+        enqueueSnackbar(res.message, { variant: "error" })
+      return res
+    },
+    { enabled: false }
+  )
   function validateForm() {
     const { nodeset, action, actionValue, tags, value } = formValues
     const formErrors = {}
@@ -174,6 +192,8 @@ const EditNodes = () => {
                   setField("action", e.target.value)
                   formValues.value = ""
                   if (e.target.value === "image") query.refetch()
+                  else if (e.target.value === "firmware")
+                    firmwareQuery.refetch()
                 }}
               >
                 <MenuItem value={"provision"}>Set Provision</MenuItem>
@@ -229,7 +249,7 @@ const EditNodes = () => {
                 }}
               ></TextField>
             )}
-            {formValues.action === "firmware" && (
+            {formValues.action === "firmware" && firmwareQuery.isFetched && (
               <FormControl sx={{ width: "100%" }}>
                 <InputLabel id="firmware-select-label">Value</InputLabel>
                 <Select
@@ -241,10 +261,11 @@ const EditNodes = () => {
                     setField("value", e.target.value)
                   }}
                 >
-                  <MenuItem value={"ipxe-x86_64.efi"}>ipxe-x86_64.efi</MenuItem>
-                  <MenuItem value={"snponly-x86_64.efi"}>
-                    snponly-x86_64.efi
-                  </MenuItem>
+                  {firmwareQuery.data.result.map((val, index) => (
+                    <MenuItem value={val} key={index}>
+                      {val}
+                    </MenuItem>
+                  ))}
                 </Select>
                 <FormHelperText error>{formError.value}</FormHelperText>
               </FormControl>
