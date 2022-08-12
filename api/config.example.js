@@ -50,4 +50,13 @@ config.ome = {
   pass: "", // OME api password
 }
 
+// Grendel pxe firmware list | changes the firmware options shown in lists
+config.firmware = [
+  "ipxe.pxe",
+  "ipxe-i386.efi",
+  "ipxe-x86_64.efi",
+  "snponly-x86_64.efi",
+  "undionly.kpxe",
+]
+
 module.exports = config
