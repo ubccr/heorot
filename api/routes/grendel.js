@@ -77,6 +77,13 @@ app.delete("/image/delete/:nodeset", async (req, res) => {
   res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`, "DELETE"))
 })
 
+app.get("/firmware/list", async (req, res) => {
+  res.json({
+    status: "success",
+    result: config.firmware,
+  })
+})
+
 // TODO: Error testing
 app.post("/discover", async (req, res) => {
   let output = {}
