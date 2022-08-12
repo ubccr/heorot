@@ -10,6 +10,7 @@
 
 ```bash
 $ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+$ sudo apt-get install -y nodejs
 ```
 
 ### Install Docker: [docs.docker.com](https://docs.docker.com/engine/install/ubuntu/)
