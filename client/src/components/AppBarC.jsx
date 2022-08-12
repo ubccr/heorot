@@ -164,7 +164,7 @@ const AppBarC = () => {
               <Link to={"/Login"}>Login</Link>
             </Button>
           )}
-          {user !== null && (
+          {user !== null && user.privileges === "admin" && (
             <>
               <IconButton size="large" onClick={() => setStatusOpen(true)}>
                 <InfoOutlined sx={{ color: "white" }} />
