@@ -23,7 +23,6 @@ async function sm_resetBmc(uri, token) {
   const body = JSON.stringify({ ResetType: "GracefulRestart" })
   const url = uri + "/redfish/v1/Managers/1/Actions/Manager.Reset"
   let res = await api_request(url, token, "POST", false, body)
-  console.log(res)
   if (res.data.status === 200) {
     return {
       status: "success",

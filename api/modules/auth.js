@@ -20,7 +20,6 @@ function auth(req, res, next) {
         })
       }
       let query = await User.findOne({ _id: decoded.id }).exec()
-      console.log(query)
       if (query.privileges !== "none") {
         req.userId = decoded.id
         next()
