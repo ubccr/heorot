@@ -1,7 +1,9 @@
 import { Box, Button, Grid, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
+import BootImage from "./grendel/BootImage"
 import Console from "./redfish/Console"
+import Firmware from "./grendel/Firmware"
 import Interfaces from "./grendel/Interfaces"
 import NewGridC from "./components/NewGridC"
 import Provision from "./grendel/Provision"
@@ -126,13 +128,13 @@ const Index = () => {
           />
           <NewGridC heading="Firmware:">
             <Box sx={{ textAlign: "end", marginRight: "10px" }}>
-              {apiData.firmware}
+              <Firmware initialFirmware={apiData.firmware} node={node} />
             </Box>
           </NewGridC>
           <Interfaces data={apiData.interfaces} />
           <NewGridC heading="Boot Image:">
             <Box sx={{ textAlign: "end", marginRight: "10px" }}>
-              {apiData.boot_image}
+              <BootImage bootimage={apiData.boot_image} node={node} />
             </Box>
           </NewGridC>
 
