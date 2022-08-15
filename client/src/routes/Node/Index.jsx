@@ -1,6 +1,7 @@
 import { Box, Button, Grid, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
+import Actions from "./components/Actions"
 import BootImage from "./grendel/BootImage"
 import Console from "./redfish/Console"
 import Firmware from "./grendel/Firmware"
@@ -142,40 +143,7 @@ const Index = () => {
             <>
               <Console node={node} BMC={BMC} />
 
-              <Grid
-                container
-                sx={{
-                  overflow: "hidden",
-                  padding: "10px",
-                  marginTop: "12px",
-                  alignItems: "center",
-                  border: 1,
-                  borderRadius: "10px",
-                  borderColor: "border.main",
-                  bgcolor: "background.main",
-                  color: "text.primary",
-                  boxShadow: 12,
-                  minHeight: 60,
-                }}
-              >
-                <Grid item xs>
-                  <Typography
-                    variant="h2"
-                    sx={{ fontSize: "18pt", paddingLeft: 2 }}
-                  >
-                    Actions:
-                  </Typography>
-                </Grid>
-
-                <Grid item xs sx={{ textAlign: "end" }}>
-                  <Button variant="outlined" onClick={handleClearSEL}>
-                    Clear SEL
-                  </Button>{" "}
-                  <Button variant="outlined" onClick={handleResetBMC}>
-                    Reset BMC
-                  </Button>
-                </Grid>
-              </Grid>
+              <Actions node={node} />
 
               <WarrantyDisplay node={node} bmc={BMC} />
 
