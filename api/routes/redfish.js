@@ -41,6 +41,11 @@ const {
   sm_resetBmc,
   hpe_resetBmc,
 } = require("../modules/redfish/resetBmc")
+const {
+  dell_resetNode,
+  sm_resetNode,
+  hpe_resetNode,
+} = require("../modules/redfish/resetNode")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -288,6 +293,31 @@ app.put("/v1/resetBmc/:node", async (req, res) => {
       else if (auth.oem === "Supermicro")
         api_res = await sm_resetBmc(uri, auth.token)
       else if (auth.oem === "HPE") api_res = await hpe_resetBmc(uri, auth.token)
+      else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
+
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(auth)
+  } else res.json(bmc)
+})
+
+app.get("/v1/resetNode/:node", async (req, res) => {
+  const node = req.params.node
+
+  let bmc = await getBMC(node)
+  if (bmc.status === "success") {
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      if (auth.oem === "Dell") api_res = await dell_resetNode(uri, auth.token)
+      else if (auth.oem === "Supermicro")
+        api_res = await sm_resetNode(uri, auth.token)
+      else if (auth.oem === "HPE")
+        api_res = await hpe_resetNode(uri, auth.token)
       else
         api_res = {
           status: "error",
