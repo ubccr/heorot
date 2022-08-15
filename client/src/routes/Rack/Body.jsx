@@ -1,13 +1,15 @@
 import {
-  TableRow,
-  TableCell,
+  Button,
   Table,
   TableBody,
+  TableCell,
   TableContainer,
-  Button,
+  TableRow,
   Tooltip,
+  Typography,
   Zoom,
 } from "@mui/material"
+
 import { Link } from "react-router-dom"
 
 const Body = ({ array }) => {
@@ -155,6 +157,13 @@ const Body = ({ array }) => {
           <TableRow key={val.u}>
             <TableCell align={"center"}>{val.u}</TableCell>
             <TableCell style={{ maxWidth: "200px" }}>
+              <Typography
+                variant="body1"
+                align="center"
+                sx={{ marginBottom: "10px" }}
+              >
+                <Link to={`/Node/${val.node}`}>{val.node}</Link>
+              </Typography>
               <TableContainer>
                 <Table>
                   <TableBody>
@@ -168,7 +177,7 @@ const Body = ({ array }) => {
         )
       } else {
         html[val.u] = (
-          <TableRow>
+          <TableRow key={val.u}>
             <TableCell align={"center"}>{val.u}</TableCell>
             <TableCell align={"center"}>
               <Link to={`/Node/${val.node}`}>{val.node}</Link>
