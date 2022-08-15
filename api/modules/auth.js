@@ -3,7 +3,7 @@ let config = require("../config")
 const User = require("../models/User")
 
 function auth(req, res, next) {
-  if ("prod" === "dev") {
+  if (config.environment === "dev") {
     return next()
   } else {
     let token = req.headers["x-access-token"]
