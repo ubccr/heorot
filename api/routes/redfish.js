@@ -305,7 +305,7 @@ app.put("/v1/resetBmc/:node", async (req, res) => {
   } else res.json(bmc)
 })
 
-app.get("/v1/resetNode/:node", async (req, res) => {
+app.put("/v1/resetNode/:node", async (req, res) => {
   const node = req.params.node
 
   let bmc = await getBMC(node)
