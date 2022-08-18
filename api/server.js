@@ -45,6 +45,9 @@ app.use("/openmanage", auth, openmanageRouter)
 const warrantyRouter = require("./routes/warranty.js")
 app.use("/warranty", auth, warrantyRouter)
 
+const switchesRouter = require("./routes/switches.js")
+app.use("/switches", auth, switchesRouter)
+
 app.get("/plugins", async function (req, res) {
   let warranty,
     ome,
