@@ -75,8 +75,21 @@ app.get("/rack/:rack", async (req, res) => {
           } else nodes[resNode.u] = resNode
         }
       } else if (nodeset[0] === "swe") {
-        resSwitch = switchFormat(element, nodeset, resGrendel)
-        nodes[resSwitch.u] = resSwitch
+        if (element.tags.includes("core-switch")) {
+          let u = parseInt(nodeset[2])
+          nodes[u] = {
+            u: u,
+            node: element.name,
+            ports: [],
+            tags: [],
+            height: 1,
+            width: 1,
+            type: "switch",
+          }
+        } else {
+          resSwitch = switchFormat(element, nodeset, resGrendel)
+          nodes[resSwitch.u] = resSwitch
+        }
       } else if (nodeset[0] === "swi") {
         let u = parseInt(nodeset[2])
         nodes[u] = {
