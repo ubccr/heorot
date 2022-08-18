@@ -4,10 +4,12 @@ import { useContext, useEffect, useState } from "react"
 import Actions from "./components/Actions"
 import BootImage from "./grendel/BootImage"
 import Console from "./redfish/Console"
+import CoreSwitch from "./components/CoreSwitch"
 import Firmware from "./grendel/Firmware"
 import Interfaces from "./grendel/Interfaces"
 import NewGridC from "./components/NewGridC"
 import Provision from "./grendel/Provision"
+import Switches from "./components/Switches"
 import TableC from "./components/TableC"
 import Tags from "./grendel/Tags"
 import { UserContext } from "../../contexts/UserContext"
@@ -19,6 +21,7 @@ import { useSnackbar } from "notistack"
 const Index = () => {
   const { node } = useParams()
   const [simple, setSimple] = useState(false)
+  const [coreSw, setCoreSw] = useState(false)
   const [apiData, setApiData] = useState()
   const [refetch, setRefetch] = useState(false)
   const [BMC, setBMC] = useState("")
@@ -49,6 +52,8 @@ const Index = () => {
             if (val.fqdn.substring(0, 3) === "bmc") setBMC(val.fqdn)
           })
           if (response.bmc === false) setSimple(true)
+          if (data.tags.includes("core-switch")) setCoreSw(true)
+          else setCoreSw(false)
 
           setApiData(data)
           setLoading(false)
@@ -57,33 +62,6 @@ const Index = () => {
         }
       })
   }, [refetch, node])
-  const handleClearSEL = () => {
-    let payload = {
-      method: "PUT",
-      headers: {
-        "x-access-token": user.accessToken,
-      },
-    }
-    fetch(`${apiConfig.apiUrl}/redfish/v1/clearSEL/${node}`, payload)
-      .then((res) => res.json())
-      .then((result) => {
-        enqueueSnackbar(result.message, { variant: result.status })
-      })
-  }
-
-  const handleResetBMC = () => {
-    let payload = {
-      method: "PUT",
-      headers: {
-        "x-access-token": user.accessToken,
-      },
-    }
-    fetch(`${apiConfig.apiUrl}/redfish/v1/resetBmc/${node}`, payload)
-      .then((res) => res.json())
-      .then((result) => {
-        enqueueSnackbar(result.message, { variant: result.status })
-      })
-  }
 
   return (
     <Box>
@@ -115,18 +93,8 @@ const Index = () => {
               {node}
             </Typography>
           </Box>
-          <Provision
-            node={node}
-            data={apiData.provision}
-            refetch={refetch}
-            setRefetch={setRefetch}
-          />
-          <Tags
-            node={node}
-            data={apiData.tags}
-            refetch={refetch}
-            setRefetch={setRefetch}
-          />
+          <Provision node={node} data={apiData.provision} refetch={refetch} setRefetch={setRefetch} />
+          <Tags node={node} data={apiData.tags} refetch={refetch} setRefetch={setRefetch} />
           <NewGridC heading="Firmware:">
             <Box sx={{ textAlign: "end", marginRight: "10px" }}>
               <Firmware initialFirmware={apiData.firmware} node={node} />
@@ -138,6 +106,9 @@ const Index = () => {
               <BootImage bootimage={apiData.boot_image} node={node} />
             </Box>
           </NewGridC>
+
+          {!coreSw && node.substring(0, 3) === "swe" && <Switches node={node} />}
+          {coreSw && <CoreSwitch node={node} />}
 
           {!simple && (
             <>
