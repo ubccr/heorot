@@ -10,6 +10,7 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data:/data/db
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
