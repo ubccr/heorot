@@ -78,11 +78,8 @@ const FloorPlan = () => {
       },
       signal,
     }
-    const res = await (
-      await fetch(`${apiConfig.apiUrl}/switches/allData`, payload)
-    ).json()
-    if (res.status === "error")
-      enqueueSnackbar(res.message, { variant: "error" })
+    const res = await (await fetch(`${apiConfig.apiUrl}/switches/allData`, payload)).json()
+    if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
     return res
   })
 
@@ -100,12 +97,14 @@ const FloorPlan = () => {
     >
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
         <TableContainer sx={{ maxHeight: "calc(100vh - 135.5px)" }}>
-          <FormGroup>
-            <FormControlLabel
-              control={<Switch onChange={() => setShowRatios(!showRatios)} />}
-              label="Show oversub ratios"
-            />
-          </FormGroup>
+          {switchesQuery.isFetched && switchesQuery.data.status === "success" && (
+            <FormGroup>
+              <FormControlLabel
+                control={<Switch onChange={() => setShowRatios(!showRatios)} />}
+                label="Show oversub ratios"
+              />
+            </FormGroup>
+          )}
           {loading && <LinearProgress />}
           {!loading && (
             <Table size="small" style={{ tableLayout: "fixed" }}>
