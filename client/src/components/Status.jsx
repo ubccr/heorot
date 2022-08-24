@@ -36,14 +36,8 @@ const Status = ({ open, setOpen }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(
-          `${apiConfig.apiUrl}/grendel/status/${value}/${tags}`,
-          payload
-        )
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/status/${value}/${tags}`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { enabled: !!user }
@@ -85,33 +79,18 @@ const Status = ({ open, setOpen }) => {
           <TextField
             size="small"
             label="Tags"
-            placeholder="ex: a01, gpu"
+            placeholder="ex: a01,gpu"
             onChange={(e) => setTags(e.target.value)}
             sx={{ width: "150px" }}
           />
-          <ToggleButtonGroup
-            exclusive
-            value={value}
-            color="primary"
-            size="small"
-            sx={{ marginRight: "8px" }}
-          >
-            <ToggleButton
-              value="short"
-              onClick={(e) => setValue(e.target.value)}
-            >
+          <ToggleButtonGroup exclusive value={value} color="primary" size="small" sx={{ marginRight: "8px" }}>
+            <ToggleButton value="short" onClick={(e) => setValue(e.target.value)}>
               Short
             </ToggleButton>
-            <ToggleButton
-              value="nodes"
-              onClick={(e) => setValue(e.target.value)}
-            >
+            <ToggleButton value="nodes" onClick={(e) => setValue(e.target.value)}>
               Nodes
             </ToggleButton>
-            <ToggleButton
-              value="long"
-              onClick={(e) => setValue(e.target.value)}
-            >
+            <ToggleButton value="long" onClick={(e) => setValue(e.target.value)}>
               Long
             </ToggleButton>
           </ToggleButtonGroup>
