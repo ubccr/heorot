@@ -69,10 +69,6 @@ const io = require("socket.io")(Server, {
   cors: { origin: config.origin },
 })
 const SSHClient = require("ssh2").Client
-// TODO: Verify key mapping
-// const consoleMessage =
-//   "\r\n KEY MAPPING FOR CONSOLE REDIRECTION: \r\n \r\n Use the <ESC><1> key sequence for <F1> \r\n Use the <ESC><2> key sequence for <F2> \r\n Use the <ESC><3> key sequence for <F3> \r\n Use the <ESC><0> key sequence for <F10> \r\n Use the <ESC><!> key sequence for <F11> \r\n Use the <ESC><@> key sequence for <F12> \r\n \r\n Use the <ESC><Ctrl><M> key sequence for <Ctrl><M> \r\n Use the <ESC><Ctrl><H> key sequence for <Ctrl><H> \r\n Use the <ESC><Ctrl><I> key sequence for <Ctrl><I> \r\n Use the <ESC><Ctrl><J> key sequence for <Ctrl><J> \r\n \r\n Use the <ESC><X><X> key sequence for <Alt><x>, where x is any letter key, and X is the upper case of that key \r\n \r\n Use the <ESC><R><ESC><r><ESC><R> key sequence for <Ctrl><Alt><Del> \r\n"
-
 io.on("connection", function (socket) {
   socket.on("auth", function (token) {
     jwt.verify(token, config.auth.API_JWT_SECRET, (err, decoded) => {
@@ -80,12 +76,31 @@ io.on("connection", function (socket) {
         socket.emit("auth", "authenticated")
         socket.on("node", function (data) {
           nodeAddr = data
-          // socket.emit("data", consoleMessage)
           let SSHConnection = {
             host: nodeAddr,
             port: 22,
             username: config.bmc.DELL_USER,
+            tryKeyboard: true,
+            password: config.bmc.DELL_PASS,
             privateKey: fs.readFileSync("./keys/bmc.key"),
+            algorithms: {
+              kex: [
+                "curve25519-sha256",
+                "curve25519-sha256@libssh.org",
+                "ecdh-sha2-nistp256",
+                "ecdh-sha2-nistp384",
+                "ecdh-sha2-nistp521",
+                "diffie-hellman-group-exchange-sha256",
+                "diffie-hellman-group14-sha256",
+                "diffie-hellman-group15-sha512",
+                "diffie-hellman-group16-sha512",
+                "diffie-hellman-group17-sha512",
+                "diffie-hellman-group18-sha512",
+                // older algos for HPE nodes
+                "diffie-hellman-group14-sha1",
+                "diffie-hellman-group1-sha1",
+              ],
+            },
           }
           var conn = new SSHClient()
           conn
@@ -93,11 +108,7 @@ io.on("connection", function (socket) {
               socket.emit("clear", true)
               socket.emit("data", "\r\n Connected to SSH Session: \r\n \r\n")
               conn.shell(function (err, stream) {
-                if (err)
-                  return socket.emit(
-                    "data",
-                    "\r\n SSH2 SHELL ERROR: " + err.message + " \r\n"
-                  )
+                if (err) return socket.emit("data", "\r\n SSH2 SHELL ERROR: " + err.message + " \r\n")
                 socket
                   .on("data", function (data) {
                     stream.write(data)
@@ -115,14 +126,14 @@ io.on("connection", function (socket) {
                   })
               })
             })
+            .on("keyboard-interactive", function (name, instr, lang, prompts, cb) {
+              if (prompts[0].prompt === "Password: ") cb([config.bmc.DELL_PASS])
+            })
             .on("close", function () {
               socket.emit("data", "\r\n Disconnected from SSH Session \r\n")
             })
             .on("error", function (err) {
-              socket.emit(
-                "data",
-                "\r\n SSH2 CONNECTION ERROR: " + err.message + " \r\n"
-              )
+              socket.emit("data", "\r\n SSH2 CONNECTION ERROR: " + err.message + " \r\n")
             })
             .connect(SSHConnection)
         })
