@@ -1,9 +1,11 @@
+const { json } = require("express")
 const express = require("express")
 const app = express.Router()
 const fs = require("fs")
+const fetch = require("node-fetch")
 
 const config = require("../config")
-const grendelRequest = require("../modules/grendel")
+const { grendelRequest, getBMC } = require("../modules/grendel")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -129,6 +131,51 @@ app.get("/switch/:rack/:node", async (req, res) => {
       })
     else res.json({ status: "success", result: data })
   }
+})
+
+app.get("/v1/interfaces/:node", async (req, res) => {
+  const node = req.params.node
+  // let bmc = await getBMC(node)
+  // if (bmc.status === "success") {
+  let headers = {
+    "x-api-key": config.netpalm.apiKey,
+    "Content-Type": "application/json",
+  }
+  let payload = {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({
+      script: "generic_query",
+      args: {
+        driver: "dellos10",
+        hostname: `${node}.compute.cbls.ccr.buffalo.edu`,
+        username: config.netpalm.swUser,
+        password: config.netpalm.swPass,
+      },
+      queue_strategy: "fifo",
+    }),
+  }
+  let swRes = await await (await fetch(`${config.netpalm.url}/script`, payload)).json()
+  if (swRes.status === "success") {
+    let taskRes = new Object()
+    for (let attempts = 0; attempts < 12; attempts++) {
+      taskRes = await await (await fetch(`${config.netpalm.url}/task/${swRes.data.task_id}`, { headers })).json()
+      if (taskRes.status === "success" && taskRes.data.task_status === "finished") {
+        break
+      } else if (taskRes.detail === "Not Found") {
+        taskRes = {
+          status: "error",
+          message: "Job failed",
+        }
+        break
+      } else
+        await new Promise((resolve) => {
+          setTimeout(resolve, 5000)
+        })
+    }
+    res.json(taskRes)
+  } else res.json(swRes)
+  // } else res.json(bmc)
 })
 
 const readJsonFile = () => {
