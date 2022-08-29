@@ -1,11 +1,11 @@
 const express = require("express")
 const app = express.Router()
-const { spawn, exec } = require("child_process")
+const { spawn } = require("child_process")
 const fs = require("fs")
 
 let config = require("../config")
 
-const grendelRequest = require("../modules/grendel")
+const { grendelRequest } = require("../modules/grendel")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -56,9 +56,7 @@ app.get("/tag/:nodeset/:tags", async (req, res) => {
 app.get("/untag/:nodeset/:tags", async (req, res) => {
   const nodeset = req.params.nodeset
   const tags = req.params.tags
-  res.json(
-    await grendelRequest(`/v1/host/untag/${nodeset}?tags=${tags}`, "PUT")
-  )
+  res.json(await grendelRequest(`/v1/host/untag/${nodeset}?tags=${tags}`, "PUT"))
 })
 
 // --- images ---

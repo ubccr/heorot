@@ -1,24 +1,25 @@
 import {
-  Button,
-  FormGroup,
-  Grid,
-  TextareaAutosize,
-  TextField,
-  Typography,
   Box,
-  FormHelperText,
+  Button,
   Dialog,
-  DialogTitle,
   DialogActions,
+  DialogTitle,
+  FormGroup,
+  FormHelperText,
+  Grid,
   IconButton,
+  TextField,
+  TextareaAutosize,
+  Typography,
 } from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
-import { useState, useContext } from "react"
-import { useSnackbar } from "notistack"
+import { useContext, useState } from "react"
 
+import CloseIcon from "@mui/icons-material/Close"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
-const AddNodes = () => {
+import { useSnackbar } from "notistack"
+
+const ImportNodes = () => {
   const [user, setUser] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
   const [open, setOpen] = useState(false)
@@ -83,19 +84,13 @@ const AddNodes = () => {
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success") {
-            enqueueSnackbar(
-              `Successfully added ${result.result.hosts} host(s)`,
-              {
-                variant: "success",
-              }
-            )
+            enqueueSnackbar(`Successfully added ${result.result.hosts} host(s)`, {
+              variant: "success",
+            })
           } else if (result.status === "error")
-            enqueueSnackbar(
-              `Failed to edit node. Response: ${result.result.message}`,
-              {
-                variant: "error",
-              }
-            )
+            enqueueSnackbar(`Failed to edit node. Response: ${result.result.message}`, {
+              variant: "error",
+            })
         })
     } catch (e) {
       enqueueSnackbar(`Error in JSON syntax: ${e}`, { variant: "error" })
@@ -103,41 +98,20 @@ const AddNodes = () => {
   }
   return (
     <>
-      <Typography
-        variant="h2"
-        sx={{ fontSize: "16pt", marginTop: "20px", marginBottom: "10px" }}
-      >
+      <Typography variant="h2" sx={{ fontSize: "16pt", marginTop: "20px", marginBottom: "10px" }}>
         Add Nodes:
       </Typography>
       <form onSubmit={handleSubmit}>
         <FormGroup>
           <Grid container spacing={2}>
             <Grid item xs>
-              <TextField
-                fullWidth
-                label="Switch"
-                name="switch"
-                placeholder="swe-z01-22"
-                required
-              />
+              <TextField fullWidth label="Switch" name="switch" placeholder="swe-z01-22" required />
             </Grid>
             <Grid item xs>
-              <TextField
-                fullWidth
-                label="Domain"
-                defaultValue={apiConfig.grendelDomain}
-                name="domain"
-                required
-              />
+              <TextField fullWidth label="Domain" defaultValue={apiConfig.grendelDomain} name="domain" required />
             </Grid>
             <Grid item xs>
-              <TextField
-                fullWidth
-                label="Subnet"
-                name="subnet"
-                defaultValue={apiConfig.grendelSubnet}
-                required
-              />
+              <TextField fullWidth label="Subnet" name="subnet" defaultValue={apiConfig.grendelSubnet} required />
             </Grid>
             <Grid item xs>
               <TextField
@@ -161,12 +135,7 @@ const AddNodes = () => {
             >
               Host Mapping:
             </Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              type="submit"
-              sx={{ marginTop: "15px" }}
-            >
+            <Button variant="outlined" size="small" type="submit" sx={{ marginTop: "15px" }}>
               Submit
             </Button>
           </Box>
@@ -180,13 +149,7 @@ const AddNodes = () => {
           ></TextField>
         </FormGroup>
       </form>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        maxWidth="md"
-        fullWidth
-        scroll="paper"
-      >
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth scroll="paper">
         <DialogTitle>
           Discovered Nodes:
           <IconButton
@@ -220,4 +183,4 @@ const AddNodes = () => {
   )
 }
 
-export default AddNodes
+export default ImportNodes

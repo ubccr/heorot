@@ -50,4 +50,28 @@ async function grendelRequest(path, method = "GET", body = {}) {
     }
   }
 }
-module.exports = grendelRequest
+async function getBMC(node) {
+  let bmcInterface = ""
+  let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
+  if (grendelRes.result.length > 0) {
+    let grendelNode = grendelRes.result[0]
+    grendelNode.interfaces.forEach((element) => {
+      if (element.bmc === true) {
+        if (element.fqdn !== "") bmcInterface = element.fqdn
+        else bmcInterface = element.ip
+      }
+    })
+
+    return {
+      status: grendelRes.status,
+      address: bmcInterface,
+      node: grendelNode,
+    }
+  } else {
+    return {
+      status: "error",
+      message: `No hosts matching ${node} found`,
+    }
+  }
+}
+module.exports = { grendelRequest, getBMC }

@@ -1,13 +1,14 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Tab, Tabs, Typography } from "@mui/material"
 
-import AddNodes from "./AddNodes"
+import AddNode from "./AddNode"
 import BgContainer from "../../components/BgContainer"
 import EditJson from "./EditJson"
 import EditNodes from "./EditNodes"
-import General from "./General"
-import React from "react"
+import ImportNodes from "./ImportNodes"
+import { useState } from "react"
 
 const Index = () => {
+  const [value, setValue] = useState(0)
   return (
     <>
       <Box
@@ -37,10 +38,28 @@ const Index = () => {
         </Typography>
       </Box>
       <BgContainer sx={{ alignItems: "Center" }}>
-        {/* <General /> */}
-        <EditNodes />
-        <EditJson />
-        <AddNodes />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "10px",
+          }}
+        >
+          <Tabs value={value} onChange={(e, newVal) => setValue(newVal)}>
+            <Tab label="Add Node" />
+            <Tab label="Edit Nodes" />
+            <Tab label="Bulk Import Nodes" />
+          </Tabs>
+        </Box>
+        {value === 0 && <AddNode />}
+
+        {value === 1 && (
+          <>
+            <EditNodes />
+            <EditJson />
+          </>
+        )}
+        {value === 2 && <ImportNodes />}
       </BgContainer>
     </>
   )

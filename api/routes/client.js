@@ -1,14 +1,9 @@
 const express = require("express")
 const app = express.Router()
 
-const grendelRequest = require("../modules/grendel")
+const { grendelRequest } = require("../modules/grendel")
 
-const {
-  pduFormat,
-  switchFormat,
-  nodeFormat,
-  quadNodeFormat,
-} = require("../modules/client")
+const { pduFormat, switchFormat, nodeFormat, quadNodeFormat } = require("../modules/client")
 const config = require("../config")
 
 app.get("/", (req, res) => {

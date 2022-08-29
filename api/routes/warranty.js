@@ -3,10 +3,7 @@ const app = express.Router()
 const fetch = require("node-fetch")
 const Warranty = require("../models/Warranty")
 
-// TODO: deprecate
-// const { exists } = require("../models/Warranty")
-
-const grendelRequest = require("../modules/grendel")
+const { grendelRequest } = require("../modules/grendel")
 const { biosApi } = require("../modules/nodeApi")
 const { warrantyApiReq } = require("../modules/Warranty")
 
@@ -29,10 +26,7 @@ app.get("/add/:tags", async (req, res) => {
   if (response.status === "success") {
     let arr = []
     for (const nodes of response.result) {
-      if (
-        nodes.name.substring(0, 3) === "cpn" ||
-        nodes.name.substring(0, 3) === "srv"
-      ) {
+      if (nodes.name.substring(0, 3) === "cpn" || nodes.name.substring(0, 3) === "srv") {
         let query = await Warranty.findOne({ nodeName: nodes.name }).exec()
         if (query === null) {
           let bmc = nodes.interfaces.find((element) => {
@@ -94,8 +88,7 @@ app.get("/add/:tags", async (req, res) => {
           else
             res.json({
               status: "success",
-              message:
-                warranty.insertedCount + " Nodes successfully added to the DB",
+              message: warranty.insertedCount + " Nodes successfully added to the DB",
               color: "success",
               warranty: warranty,
             })
