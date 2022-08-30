@@ -21,7 +21,7 @@ async function grendelRequest(path, method = "GET", body = {}) {
         response = await got.delete(`unix:${config.grendel.socket}:${path}`)
         break
     }
-    return { status: "success", result: JSON.parse(response.body) }
+    return { status: "success", result: JSON.parse(response.body), message: JSON.stringify(JSON.parse(response.body)) }
   } catch (err) {
     if (err.code === "ENOENT" && err.response === undefined) {
       return {
@@ -39,6 +39,7 @@ async function grendelRequest(path, method = "GET", body = {}) {
       return {
         status: "error",
         result: JSON.parse(err.response.body),
+        message: JSON.stringify(JSON.parse(err.response.body)),
         code: err.code,
       }
     } else {
