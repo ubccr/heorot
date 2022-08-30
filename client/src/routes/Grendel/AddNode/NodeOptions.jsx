@@ -10,36 +10,28 @@ const NodeOptions = ({ options, setOptions }) => {
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
-  const imageQuery = useQuery(
-    "image",
-    async ({ signal }) => {
-      let payload = {
-        headers: {
-          "x-access-token": user.accessToken,
-        },
-        signal,
-      }
-      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)).json()
-      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
-      return res
-    },
-    { enabled: false }
-  )
-  const firmwareQuery = useQuery(
-    "firmware",
-    async ({ signal }) => {
-      let payload = {
-        headers: {
-          "x-access-token": user.accessToken,
-        },
-        signal,
-      }
-      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/firmware/list`, payload)).json()
-      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
-      return res
-    },
-    { enabled: false }
-  )
+  const imageQuery = useQuery("image", async ({ signal }) => {
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+      signal,
+    }
+    const res = await (await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)).json()
+    if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
+    return res
+  })
+  const firmwareQuery = useQuery("firmware", async ({ signal }) => {
+    let payload = {
+      headers: {
+        "x-access-token": user.accessToken,
+      },
+      signal,
+    }
+    const res = await (await fetch(`${apiConfig.apiUrl}/grendel/firmware/list`, payload)).json()
+    if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
+    return res
+  })
 
   return (
     <Grid container spacing={2}>
@@ -48,7 +40,8 @@ const NodeOptions = ({ options, setOptions }) => {
           label="Node Name"
           placeholder="cpn-a01-01"
           variant="outlined"
-          onChange={(e) => setOptions({ ...options, node: e.target.value })}
+          value={options.name}
+          onChange={(e) => setOptions({ ...options, name: e.target.value })}
           fullWidth
         />
       </Grid>
@@ -78,10 +71,10 @@ const NodeOptions = ({ options, setOptions }) => {
         <FormControl fullWidth>
           <InputLabel>Boot Image {imageQuery.isLoading && <CircularProgress color="primary" size={15} />}</InputLabel>
           <Select
-            value={options.bootImage}
+            value={options.boot_image}
             onOpen={() => imageQuery.refetch()}
             label={"Boot Image"}
-            onChange={(e) => setOptions({ ...options, bootImage: e.target.value })}
+            onChange={(e) => setOptions({ ...options, boot_image: e.target.value })}
             variant="outlined"
           >
             {imageQuery.isFetched &&
@@ -106,17 +99,18 @@ const NodeOptions = ({ options, setOptions }) => {
             onChange={(e) => setOptions({ ...options, provision: e.target.value })}
             variant="outlined"
           >
-            <MenuItem value="True">True</MenuItem>
-            <MenuItem value="False">False</MenuItem>
+            <MenuItem value={true}>true</MenuItem>
+            <MenuItem value={false}>false</MenuItem>
           </Select>
         </FormControl>
       </Grid>
       <Grid item xs={6} md={4}>
         <TextField
+          value={options.tags.join(",")}
           label="Tags"
           variant="outlined"
           fullWidth
-          onChange={(e) => setOptions({ ...options, tags: e.target.value })}
+          onChange={(e) => setOptions({ ...options, tags: e.target.value.split(",") })}
         />
       </Grid>
     </Grid>

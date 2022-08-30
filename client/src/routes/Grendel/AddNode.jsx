@@ -2,17 +2,56 @@ import { Box, Button, FormGroup, Step, StepButton, Stepper } from "@mui/material
 
 import ConfigureInterfaces from "./AddNode/ConfigureInterfaces"
 import NodeOptions from "./AddNode/NodeOptions"
+import ReviewNode from "./AddNode/ReviewNode"
+import { UserContext } from "../../contexts/UserContext"
+import { apiConfig } from "../../config"
+import { useContext } from "react"
+import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 import { useState } from "react"
 
 const AddNode = () => {
-  const [step, setStep] = useState(0)
-  const [options, setOptions] = useState({
-    node: "",
+  const [user] = useContext(UserContext)
+  const { enqueueSnackbar } = useSnackbar()
+
+  const initialOptions = {
+    name: "",
     firmware: "",
-    bootImage: "",
-    provision: "True",
-    tags: "",
-  })
+    boot_image: "",
+    provision: true,
+    tags: [],
+  }
+
+  const [step, setStep] = useState(0)
+  const [ifaces, setIfaces] = useState([])
+  const [options, setOptions] = useState(initialOptions)
+  const newIface = { name: "", fqdn: "", ip: "", mac: "", bmc: false }
+
+  const addNodeQuery = useQuery(
+    "addNode",
+    async ({ signal }) => {
+      let payload = {
+        method: "POST",
+        headers: {
+          "x-access-token": user.accessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([
+          {
+            ...options,
+            interfaces: ifaces,
+          },
+        ]),
+        signal,
+      }
+      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/host`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
+      else if (res.status === "success")
+        enqueueSnackbar(`Successfully added ${res.result.hosts} host.`, { variant: "success" })
+      return res
+    },
+    { enabled: false }
+  )
 
   return (
     <FormGroup>
@@ -36,26 +75,54 @@ const AddNode = () => {
             </Step>
           </Stepper>
         </Box>
-
-        {/* Content */}
-        <Box sx={{ margin: "20px" }}>
-          {step === 0 && <NodeOptions options={options} setOptions={setOptions} />}
-          {step === 1 && <ConfigureInterfaces />}
-        </Box>
-
-        {/* Footer */}
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", paddingLeft: "40px", paddingRight: "40px" }}>
           <Button onClick={() => setStep(step - 1)} disabled={step === 0 ? true : false} variant="outlined">
             Back
           </Button>
           <Box sx={{ flex: "1 1 auto" }}></Box>
+          {step === 1 && (
+            <Button onClick={() => setIfaces([...ifaces, newIface])} variant="outlined" sx={{ marginRight: "5px" }}>
+              Add Interface
+            </Button>
+          )}
           {step < 2 && (
             <Button onClick={() => setStep(step + 1)} variant="outlined">
               Next
             </Button>
           )}
-          {step >= 2 && <Button variant="outlined">Finish</Button>}
+          {step >= 2 && (
+            <>
+              <Button
+                onClick={() => {
+                  setOptions(initialOptions)
+                  setIfaces([])
+                }}
+                variant="outlined"
+                color="warning"
+                sx={{ marginRight: "5px" }}
+              >
+                Clear Form
+              </Button>
+              <Button
+                onClick={() => {
+                  addNodeQuery.refetch()
+                }}
+                variant="outlined"
+              >
+                Import Node
+              </Button>
+            </>
+          )}
         </Box>
+
+        {/* Content */}
+        <Box sx={{ margin: "20px" }}>
+          {step === 0 && <NodeOptions options={options} setOptions={setOptions} />}
+          {step === 1 && <ConfigureInterfaces ifaces={ifaces} setIfaces={setIfaces} />}
+          {step === 2 && <ReviewNode options={options} ifaces={ifaces} />}
+        </Box>
+
+        {/* Footer */}
       </Box>
     </FormGroup>
   )
