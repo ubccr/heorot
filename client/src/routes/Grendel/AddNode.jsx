@@ -1,124 +1,62 @@
-import {
-  CircularProgress,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Switch,
-  TextField,
-} from "@mui/material"
-import { useContext, useState } from "react"
+import { Box, Button, FormGroup, Step, StepButton, Stepper } from "@mui/material"
 
-import { UserContext } from "../../contexts/UserContext"
-import { apiConfig } from "../../config"
-import { useQuery } from "react-query"
-import { useSnackbar } from "notistack"
+import ConfigureInterfaces from "./AddNode/ConfigureInterfaces"
+import NodeOptions from "./AddNode/NodeOptions"
+import { useState } from "react"
 
 const AddNode = () => {
-  const [image, setImage] = useState("")
-  const [firmware, setFirmware] = useState("")
-  const [user] = useContext(UserContext)
-  const { enqueueSnackbar } = useSnackbar()
-
-  const imageQuery = useQuery(
-    "image",
-    async ({ signal }) => {
-      let payload = {
-        headers: {
-          "x-access-token": user.accessToken,
-        },
-        signal,
-      }
-      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)).json()
-      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
-      return res
-    },
-    { enabled: false }
-  )
-  const firmwareQuery = useQuery(
-    "firmware",
-    async ({ signal }) => {
-      let payload = {
-        headers: {
-          "x-access-token": user.accessToken,
-        },
-        signal,
-      }
-      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/firmware/list`, payload)).json()
-      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
-      return res
-    },
-    { enabled: false }
-  )
+  const [step, setStep] = useState(0)
+  const [options, setOptions] = useState({
+    node: "",
+    firmware: "",
+    bootImage: "",
+    provision: "True",
+    tags: "",
+  })
 
   return (
     <FormGroup>
-      <Grid container spacing={2}>
-        <Grid item xs={6} md={2}>
-          <TextField label="Node" placeholder="cpn-a01-01" variant="outlined" fullWidth />
-        </Grid>
-        <Grid item xs={6} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>
-              Firmware {firmwareQuery.isLoading && <CircularProgress color="primary" size={15} />}
-            </InputLabel>
-            <Select
-              value={firmware}
-              onOpen={() => firmwareQuery.refetch()}
-              label={"Firmware"}
-              onChange={(e) => setFirmware(e.target.value)}
-              variant="outlined"
-            >
-              {firmwareQuery.isFetched &&
-                firmwareQuery.data.status === "success" &&
-                firmwareQuery.data.result.map((val, index) => {
-                  return (
-                    <MenuItem value={val} key={index}>
-                      {val}
-                    </MenuItem>
-                  )
-                })}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={6} md={2}>
-          <FormControl fullWidth>
-            <InputLabel>Boot Image {imageQuery.isLoading && <CircularProgress color="primary" size={15} />}</InputLabel>
-            <Select
-              value={image}
-              onOpen={() => imageQuery.refetch()}
-              label={"Boot Image"}
-              onChange={(e) => setImage(e.target.value)}
-              variant="outlined"
-            >
-              {imageQuery.isFetched &&
-                imageQuery.data.status === "success" &&
-                imageQuery.data.result.map((val, index) => {
-                  return (
-                    <MenuItem value={val.name} key={index}>
-                      {val.name}
-                    </MenuItem>
-                  )
-                })}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={6}>
-          {/* add or remove  */}
-          <TextField label="Interfaces" variant="outlined" fullWidth />
-        </Grid>
-        <Grid item xs={6}>
-          <FormGroup>
-            <FormControlLabel control={<Switch defaultChecked />} label="Provision" />
-          </FormGroup>
-        </Grid>
-        <Grid item xs={6}>
-          <TextField label="Tags" variant="outlined" fullWidth />
-        </Grid>
-      </Grid>
+      <Box>
+        <Box
+          sx={{
+            marginBottom: "30px",
+            marginTop: "30px",
+            width: "100%",
+          }}
+        >
+          <Stepper nonLinear activeStep={step}>
+            <Step key={0}>
+              <StepButton onClick={() => setStep(0)}>Node Options</StepButton>
+            </Step>
+            <Step key={1}>
+              <StepButton onClick={() => setStep(1)}>Configure Interfaces</StepButton>
+            </Step>
+            <Step key={2}>
+              <StepButton onClick={() => setStep(2)}>Review Node</StepButton>
+            </Step>
+          </Stepper>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ margin: "20px" }}>
+          {step === 0 && <NodeOptions options={options} setOptions={setOptions} />}
+          {step === 1 && <ConfigureInterfaces />}
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{ display: "flex" }}>
+          <Button onClick={() => setStep(step - 1)} disabled={step === 0 ? true : false} variant="outlined">
+            Back
+          </Button>
+          <Box sx={{ flex: "1 1 auto" }}></Box>
+          {step < 2 && (
+            <Button onClick={() => setStep(step + 1)} variant="outlined">
+              Next
+            </Button>
+          )}
+          {step >= 2 && <Button variant="outlined">Finish</Button>}
+        </Box>
+      </Box>
     </FormGroup>
   )
 }
