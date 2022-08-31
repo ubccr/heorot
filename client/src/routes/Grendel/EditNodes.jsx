@@ -56,16 +56,12 @@ const EditNodes = () => {
 
       if (formValues.action === "provision") {
         if (formValues.actionValue === "true") url += `provision/${nodeset}`
-        else if (formValues.actionValue === "false")
-          url += `unprovision/${nodeset}`
+        else if (formValues.actionValue === "false") url += `unprovision/${nodeset}`
       } else if (formValues.action === "tag") {
         url += `tag/${nodeset}/${formValues.tags}`
       } else if (formValues.action === "untag") {
         url += `untag/${nodeset}/${formValues.tags}`
-      } else if (
-        formValues.action === "firmware" ||
-        formValues.action === "image"
-      ) {
+      } else if (formValues.action === "firmware" || formValues.action === "image") {
         url += `edit`
         payload = {
           method: "POST",
@@ -84,17 +80,11 @@ const EditNodes = () => {
         .then((res) => res.json())
         .then((result) => {
           if (result.status === "success")
-            enqueueSnackbar(
-              `Successfully edited ${result.result.hosts} host(s)`,
-              { variant: "success" }
-            )
+            enqueueSnackbar(`Successfully edited ${result.result.hosts} host(s)`, { variant: "success" })
           else if (result.status === "error")
-            enqueueSnackbar(
-              `Failed to fetch node. Response: ${result.result.message}`,
-              {
-                variant: "error",
-              }
-            )
+            enqueueSnackbar(`Failed to fetch node. Response: ${result.result.message}`, {
+              variant: "error",
+            })
         })
     }
   }
@@ -107,11 +97,8 @@ const EditNodes = () => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/image/list`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { enabled: false }
@@ -126,11 +113,8 @@ const EditNodes = () => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/grendel/firmware/list`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/firmware/list`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { enabled: false }
@@ -139,15 +123,11 @@ const EditNodes = () => {
     const { nodeset, action, actionValue, tags, value } = formValues
     const formErrors = {}
 
-    if (!nodeset || nodeset === "")
-      formErrors.nodeset = "Nodeset cannot be blank"
+    if (!nodeset || nodeset === "") formErrors.nodeset = "Nodeset cannot be blank"
     else if (action === "") formErrors.action = "Action cannot be blank"
-    else if (actionValue === "" && action === "provision")
-      formErrors.actionValue = "Value cannot be blank"
-    else if (!tags && (action === "tag" || action === "untag"))
-      formErrors.tags = "Tags cannot be blank"
-    else if (!value && (action === "firmware" || action === "image"))
-      formErrors.value = "Value cannot be blank"
+    else if (actionValue === "" && action === "provision") formErrors.actionValue = "Value cannot be blank"
+    else if (!tags && (action === "tag" || action === "untag")) formErrors.tags = "Tags cannot be blank"
+    else if (!value && (action === "firmware" || action === "image")) formErrors.value = "Value cannot be blank"
 
     return formErrors
   }
@@ -178,6 +158,7 @@ const EditNodes = () => {
               placeholder="ex: cpn-z01-[03-32]"
               sx={{ width: "100%" }}
               onChange={(e) => setField("nodeset", e.target.value)}
+              autoComplete="new-password"
             />
           </Grid>
           <Grid item xs>
@@ -192,8 +173,7 @@ const EditNodes = () => {
                   setField("action", e.target.value)
                   formValues.value = ""
                   if (e.target.value === "image") query.refetch()
-                  else if (e.target.value === "firmware")
-                    firmwareQuery.refetch()
+                  else if (e.target.value === "firmware") firmwareQuery.refetch()
                 }}
               >
                 <MenuItem value={"provision"}>Set Provision</MenuItem>
@@ -235,7 +215,8 @@ const EditNodes = () => {
                 onChange={(e) => {
                   setField("tags", e.target.value)
                 }}
-              ></TextField>
+                autoComplete="new-password"
+              />
             )}
             {formValues.action === "untag" && (
               <TextField
@@ -247,7 +228,8 @@ const EditNodes = () => {
                 onChange={(e) => {
                   setField("tags", e.target.value)
                 }}
-              ></TextField>
+                autoComplete="new-password"
+              />
             )}
             {formValues.action === "firmware" && firmwareQuery.isFetched && (
               <FormControl sx={{ width: "100%" }}>
@@ -299,6 +281,7 @@ const EditNodes = () => {
                 sx={{ width: "100%" }}
                 placeholder="Please select an Action"
                 disabled
+                autoComplete="new-password"
               />
             )}
           </Grid>

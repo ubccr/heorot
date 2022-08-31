@@ -43,6 +43,7 @@ const NodeOptions = ({ options, setOptions }) => {
           value={options.name}
           onChange={(e) => setOptions({ ...options, name: e.target.value })}
           fullWidth
+          autoComplete="new-password"
         />
       </Grid>
       <Grid item xs={6} md={4}>
@@ -111,6 +112,7 @@ const NodeOptions = ({ options, setOptions }) => {
           variant="outlined"
           fullWidth
           onChange={(e) => setOptions({ ...options, tags: e.target.value.split(",") })}
+          autoComplete="new-password"
         />
       </Grid>
     </Grid>

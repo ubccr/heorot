@@ -105,13 +105,34 @@ const ImportNodes = () => {
         <FormGroup>
           <Grid container spacing={2}>
             <Grid item xs>
-              <TextField fullWidth label="Switch" name="switch" placeholder="swe-z01-22" required />
+              <TextField
+                fullWidth
+                label="Switch"
+                name="switch"
+                placeholder="swe-z01-22"
+                required
+                autoComplete="new-password"
+              />
             </Grid>
             <Grid item xs>
-              <TextField fullWidth label="Domain" defaultValue={apiConfig.grendelDomain} name="domain" required />
+              <TextField
+                fullWidth
+                label="Domain"
+                defaultValue={apiConfig.grendelDomain}
+                name="domain"
+                required
+                autoComplete="new-password"
+              />
             </Grid>
             <Grid item xs>
-              <TextField fullWidth label="Subnet" name="subnet" defaultValue={apiConfig.grendelSubnet} required />
+              <TextField
+                fullWidth
+                label="Subnet"
+                name="subnet"
+                defaultValue={apiConfig.grendelSubnet}
+                required
+                autoComplete="new-password"
+              />
             </Grid>
             <Grid item xs>
               <TextField
@@ -120,6 +141,7 @@ const ImportNodes = () => {
                 defaultValue={apiConfig.grendelBmcSubnet}
                 name="bmcSubnet"
                 required
+                autoComplete="new-password"
               />
             </Grid>
           </Grid>
@@ -146,7 +168,7 @@ const ImportNodes = () => {
             required
             onKeyDown={(e) => handleTab(e)}
             sx={{ margin: "10px" }}
-          ></TextField>
+          />
         </FormGroup>
       </form>
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth scroll="paper">
