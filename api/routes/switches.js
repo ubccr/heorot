@@ -178,6 +178,111 @@ app.get("/v1/interfaces/:node", async (req, res) => {
   // } else res.json(bmc)
 })
 
+app.get("/v1/command/:node/:command", async (req, res) => {
+  const SSH2Promise = require("ssh2-promise")
+  const node = req.params.node
+  const command = parseInt(req.params.command)
+  let output = new Object()
+  let cmdNumber = 0
+
+  if (typeof command === "number") cmdNumber = command
+  else {
+    if (command === "version") {
+      cmdNumber = 0
+    } else if (command === "interfaces") {
+      cmdNumber = 1
+    } else if (command === "mac-address-table") {
+      cmdNumber = 2
+    }
+  }
+
+  let swRes = await getSwInfo(node, cmdNumber)
+
+  if (swRes.status === "success") {
+    const grendel = swRes.result[0]
+    let SSHConfig = {
+      host: grendel.interfaces[0].fqdn,
+      port: 22,
+      username: config.netpalm.swUser,
+      tryKeyboard: true,
+      password: config.netpalm.swPass,
+      // privateKey: fs.readFileSync("./keys/bmc.key"),
+      algorithms: {
+        kex: [
+          "curve25519-sha256",
+          "curve25519-sha256@libssh.org",
+          "ecdh-sha2-nistp256",
+          "ecdh-sha2-nistp384",
+          "ecdh-sha2-nistp521",
+          "diffie-hellman-group-exchange-sha256",
+          "diffie-hellman-group14-sha256",
+          "diffie-hellman-group15-sha512",
+          "diffie-hellman-group16-sha512",
+          "diffie-hellman-group17-sha512",
+          "diffie-hellman-group18-sha512",
+          // older algos for HPE nodes
+          "diffie-hellman-group14-sha1",
+          "diffie-hellman-group1-sha1",
+        ],
+      },
+    }
+    let conn = new SSH2Promise(SSHConfig)
+
+    try {
+      await conn.connect()
+      let data = await conn.exec(swRes.command)
+      output.status = "success"
+      output.data = parseOutput(swRes.parseType, data)
+
+      conn.close()
+
+      res.json(output)
+    } catch (err) {
+      res.json(err)
+    }
+  } else {
+    res.json(swRes)
+  }
+})
+
+const getSwInfo = async (node, cmdNumber) => {
+  const cmdListOS10 = ["show version", "show interface status", "show mac address-table"]
+  const cmdListOS9 = ["show version", "show interfaces status", "show mac-address-table"]
+  const grendel = await grendelRequest(`/v1/host/find/${node}`)
+
+  if (grendel.result.length === 0) {
+    return { status: "error", message: "No matching node name found in Grendel" }
+  }
+  if (grendel.status !== "success") {
+    return { status: "error", message: grendel.result }
+  }
+  let grendelInfo = grendel.result[0]
+  if (grendelInfo.tags.includes("Dell_OS10")) {
+    output = {
+      command: cmdListOS10[cmdNumber],
+      parseType: "OS10",
+    }
+  } else if (grendelInfo.tags.includes("Dell_OS9")) {
+    output = {
+      command: cmdListOS9[cmdNumber],
+      parseType: "OS9",
+    }
+  } else if (grendelInfo.tags.includes("Dell_OS8")) {
+    // TODO: add OS8 support
+    // change credentials
+    return { status: "error", message: "Dell OS8 queries not supported" }
+  }
+  return { ...output, ...grendel }
+}
+
+const parseOutput = (type, data) => {
+  if (type === "OS10") {
+    return data.split("\n").map((val) => val.split("\t").filter(String))
+  } else if (type === "OS9") {
+    return data.split("\r\n").map((val) => val.split("\t").filter(String))
+  }
+}
+
 const readJsonFile = () => {
   try {
     const jsonData = JSON.parse(fs.readFileSync("./keys/switch-data.json"))
