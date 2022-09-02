@@ -18,9 +18,9 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.2.4",
     "node-fetch": "^2.6.7",
+    "node-ssh": "^13.0.0",
     "socket.io": "^4.4.1",
-    "ssh2": "^1.6.0",
-    "ssh2-promise": "^1.0.3"
+    "ssh2": "^1.6.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.19"
