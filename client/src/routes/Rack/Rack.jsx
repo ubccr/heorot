@@ -1,20 +1,10 @@
-import { useParams } from "react-router-dom"
-import { useState, useEffect, useContext } from "react"
-import { UserContext } from "../../contexts/UserContext"
-
-import {
-  Box,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  LinearProgress,
-} from "@mui/material"
+import { Box, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { useContext, useEffect, useState } from "react"
 
 import Body from "./Body.jsx"
+import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useParams } from "react-router-dom"
 
 const Rack = () => {
   const { rack } = useParams()
@@ -35,7 +25,7 @@ const Rack = () => {
         setRows(response.result.nodes)
         setIsRackLoading(false)
       })
-  }, [])
+  }, [rack])
 
   return (
     <Box
@@ -50,7 +40,7 @@ const Rack = () => {
       <TableContainer
         sx={{
           maxHeight: "calc(100vh - 95.5px)",
-          overflowX: "hidden",
+          // overflowX: "hidden",
         }}
       >
         {isRackLoading && <LinearProgress />}
