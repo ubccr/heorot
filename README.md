@@ -134,7 +134,7 @@ You can access the dev Web UI at https://_your_ip_here_
 ### Log files:
 
 ```bash
- tail -f /var/log/dev-heorot.log
+ tail -f /var/log/heorot.log
 ```
 
 ## :memo: License
