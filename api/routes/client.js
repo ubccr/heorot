@@ -76,7 +76,7 @@ app.get("/rack/:rack", async (req, res) => {
             u: u,
             node: element.name,
             ports: [],
-            tags: [],
+            tags: element.tags,
             height: 1,
             width: 1,
             type: "switch",
