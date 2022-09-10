@@ -71,16 +71,31 @@ app.get("/rack/:rack", async (req, res) => {
         }
       } else if (nodeset[0] === "swe") {
         if (element.tags.includes("core-switch")) {
+          resNode = nodeFormat(element, nodeset)
           let u = parseInt(nodeset[2])
-          nodes[u] = {
-            u: u,
-            node: element.name,
-            ports: [],
-            tags: element.tags,
-            height: 1,
-            width: 1,
-            type: "switch",
-          }
+          if (resNode.height > 1) {
+            // multi u node
+            let offset = resNode.height - 1
+            let offsetU = resNode.u + offset
+
+            nodes[offsetU] = resNode
+            nodes[offsetU].u = offsetU
+            nodes[offsetU].type = "switch"
+            nodes[offsetU].ports = []
+
+            for (let i = offset; i > 0; i--) {
+              nodes[offsetU - i].type = "rowSpan"
+            }
+          } else
+            nodes[u] = {
+              u: u,
+              node: element.name,
+              ports: [],
+              tags: element.tags,
+              height: 1,
+              width: 1,
+              type: "switch",
+            }
         } else {
           resSwitch = switchFormat(element, nodeset, resGrendel)
           nodes[resSwitch.u] = resSwitch

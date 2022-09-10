@@ -42,6 +42,7 @@ function nodeFormat(grendel, nodeset) {
   if (grendel.tags.includes("2u")) height = 2
   else if (grendel.tags.includes("3u")) height = 3
   else if (grendel.tags.includes("4u")) height = 4
+  else if (grendel.tags.includes("10u")) height = 10
   return {
     u: parseInt(nodeset[2]),
     node: grendel.name,
