@@ -131,10 +131,10 @@ const parseOutput = (data, type, command) => {
           else iface = val[3]
 
           return {
-            vlan: val[0],
-            mac: val[1],
-            type: val[2],
-            interface: iface,
+            vlan: val[0].trim(),
+            mac: val[1].trim(),
+            type: val[2].trim(),
+            interface: iface.trim(),
           }
         }
       })
@@ -181,7 +181,7 @@ const parseOutput = (data, type, command) => {
               duplex: val[4],
               speed: val[3].trim(),
               mode: val[5].trim(),
-              vlans: val[6],
+              vlans: val[6] ?? "",
             }
           } else if (type === "EOS" && val[0].length > 5) {
             if (val[6] === " ") val.splice(4, 0, "")
@@ -192,10 +192,10 @@ const parseOutput = (data, type, command) => {
               port: val[0].substring(2),
               description: val[1],
               status: val[2],
-              vlan: val[3],
+              vlans: val[3].trim(),
               duplex: val[4],
               speed: val[5].trim(),
-              type: val[6],
+              type: val[6].trim(),
             }
           }
 
