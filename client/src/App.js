@@ -1,33 +1,31 @@
-import { Routes, Route } from "react-router-dom"
-import { Container, createTheme, Paper, ThemeProvider } from "@mui/material"
-import { useEffect, useState } from "react"
-
 import "./App.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 
+import { Container, Paper, ThemeProvider, createTheme } from "@mui/material"
+import { QueryClient, QueryClientProvider } from "react-query"
+import { Route, Routes } from "react-router-dom"
+import { useEffect, useState } from "react"
+
+import Alerts from "./routes/Alerts/Index"
+import AppBarC from "./components/AppBarC"
+import FloorPlan from "./routes/FloorPlan/FloorPlan"
+import Grendel from "./routes/Grendel/Index"
+import Home from "./routes/Home"
+import Login from "./routes/Auth/Login"
+import ManageUsers from "./routes/Admin/ManageUsers"
+import Node from "./routes/Node/Index"
+import PrivateRoute from "./components/PrivateRoute"
+import Profile from "./routes/Profile/Profile"
+import Rack from "./routes/Rack/Rack"
+import Signup from "./routes/Auth/Signup"
+import { SnackbarProvider } from "notistack"
 // --- Components ---
 import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
-import PrivateRoute from "./components/PrivateRoute"
-import { QueryClient, QueryClientProvider } from "react-query"
-import { SnackbarProvider } from "notistack"
-import { apiConfig } from "./config"
-
-import largeTriangles from "./backgrounds/large-triangles.svg"
-import darkTriangles from "./backgrounds/large-triangles-dark.svg"
-
-import AppBarC from "./components/AppBarC"
-import Home from "./routes/Home"
-import Profile from "./routes/Profile/Profile"
-import Login from "./routes/Auth/Login"
-import Signup from "./routes/Auth/Signup"
-import FloorPlan from "./routes/FloorPlan/FloorPlan"
-import Rack from "./routes/Rack/Rack"
-import Node from "./routes/Node/Index"
-import Alerts from "./routes/Alerts/Index"
 import Warranty from "./routes/Admin/Warranty"
-import Grendel from "./routes/Grendel/Index"
-import ManageUsers from "./routes/Admin/ManageUsers"
+import { apiConfig } from "./config"
+import darkTriangles from "./backgrounds/large-triangles-dark.svg"
+import largeTriangles from "./backgrounds/large-triangles.svg"
 
 function App() {
   const queryClient = new QueryClient({
@@ -86,6 +84,7 @@ function App() {
             },
             border: {
               main: "#e0e0e0",
+              secondary: "#bdbdbd",
               // 600 level colors
               table: {
                 single: "#ffb300",
@@ -110,6 +109,7 @@ function App() {
             },
             border: {
               main: "#424242",
+              secondary: "#616161",
               table: {
                 single: "#ffb300",
                 double: "#43a047",
