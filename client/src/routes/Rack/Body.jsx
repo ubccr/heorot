@@ -128,7 +128,7 @@ const Body = ({ array }) => {
         )
       }
     } else if (val.type === "switch") {
-      html[val.u] = <SwitchGen key={val.u} node={val.node} u={val.u} tags={val.tags} />
+      html[val.u] = <SwitchGen key={val.u} node={val.node} u={val.u} tags={val.tags} height={val.height} />
     }
     // if (val.ports.length > 0) {
     //   let switchHtmlTop = []
