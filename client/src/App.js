@@ -24,7 +24,7 @@ import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
 import Warranty from "./routes/Admin/Warranty"
 import { apiConfig } from "./config"
-import darkTriangles from "./backgrounds/large-triangles-dark.svg"
+// import darkTriangles from "./backgrounds/large-triangles-dark.svg"
 import largeTriangles from "./backgrounds/large-triangles.svg"
 
 function App() {
@@ -61,7 +61,7 @@ function App() {
           }
         })
     }
-  }, [])
+  }, [user])
 
   let userTheme = "light"
   if (user) userTheme = user.theme
