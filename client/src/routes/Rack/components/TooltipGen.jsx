@@ -1,4 +1,4 @@
-import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material"
+import { Box, Divider, Grid, Typography } from "@mui/material"
 
 import React from "react"
 
@@ -8,19 +8,21 @@ const TooltipGen = ({ port, query, nodeQuery = null }) => {
     let portMacs = portInfo.map((val) => {
       return val.mac
     })
-    let nodeMapping = new Array()
-
+    let nodeMapping = []
     if (nodeQuery !== null && nodeQuery.isFetched && nodeQuery.data.status === "success") {
-      //   nodeMapping = nodeQuery.data.result
-      //     .map((val, index) => {
-      //       let tmp = val.interfaces.map((e) => portMacs.includes(e.mac))
-      //       if (tmp !== undefined) return val
-      //     })
-      //     .filter(Boolean)
-
-      nodeMapping = portMacs
-        .map((key) => nodeQuery.data.result.find((val) => val.interfaces.find((iface) => iface.mac === key)))
-        .filter(Boolean)
+      // function for finding grendel interfaces that match the MAC addresses
+      portMacs.forEach((key) => {
+        nodeQuery.data.result.forEach((val) => {
+          val.interfaces.forEach((e) => {
+            if (e.mac === key) {
+              nodeMapping.push({
+                name: val.name,
+                ...e,
+              })
+            }
+          })
+        })
+      })
     }
 
     query.data.client = (
@@ -30,50 +32,40 @@ const TooltipGen = ({ port, query, nodeQuery = null }) => {
             nodeMapping.map((val, index) => (
               <React.Fragment key={index}>
                 <Grid item xs={12}>
-                  <Typography align="center">{val.name}</Typography>
+                  <Typography align="center" variant="body2">
+                    {val.name}
+                  </Typography>
                 </Grid>
-                {val.interfaces.map((ifaces, index) => (
-                  <React.Fragment key={index}>
-                    {/* <Typography>FQDN: {ifaces.fqdn}</Typography> */}
-                    <Grid item xs={6}>
-                      <Typography align="center">{ifaces.ip}</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography align="center">{ifaces.mac}</Typography>
-                    </Grid>
-                  </React.Fragment>
-                ))}
+                <Grid item xs={6}>
+                  <Typography align="center" variant="body2">
+                    {val.ip}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography align="center" variant="body2">
+                    {val.mac}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ borderColor: "border.main" }} />
+                </Grid>
               </React.Fragment>
             ))}
-          {port.description !== "" && (
-            <Grid item xs={12}>
-              <Typography>Description: {port.description}</Typography>
-            </Grid>
-          )}
-          <Grid item xs={12}>
-            <Divider sx={{ borderColor: "border.main" }} />
-          </Grid>
-          <Grid item xs={6}>
-            <Typography>Speed: {port.speed}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            {port.vlans !== "" && <Typography>vlans: {port.vlans}</Typography>}
-          </Grid>
-          {portMacs.map((mac, index) => (
-            <Grid item xs={6} key={index}>
-              <Typography>{mac}</Typography>
-            </Grid>
-          ))}
-
-          {/* <Typography>Dulplex: {port.duplex}</Typography> */}
-          {/* <Typography>Mode: {port.mode}</Typography> */}
-          {/* {portInfo.map((val, index) => (
-            <React.Fragment key={index}>
-            <Typography>MAC: {val.mac}</Typography>
-            <Typography>vlan: {val.vlan}</Typography>
-            </React.Fragment>
-        ))} */}
         </Grid>
+        {port.description !== "" && (
+          <>
+            <Typography variant="body2">Description: {port.description}</Typography>
+            <Divider sx={{ borderColor: "border.main" }} />
+          </>
+        )}
+        {nodeMapping.length === 0 && (
+          <>
+            {port.status !== "" && <> Status: {port.status}, </>}
+            {port.speed !== "" && port.speed !== "0" && <> Speed: {port.speed}, </>}
+            {port.vlans !== "" && <> Vlans: {port.vlans}, </>}
+            {portMacs.length > 0 && portMacs.join(", ")}
+          </>
+        )}
       </>
     )
   }
