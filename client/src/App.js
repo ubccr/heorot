@@ -136,7 +136,7 @@ function App() {
                   }}
                 >
                   <AppBarC />
-                  <Container>
+                  <Container maxWidth="xl">
                     <Routes>
                       <Route exact path="/" element={<Home />} />
                       <Route path="/Login" element={<Login />} />
