@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import React, { useContext, useState } from "react"
+import React, { useContext } from "react"
 
 import { Link } from "react-router-dom"
 import TooltipGen from "./TooltipGen"
@@ -72,7 +72,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
       // core switch only
       let firstBlade = parseInt(interfacesQuery.data.data[0].port.split("/")[0])
       let lastBlade = parseInt(interfacesQuery.data.data[interfacesQuery.data.data.length - 1].port.split("/")[0])
-      let bladeArr = new Array()
+      let bladeArr = []
 
       for (let x = firstBlade; x <= lastBlade; x++) {
         // separate the port array into blades
@@ -90,6 +90,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                   ]
                 else if (val.speed !== "10G" && portArr[2] === "1") return val
               }
+              return undefined
             })
             .filter(Boolean)
         )
@@ -133,7 +134,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                       </TableCell>
                     )
                   }
-                }
+                } else return undefined
               })}
             </TableRow>
             {/* Odd ports */}
@@ -181,7 +182,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         </Tooltip>
                                       </TableCell>
                                     )
-                                  }
+                                  } else return undefined
                                 })}
                               </TableRow>
                               <TableRow>
@@ -219,7 +220,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         </Tooltip>
                                       </TableCell>
                                     )
-                                  }
+                                  } else return undefined
                                 })}
                               </TableRow>
                             </TableBody>
@@ -251,7 +252,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                       </TableCell>
                     )
                   }
-                }
+                } else return undefined
               })}
             </TableRow>
             {/* Even ports */}
@@ -300,7 +301,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         </Tooltip>
                                       </TableCell>
                                     )
-                                  }
+                                  } else return undefined
                                 })}
                               </TableRow>
                               <TableRow>
@@ -339,7 +340,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         </Tooltip>
                                       </TableCell>
                                     )
-                                  }
+                                  } else return undefined
                                 })}
                               </TableRow>
                             </TableBody>
@@ -372,7 +373,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                       </TableCell>
                     )
                   }
-                }
+                } else return undefined
               })}
             </TableRow>
           </React.Fragment>
@@ -436,6 +437,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                       interfacesQuery.data.status === "success" &&
                       interfacesQuery.data.client.map((val, index) => {
                         if (!(index % 2)) return <React.Fragment key={index}>{val}</React.Fragment>
+                        else return undefined
                       })}
                   </TableRow>
                   <TableRow>
@@ -443,6 +445,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                       interfacesQuery.data.status === "success" &&
                       interfacesQuery.data.client.map((val, index) => {
                         if (index % 2) return <React.Fragment key={index}>{val}</React.Fragment>
+                        else return undefined
                       })}
                   </TableRow>
                 </TableBody>
