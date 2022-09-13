@@ -3,7 +3,7 @@ const app = express.Router()
 const fs = require("fs")
 
 const { grendelRequest } = require("../modules/grendel")
-const { getSwInfo } = require("../modules/switches")
+const { getSwInfo, getSwInfoV2 } = require("../modules/switches")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -156,6 +156,13 @@ app.get("/v1/module/:node", async (req, res) => {
   const node = req.params.node
 
   let resSw = await getSwInfo(node, "show module")
+  res.json(resSw)
+})
+
+app.get("/v1/query/:node", async (req, res) => {
+  const node = req.params.node
+
+  let resSw = await getSwInfoV2(node)
   res.json(resSw)
 })
 

@@ -1,6 +1,8 @@
 const { NodeSSH } = require("node-ssh")
 const { grendelRequest } = require("../modules/grendel")
 const config = require("../config")
+const xml2js = require("xml2js")
+const SSH2Promise = require("ssh2-promise")
 
 async function getSwInfo(node, command) {
   // Grendel
@@ -212,4 +214,276 @@ const parseOutput = (data, type, command) => {
   }
 }
 
-module.exports = { getSwInfo }
+const getSwInfoV2 = async (node) => {
+  // Grendel
+  const grendelRes = await grendelRequest(`/v1/host/find/${node}`)
+
+  if (grendelRes.result.length === 0) {
+    return { status: "error", message: "No matching node name found in Grendel" }
+  }
+  if (grendelRes.status !== "success") {
+    return { status: "error", message: grendelRes.result }
+  }
+  let grendel = grendelRes.result[0]
+  const fqdn = grendel.interfaces[0].fqdn !== "" ? grendel.interfaces[0].fqdn : grendel.interfaces[0].ip
+
+  // Switch version logic
+  let parseType = ""
+  let user = config.switches.user
+  let pass = config.switches.pass
+
+  let commands = ["show version", "show interfaces status", "show mac address-table"]
+
+  if (grendel.tags.includes("Arista_EOS")) {
+    parseType = "EOS"
+    user = config.switches.userEOS !== "" ? config.switches.userEOS : user
+    pass = config.switches.passEOS !== "" ? config.switches.passEOS : pass
+    commands = ["show version | json", "show interfaces status | json", "show mac address-table | json"]
+  } else if (grendel.tags.includes("Dell_OS10")) {
+    commands = [
+      "show version | display-xml",
+      "show interface status | display-xml",
+      "show mac address-table | display-xml",
+    ]
+
+    parseType = "OS10"
+    user = config.switches.userOS10 !== "" ? config.switches.userOS10 : user
+    pass = config.switches.passOS10 !== "" ? config.switches.passOS10 : pass
+  } else if (grendel.tags.includes("Dell_OS9")) {
+    commands = ["show version", "show interface status", "show mac-address-table"]
+
+    parseType = "OS9"
+    user = config.switches.userOS9 !== "" ? config.switches.userOS9 : user
+    pass = config.switches.passOS9 !== "" ? config.switches.passOS9 : pass
+
+    return oldSwInfo(commands, fqdn, user, pass)
+  } else if (grendel.tags.includes("Dell_OS8")) {
+    commands = ["show interfaces status"]
+
+    parseType = "OS8"
+    user = config.switches.userOS8 !== "" ? config.switches.userOS8 : user
+    pass = config.switches.passOS8 !== "" ? config.switches.passOS8 : pass
+
+    return oldSwInfo(commands, fqdn, user, pass)
+
+    // return { status: "error", message: "Dell OS8 switches are not supported" }
+  } else
+    return {
+      status: "error",
+      message: `Could not determine ${node}'s OS version, please add the appropriate grendel tag entry`,
+    }
+
+  // Switch query
+  let conn = new NodeSSH()
+  let SSHConfig = {
+    host: fqdn,
+    username: user,
+    tryKeyboard: true,
+    password: pass,
+    onKeyboardInteractive(name, instructions, instructionsLang, prompts, finish) {
+      if (prompts.length > 0 && prompts[0].prompt.toLowerCase().includes("password")) {
+        finish([pass])
+      }
+    },
+    algorithms: {
+      kex: [
+        "curve25519-sha256",
+        "curve25519-sha256@libssh.org",
+        "ecdh-sha2-nistp256",
+        "ecdh-sha2-nistp384",
+        "ecdh-sha2-nistp521",
+        "diffie-hellman-group-exchange-sha256",
+        "diffie-hellman-group14-sha256",
+        "diffie-hellman-group15-sha512",
+        "diffie-hellman-group16-sha512",
+        "diffie-hellman-group17-sha512",
+        "diffie-hellman-group18-sha512",
+        // older algos for HPE nodes
+        "diffie-hellman-group14-sha1",
+        "diffie-hellman-group1-sha1",
+      ],
+      cipher: [
+        "aes128-ctr",
+        "aes192-ctr",
+        "aes256-ctr",
+        "aes128-gcm",
+        "aes256-gcm",
+        "aes128-cbc",
+        "3des-cbc",
+        "aes256-cbc",
+      ],
+    },
+  }
+  try {
+    await conn.connect(SSHConfig)
+
+    let data = commands.map(async (cmd) => {
+      return await conn.execCommand(cmd)
+    })
+    let raw = await Promise.all(data)
+    let parsed = raw.map(async (val) => {
+      let tmp = {}
+      if (val.code === 0) {
+        tmp.result = await parseOutputV2(val.stdout, parseType)
+        tmp.status = "success"
+      } else {
+        tmp.status = "error"
+        tmp.result = val.stderr
+      }
+      return {
+        ...tmp,
+      }
+    })
+    let output = await Promise.all(parsed)
+    return output
+    // return output
+  } catch (err) {
+    console.error(err)
+    return {
+      status: "error",
+      message: `Switch SSH connection error on switch ${node}`,
+    }
+  }
+}
+
+const parseOutputV2 = async (data, type) => {
+  if (type === "EOS") {
+    return JSON.parse(data)
+  } else if (type === "OS10") {
+    try {
+      let output = await xml2js.parseStringPromise(data)
+      if (output["rpc-reply"].hasOwnProperty("bulk")) return output["rpc-reply"].bulk[0].data
+      else return output["rpc-reply"].data
+    } catch (err) {
+      console.error(err)
+    }
+  }
+}
+
+const oldSwInfo = async (commands, fqdn, user, pass) => {
+  let sshConfig = {
+    host: fqdn,
+    username: user,
+    password: pass,
+    algorithms: {
+      kex: [
+        "curve25519-sha256",
+        "curve25519-sha256@libssh.org",
+        "ecdh-sha2-nistp256",
+        "ecdh-sha2-nistp384",
+        "ecdh-sha2-nistp521",
+        "diffie-hellman-group-exchange-sha256",
+        "diffie-hellman-group14-sha256",
+        "diffie-hellman-group15-sha512",
+        "diffie-hellman-group16-sha512",
+        "diffie-hellman-group17-sha512",
+        "diffie-hellman-group18-sha512",
+        // older algos for HPE nodes
+        "diffie-hellman-group14-sha1",
+        "diffie-hellman-group1-sha1",
+      ],
+      cipher: [
+        "aes128-ctr",
+        "aes192-ctr",
+        "aes256-ctr",
+        "aes128-gcm",
+        "aes256-gcm",
+        "aes128-cbc",
+        "3des-cbc",
+        "aes256-cbc",
+      ],
+    },
+  }
+
+  const ssh = new SSH2Promise(sshConfig)
+
+  await ssh.connect()
+
+  try {
+    const socket = await ssh.shell()
+    let output = ""
+    socket.on("data", (data) => {
+      output += data
+      console.log(`OUTPUT: ${data}`)
+    })
+    socket.write(commands[0])
+    socket.on("close", () => {
+      return output
+    })
+    await ssh.close()
+  } catch (err) {
+    console.error(err)
+  }
+  // let output = commands.map(async (cmd) => {
+  // })
+
+  // let host = {
+  //   server: {
+  //     host: fqdn,
+  //     userName: user,
+  //     password: pass,
+  //     algorithms: {
+  //       kex: [
+  //         "curve25519-sha256",
+  //         "curve25519-sha256@libssh.org",
+  //         "ecdh-sha2-nistp256",
+  //         "ecdh-sha2-nistp384",
+  //         "ecdh-sha2-nistp521",
+  //         "diffie-hellman-group-exchange-sha256",
+  //         "diffie-hellman-group14-sha256",
+  //         "diffie-hellman-group15-sha512",
+  //         "diffie-hellman-group16-sha512",
+  //         "diffie-hellman-group17-sha512",
+  //         "diffie-hellman-group18-sha512",
+  //         // older algos for HPE nodes
+  //         "diffie-hellman-group14-sha1",
+  //         "diffie-hellman-group1-sha1",
+  //       ],
+  //       cipher: [
+  //         "aes128-ctr",
+  //         "aes192-ctr",
+  //         "aes256-ctr",
+  //         "aes128-gcm",
+  //         "aes256-gcm",
+  //         "aes128-cbc",
+  //         "3des-cbc",
+  //         "aes256-cbc",
+  //       ],
+  //     },
+  //   },
+  //   tryKeyboard: true,
+  //   idleTimeOut: 15000,
+  //   commands: commands,
+  // }
+
+  // const SSH2Shell = require("ssh2shell")
+  // let SSH = new SSH2Shell(host)
+
+  // // SSH.on("keyboard-interactive", (name, instructions, instructionsLang, prompts, finish) => {
+  // //   console.log(instructions)
+  // //   finish(["y"])
+  // // })
+
+  // // const callback = (sessionText) => {
+  // //   console.log(sessionText)
+  // // }
+
+  // SSH.on("commandProcessing", (command, response, sshObj, stream) => {
+  //   if (response.indexOf("(y/n)") != -1 && sshObj.firstRun !== true) {
+  //     sshObj.firstRun = true
+  //     stream.write("y")
+  //   } else if (response.indexOf("--More--") != -1) {
+  //     stream.write("\n")
+  //   }
+  // })
+  // await SSH.on("commandComplete", (command, response, sshObj, stream) => {
+  //   console.log(response)
+  // })
+
+  // //Start the process
+  // SSH.connect()
+}
+
+const parseOldOutput = async (data, type) => {}
+
+module.exports = { getSwInfo, getSwInfoV2 }
