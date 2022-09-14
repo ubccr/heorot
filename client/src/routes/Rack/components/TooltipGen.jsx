@@ -4,7 +4,7 @@ import React from "react"
 
 const TooltipGen = ({ port, query, nodeQuery = null }) => {
   if (query.isFetched && query.data.status === "success") {
-    let portInfo = query.data.data.filter((val) => val.interface === port.port)
+    let portInfo = query.data.result[2].output.filter((val) => val.port === port.port)
     let portMacs = portInfo.map((val) => {
       return val.mac
     })

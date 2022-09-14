@@ -23,8 +23,8 @@ const SwitchGen = ({ node, u, tags, height }) => {
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
-  const interfacesQuery = useQuery(
-    ["interfaces", node],
+  const switchQuery = useQuery(
+    ["switch", node],
     async ({ signal }) => {
       let payload = {
         headers: {
@@ -32,23 +32,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/interfaces/${node}`, payload)).json()
-      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
-      return res
-    },
-    { staleTime: 120000, cacheTime: 120000 }
-  )
-
-  const macAddressQuery = useQuery(
-    ["macAddress", node],
-    async ({ signal }) => {
-      let payload = {
-        headers: {
-          "x-access-token": user.accessToken,
-        },
-        signal,
-      }
-      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/macAddressTable/${node}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${node}`, payload)).json()
       if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
@@ -67,26 +51,27 @@ const SwitchGen = ({ node, u, tags, height }) => {
     return res
   })
 
-  if (interfacesQuery.isFetched && interfacesQuery.data.status === "success") {
-    if (interfacesQuery.data.data[0].port.match(/[0-9]\/[0-9]\/[0-9]/g)) {
+  if (switchQuery.isFetched && switchQuery.data.status === "success") {
+    if (switchQuery.data.result[1].output[0].port.match(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]/g)) {
       // core switch only
-      let firstBlade = parseInt(interfacesQuery.data.data[0].port.split("/")[0])
-      let lastBlade = parseInt(interfacesQuery.data.data[interfacesQuery.data.data.length - 1].port.split("/")[0])
+      let firstBlade = parseInt(switchQuery.data.result[1].output[0].port.split("/")[0])
+      let lastBlade = parseInt(
+        switchQuery.data.result[1].output[switchQuery.data.result[1].output.length - 1].port.split("/")[0]
+      )
       let bladeArr = []
-
       for (let x = firstBlade; x <= lastBlade; x++) {
         // separate the port array into blades
         bladeArr.push(
-          interfacesQuery.data.data
+          switchQuery.data.result[1].output
             .map((val, index) => {
               let portArr = val.port.split("/")
               if (parseInt(portArr[0]) === x) {
                 if (val.speed === "10G" && portArr[2] === "1")
                   return [
                     val,
-                    interfacesQuery.data.data[index + 1],
-                    interfacesQuery.data.data[index + 2],
-                    interfacesQuery.data.data[index + 3],
+                    switchQuery.data.result[1].output[index + 1],
+                    switchQuery.data.result[1].output[index + 2],
+                    switchQuery.data.result[1].output[index + 3],
                   ]
                 else if (val.speed !== "10G" && portArr[2] === "1") return val
               }
@@ -96,7 +81,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
         )
       }
 
-      interfacesQuery.data.client = bladeArr.map((blade, index) => {
+      switchQuery.data.client = bladeArr.map((blade, index) => {
         // portmapping for each blade
         let color = "secondary"
         return (
@@ -166,7 +151,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         <Tooltip
                                           arrow
                                           placement="top"
-                                          title={<TooltipGen port={splitPort} query={macAddressQuery} />}
+                                          title={<TooltipGen port={splitPort} query={switchQuery} />}
                                         >
                                           <span>
                                             <Button
@@ -204,7 +189,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         <Tooltip
                                           arrow
                                           placement="bottom"
-                                          title={<TooltipGen port={splitPort} query={macAddressQuery} />}
+                                          title={<TooltipGen port={splitPort} query={switchQuery} />}
                                         >
                                           <span>
                                             <Button
@@ -241,7 +226,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                         <Tooltip
                           arrow
                           placement={!(index % 2) ? "top" : "bottom"}
-                          title={<TooltipGen port={port} query={macAddressQuery} />}
+                          title={<TooltipGen port={port} query={switchQuery} />}
                         >
                           <span>
                             <Button variant="contained" color={color} disabled={disabled} size="small">
@@ -285,7 +270,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         <Tooltip
                                           arrow
                                           placement="top"
-                                          title={<TooltipGen port={splitPort} query={macAddressQuery} />}
+                                          title={<TooltipGen port={splitPort} query={switchQuery} />}
                                         >
                                           <span>
                                             <Button
@@ -324,7 +309,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                                         <Tooltip
                                           arrow
                                           placement="bottom"
-                                          title={<TooltipGen port={splitPort} query={macAddressQuery} />}
+                                          title={<TooltipGen port={splitPort} query={switchQuery} />}
                                         >
                                           <span>
                                             <Button
@@ -362,7 +347,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
                           classes={{ tooltip: { maxWidth: 600 } }}
                           arrow
                           placement={!(index % 2) ? "top" : "bottom"}
-                          title={<TooltipGen port={port} query={macAddressQuery} />}
+                          title={<TooltipGen port={port} query={switchQuery} />}
                         >
                           <span>
                             <Button variant="contained" color={color} disabled={disabled} size="small">
@@ -381,7 +366,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
       })
     } else {
       // leaf switches
-      interfacesQuery.data.client = interfacesQuery.data.data.map((val, index) => {
+      switchQuery.data.client = switchQuery.data.result[1].output.map((val, index) => {
         let color = "secondary"
         if (val.speed === "100M") color = "warning"
         else if (val.speed === "1G") color = "success"
@@ -399,7 +384,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
             }}
           >
             <Tooltip
-              title={<TooltipGen port={val} query={macAddressQuery} nodeQuery={nodeQuery} />}
+              title={<TooltipGen port={val} query={switchQuery} nodeQuery={nodeQuery} />}
               TransitionComponent={Grow}
               placement={!(index % 2) ? "top" : "bottom"}
               arrow
@@ -426,24 +411,24 @@ const SwitchGen = ({ node, u, tags, height }) => {
       <TableRow>
         <TableCell align="center">{u}</TableCell>
         <TableCell align="center" sx={{ paddingRight: 0, paddingLeft: 0 }} rowSpan={height}>
-          {interfacesQuery.isFetching && <LinearProgress color="primary" sx={{ marginBottom: "10px" }} />}
+          {switchQuery.isFetching && <LinearProgress color="primary" sx={{ marginBottom: "10px" }} />}
           <Link to={`/Node/${node}`}>{node}</Link>
           <TableContainer>
             <Table>
               {!tags.includes("core-switch") && (
                 <TableBody>
                   <TableRow>
-                    {interfacesQuery.isFetched &&
-                      interfacesQuery.data.status === "success" &&
-                      interfacesQuery.data.client.map((val, index) => {
+                    {switchQuery.isFetched &&
+                      switchQuery.data.status === "success" &&
+                      switchQuery.data.client.map((val, index) => {
                         if (!(index % 2)) return <React.Fragment key={index}>{val}</React.Fragment>
                         else return undefined
                       })}
                   </TableRow>
                   <TableRow>
-                    {interfacesQuery.isFetched &&
-                      interfacesQuery.data.status === "success" &&
-                      interfacesQuery.data.client.map((val, index) => {
+                    {switchQuery.isFetched &&
+                      switchQuery.data.status === "success" &&
+                      switchQuery.data.client.map((val, index) => {
                         if (index % 2) return <React.Fragment key={index}>{val}</React.Fragment>
                         else return undefined
                       })}
@@ -452,9 +437,9 @@ const SwitchGen = ({ node, u, tags, height }) => {
               )}
               {tags.includes("core-switch") && (
                 <TableBody>
-                  {interfacesQuery.isFetched &&
-                    interfacesQuery.data.status === "success" &&
-                    interfacesQuery.data.client.map((val, index) => {
+                  {switchQuery.isFetched &&
+                    switchQuery.data.status === "success" &&
+                    switchQuery.data.client.map((val, index) => {
                       return <React.Fragment key={index}>{val}</React.Fragment>
                     })}
                 </TableBody>
