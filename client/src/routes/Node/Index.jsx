@@ -107,8 +107,8 @@ const Index = () => {
             </Box>
           </NewGridC>
 
-          {!coreSw && node.substring(0, 3) === "swe" && <Switches node={node} />}
-          {coreSw && <CoreSwitch node={node} />}
+          {node.substring(0, 3) === "swe" && <Switches node={node} />}
+          {/* {coreSw && <CoreSwitch node={node} />} */}
 
           {!simple && (
             <>
