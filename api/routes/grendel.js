@@ -144,8 +144,7 @@ app.get("/status/:value/:tags?", async (req, res) => {
 
   const status = spawn("grendel", args)
   let stdout = "",
-    stderr = "",
-    error = ""
+    stderr = ""
   status.stdout.on("data", (data) => {
     stdout += data
   })
@@ -153,7 +152,6 @@ app.get("/status/:value/:tags?", async (req, res) => {
     stderr += data
   })
   status.on("error", (err) => {
-    error = err
     res.json({
       status: "error",
       message: err,
@@ -166,10 +164,9 @@ app.get("/status/:value/:tags?", async (req, res) => {
         result: stdout,
       })
     } else {
-      console.error({
+      res.json({
         status: "error",
-        stderr,
-        error,
+        message: `Issue fetching grendel status: ${stderr}`,
       })
     }
   })
