@@ -3,7 +3,7 @@ const app = express.Router()
 const fs = require("fs")
 
 const { grendelRequest } = require("../modules/grendel")
-const { getSwInfo, getSwInfoV2 } = require("../modules/switches")
+const { getSwInfoV2 } = require("../modules/switches")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -131,33 +131,33 @@ app.get("/switch/:rack/:node", async (req, res) => {
   }
 })
 
-app.get("/v1/version/:node", async (req, res) => {
-  const node = req.params.node
+// app.get("/v1/version/:node", async (req, res) => {
+//   const node = req.params.node
 
-  let resSw = await getSwInfo(node, "show version")
-  res.json(resSw)
-})
+//   let resSw = await getSwInfo(node, "show version")
+//   res.json(resSw)
+// })
 
-app.get("/v1/macAddressTable/:node", async (req, res) => {
-  const node = req.params.node
+// app.get("/v1/macAddressTable/:node", async (req, res) => {
+//   const node = req.params.node
 
-  let resSw = await getSwInfo(node, "show mac address-table")
-  res.json(resSw)
-})
+//   let resSw = await getSwInfo(node, "show mac address-table")
+//   res.json(resSw)
+// })
 
-app.get("/v1/interfaces/:node", async (req, res) => {
-  const node = req.params.node
+// app.get("/v1/interfaces/:node", async (req, res) => {
+//   const node = req.params.node
 
-  let resSw = await getSwInfo(node, "show interfaces status")
-  res.json(resSw)
-})
+//   let resSw = await getSwInfo(node, "show interfaces status")
+//   res.json(resSw)
+// })
 
-app.get("/v1/module/:node", async (req, res) => {
-  const node = req.params.node
+// app.get("/v1/module/:node", async (req, res) => {
+//   const node = req.params.node
 
-  let resSw = await getSwInfo(node, "show module")
-  res.json(resSw)
-})
+//   let resSw = await getSwInfo(node, "show module")
+//   res.json(resSw)
+// })
 
 app.get("/v1/query/:node", async (req, res) => {
   const node = req.params.node
