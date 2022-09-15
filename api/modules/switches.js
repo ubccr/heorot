@@ -254,20 +254,34 @@ const getSwInfoV2 = async (node) => {
     parseType = "OS9"
     user = config.switches.userOS9 !== "" ? config.switches.userOS9 : user
     pass = config.switches.passOS9 !== "" ? config.switches.passOS9 : pass
-    return oldSwInfo(commands, fqdn, user, pass)
+    return oldSwInfo(commands, fqdn, user, pass, parseType)
   } else if (grendel.tags.includes("Dell_OS8")) {
     // old query
-    commands = ["show system", "show interfaces status", "enable", "show bridge address-table"]
+    commands = ["show inventory | no-more", "show interfaces status | no-more", "show mac-address-table | no-more"]
     parseType = "OS8"
     user = config.switches.userOS8 !== "" ? config.switches.userOS8 : user
     pass = config.switches.passOS8 !== "" ? config.switches.passOS8 : pass
-    return oldSwInfo(commands, fqdn, user, pass)
+    return oldSwInfo(commands, fqdn, user, pass, parseType)
     // return { status: "error", message: "Dell OS8 switches are not supported" }
-  } else
+  } else if (grendel.tags.includes("Dell_PC3")) {
+    // old query
+    commands = ["show system", "show interfaces status", "enable", "show bridge address-table"]
+    parseType = "PC3"
+    user = config.switches.userOS8 !== "" ? config.switches.userOS8 : user
+    pass = config.switches.passOS8 !== "" ? config.switches.passOS8 : pass
+    return oldSwInfo(commands, fqdn, user, pass, parseType)
+  } else if (node.match("^swi")) {
+    return {
+      status: "error",
+      silent: true,
+      message: `Infiniband switches are not supported: ${node}`,
+    }
+  } else {
     return {
       status: "error",
       message: `Could not determine ${node}'s OS version, please add the appropriate grendel tag entry`,
     }
+  }
 
   // Switch query
   let conn = new NodeSSH()
@@ -459,79 +473,93 @@ const parseOutputV2 = async (data, type) => {
   }
 }
 
-const oldSwInfo = async (commands, fqdn, user, pass) => {
-  const output = await new Promise((resolve, reject) => {
-    let host = {
-      server: {
-        host: fqdn,
-        userName: user,
-        password: pass,
-        algorithms: {
-          kex: [
-            "curve25519-sha256",
-            "curve25519-sha256@libssh.org",
-            "ecdh-sha2-nistp256",
-            "ecdh-sha2-nistp384",
-            "ecdh-sha2-nistp521",
-            "diffie-hellman-group-exchange-sha256",
-            "diffie-hellman-group14-sha256",
-            "diffie-hellman-group15-sha512",
-            "diffie-hellman-group16-sha512",
-            "diffie-hellman-group17-sha512",
-            "diffie-hellman-group18-sha512",
-            // older algos for HPE nodes
-            "diffie-hellman-group14-sha1",
-            "diffie-hellman-group1-sha1",
-          ],
-          cipher: [
-            "aes128-ctr",
-            "aes192-ctr",
-            "aes256-ctr",
-            "aes128-gcm",
-            "aes256-gcm",
-            "aes128-cbc",
-            "3des-cbc",
-            "aes256-cbc",
-          ],
+const oldSwInfo = async (commands, fqdn, user, pass, parseType) => {
+  try {
+    const output = await new Promise((resolve, reject) => {
+      let host = {
+        server: {
+          host: fqdn,
+          userName: user,
+          password: pass,
+          algorithms: {
+            kex: [
+              "curve25519-sha256",
+              "curve25519-sha256@libssh.org",
+              "ecdh-sha2-nistp256",
+              "ecdh-sha2-nistp384",
+              "ecdh-sha2-nistp521",
+              "diffie-hellman-group-exchange-sha256",
+              "diffie-hellman-group14-sha256",
+              "diffie-hellman-group15-sha512",
+              "diffie-hellman-group16-sha512",
+              "diffie-hellman-group17-sha512",
+              "diffie-hellman-group18-sha512",
+              // older algos for HPE nodes
+              "diffie-hellman-group14-sha1",
+              "diffie-hellman-group1-sha1",
+            ],
+            cipher: [
+              "aes128-ctr",
+              "aes192-ctr",
+              "aes256-ctr",
+              "aes128-gcm",
+              "aes256-gcm",
+              "aes128-cbc",
+              "3des-cbc",
+              "aes256-cbc",
+            ],
+          },
         },
-      },
-      asciiFilter: "[^\t\r\n\x20-\x7e]",
-      tryKeyboard: false,
-      idleTimeOut: 25000,
-      commands: commands,
-    }
-
-    const SSH2Shell = require("ssh2shell")
-    let SSH = new SSH2Shell(host)
-
-    let responseArr = []
-
-    SSH.on("commandProcessing", (command, response, sshObj, stream) => {
-      if (response.indexOf("(y/n)") != -1 && sshObj.firstRun !== true) {
-        sshObj.firstRun = true
-        stream.write("y")
-      } else if (response.indexOf("--More--") != -1) {
-        stream.write("\n")
+        asciiFilter: "[^\t\r\n\x20-\x7e]",
+        tryKeyboard: false,
+        idleTimeOut: 25000,
+        commands: commands,
       }
-    })
 
-    SSH.on("commandComplete", (command, response, sshObj, stream) => {
-      let output = parseOldOutput(response, command)
-      if (output !== null) responseArr.push({ command: command, output }) // get rid of null from "enable" command
+      const SSH2Shell = require("ssh2shell")
+      let SSH = new SSH2Shell(host)
+
+      let responseArr = []
+
+      SSH.on("commandProcessing", (command, response, sshObj, stream) => {
+        if (response.indexOf("(y/n)") != -1 && sshObj.firstRun !== true) {
+          sshObj.firstRun = true
+          stream.write("y")
+        } else if (response.indexOf("--More-- or (q)uit") != -1) {
+          stream.write("\n")
+        } else if (response.indexOf("--More--") != -1 && sshObj.firstRun !== true) {
+          sshObj.firstRun = true
+          stream.write("\n")
+        }
+      })
+      SSH.on("commandComplete", (command, response, sshObj, stream) => {
+        // console.log(response)
+        let output = parseOldOutput(response, command, parseType)
+        sshObj.firstRun = false
+        if (output !== null) responseArr.push({ command: command, output }) // get rid of null from "enable" command
+      })
+      callback = (response) => {
+        resolve(responseArr)
+      }
+      SSH.on("error", (error, type) => {
+        reject(error)
+      })
+
+      SSH.connect(callback)
     })
-    callback = (response) => {
-      resolve(responseArr)
+    return {
+      status: "success",
+      result: output,
     }
-
-    SSH.connect(callback)
-  })
-  return {
-    status: "success",
-    result: output,
+  } catch (err) {
+    return {
+      status: "error",
+      message: JSON.stringify(err),
+    }
   }
 }
 
-const parseOldOutput = (data, command) => {
+const parseOldOutput = (data, command, parseType) => {
   if (command.includes("inventory")) {
     // OS9 show inventory
     let tmp = data.split("\r\n").map((val) => val.split(": "))
@@ -554,8 +582,14 @@ const parseOldOutput = (data, command) => {
     }
     // return tmp
     return {
-      model: tmp.find((e) => e.find((val) => val.includes("System Type")))[1].trim(),
-      version: tmp.find((e) => e.find((val) => val.includes("Software Version")))[1],
+      model: notNull(
+        tmp.find((e) => e.find((val) => val.includes("System Type"))),
+        1
+      ),
+      version: notNull(
+        tmp.find((e) => e.find((val) => val.includes("Software Version"))),
+        1
+      ),
       serviceTag: ST,
     }
   } else if (command.includes("system")) {
@@ -598,7 +632,7 @@ const parseOldOutput = (data, command) => {
       .filter(Boolean)
     // return tmp
     return macAddressTable
-  } else if (command.includes("interfaces")) {
+  } else if (command.includes("interfaces") && parseType === "PC3") {
     // OS8 show interfaces status
     let tmp = data.split("\r\n")
     let mapping = tmp
@@ -625,7 +659,7 @@ const parseOldOutput = (data, command) => {
       })
       .filter(Boolean)
     return mapping
-  } else if (command.includes("interface status")) {
+  } else if (command.includes("interface")) {
     // OS9 show interface status
     let tmp = data.split("\r\n")
     let spacing = {}
@@ -666,8 +700,12 @@ const parseOldOutput = (data, command) => {
     let mapping = tmp
       .map((val) => {
         if (val.length > 1) {
+          let port = ""
+          if (val[3].match("^Te")) port = val[3].trim().substring(5)
+          else if (val[3].match("^Gi")) port = val[3].trim().substring(5)
+          else port = val[3].trim()
           return {
-            port: val[3].match("^Te") ? val[3].trim().substring(5) : val[3].trim(),
+            port: port,
             mac: val[1].trim(),
             type: val[2].trim(),
             vlanId: val[0].trim(),
@@ -685,7 +723,7 @@ const parseOldOutput = (data, command) => {
 
 const notNull = (data, pos = 0) => {
   // ensure return of data incase of error
-  if (data !== undefined && data !== null && data[pos] !== undefined) return data[pos]
+  if (data !== undefined && data !== null && data[pos] !== undefined) return data[pos].trim()
   else return null
 }
 

@@ -33,7 +33,10 @@ const SwitchGen = ({ node, u, tags, height }) => {
         signal,
       }
       const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${node}`, payload)).json()
-      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
+      if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
+      else if (res.status === "error" && res.hasOwnProperty("silent"))
+        console.error(`Switch rack query failed: ${res.message}`)
+
       return res
     },
     { staleTime: 120000, cacheTime: 120000 }
@@ -52,7 +55,10 @@ const SwitchGen = ({ node, u, tags, height }) => {
   })
 
   if (switchQuery.isFetched && switchQuery.data.status === "success") {
-    if (switchQuery.data.result[1].output[0].port.match(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]/g)) {
+    if (
+      switchQuery.data.result[1].output.length > 0 &&
+      switchQuery.data.result[1].output[0].port.match(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]/g)
+    ) {
       // core switch only
       let firstBlade = parseInt(switchQuery.data.result[1].output[0].port.split("/")[0])
       let lastBlade = parseInt(
