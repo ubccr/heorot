@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
-const switchesSchema = new Schema(
+const cacheSchema = new Schema(
   {
     node: { type: String, required: true, unique: true },
     cache: { type: Object, required: true },
@@ -8,5 +8,5 @@ const switchesSchema = new Schema(
   { timestamps: true }
 )
 
-const Switches = mongoose.model("Switches", switchesSchema)
-module.exports = Switches
+const Cache = mongoose.model("Cache", cacheSchema)
+module.exports = Cache

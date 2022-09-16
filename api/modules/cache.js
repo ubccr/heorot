@@ -1,8 +1,10 @@
-const setCache = async (model, key, keyData, data) => {
-  return await model.findOneAndUpdate({ [key]: keyData }, { cache: data }, { new: true, upsert: true })
+const Cache = require("../models/Cache")
+
+const setCache = async (node, data) => {
+  return await Cache.findOneAndUpdate({ node: node }, { cache: data }, { new: true, upsert: true })
 }
-const getCache = async (model, key, data) => {
-  return await model.findOne({ [key]: data })
+const getCache = async (node) => {
+  return await Cache.findOne({ node: node })
 }
 
 const timeComp = (oldTime, offset = 1 * 24 * 60 * 60 * 1000) => {
