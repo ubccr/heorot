@@ -1,6 +1,8 @@
 import {
+  Box,
   Button,
   Grow,
+  IconButton,
   LinearProgress,
   Table,
   TableBody,
@@ -10,8 +12,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 
+import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined"
 import { Link } from "react-router-dom"
 import TooltipGen from "./TooltipGen"
 import { UserContext } from "../../../contexts/UserContext"
@@ -22,9 +25,9 @@ import { useSnackbar } from "notistack"
 const SwitchGen = ({ node, u, tags, height }) => {
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
-
+  const [refreshCache, setRefreshCache] = useState("false")
   const switchQuery = useQuery(
-    ["switch", node],
+    ["switch", node, refreshCache],
     async ({ signal }) => {
       let payload = {
         headers: {
@@ -32,7 +35,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${node}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${node}/${refreshCache}`, payload)).json()
       if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "error" && res.hasOwnProperty("silent"))
         console.error(`Switch rack query failed: ${res.message}`)
@@ -53,6 +56,11 @@ const SwitchGen = ({ node, u, tags, height }) => {
     if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
     return res
   })
+
+  const refetchQuery = () => {
+    setRefreshCache("true")
+    switchQuery.refetch()
+  }
 
   if (switchQuery.isFetched && switchQuery.data.status === "success") {
     if (
@@ -374,7 +382,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
       // leaf switches
       switchQuery.data.client = switchQuery.data.result[1].output.map((val, index) => {
         let color = "secondary"
-        if (val.speed === "100M") color = "warning"
+        if (val.speed === "100M" || val.speed === "10M") color = "warning"
         else if (val.speed === "1G") color = "success"
         else if (val.speed === "10G") color = "primary"
         else if (val.speed === "40G") color = "error"
@@ -415,9 +423,15 @@ const SwitchGen = ({ node, u, tags, height }) => {
   return (
     <>
       <TableRow>
-        <TableCell align="center">{u}</TableCell>
+        <TableCell align="center">
+          {u}
+          <IconButton onClick={() => refetchQuery()} size="small">
+            <CachedOutlinedIcon />
+          </IconButton>
+        </TableCell>
         <TableCell align="center" sx={{ paddingRight: 0, paddingLeft: 0 }} rowSpan={height}>
           {switchQuery.isFetching && <LinearProgress color="primary" sx={{ marginBottom: "10px" }} />}
+
           <Link to={`/Node/${node}`}>{node}</Link>
           <TableContainer>
             <Table>

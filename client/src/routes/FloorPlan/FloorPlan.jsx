@@ -37,38 +37,35 @@ const FloorPlan = () => {
   }
   const [rows, setRows] = useState([])
   const [cols, setCols] = useState([])
-  const [Nodes, setNodes] = useState()
-  const [loading, setLoading] = useState(true)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     setRows(createRows(apiConfig.floorplan.floorX))
     setCols(createCols(apiConfig.floorplan.floorY))
-    let payload = {
-      headers: {
-        "x-access-token": user.accessToken,
-      },
-      allowUnauthorized: true,
-    }
-    const url = `${apiConfig.apiUrl}/grendel/host/list`
-    fetch(url, payload)
-      .then((res) => res.json())
-      .then((response) => {
-        if (response.status === "success") {
-          setNodes(response.result)
-          setLoading(false)
-        } else {
-          enqueueSnackbar(JSON.stringify(response.result), { variant: "error" })
-        }
-      })
     return () => {
       setRows([])
       setCols([])
-      setNodes()
-      setLoading(true)
     }
   }, [])
+
+  const nodesQuery = useQuery(
+    ["nodes"],
+    async ({ signal }) => {
+      let payload = {
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+        signal,
+      }
+      const res = await (await fetch(`${apiConfig.apiUrl}/grendel/host/list`, payload)).json()
+      if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
+      else if (res.status === "error" && res.hasOwnProperty("silent")) console.error(`${res.message}`)
+
+      return res
+    },
+    { staleTime: 120000, cacheTime: 120000 }
+  )
 
   const [showRatios, setShowRatios] = useState(false)
   const switchesQuery = useQuery("switches", async ({ signal }) => {
@@ -105,8 +102,8 @@ const FloorPlan = () => {
               />
             </FormGroup>
           )}
-          {loading && <LinearProgress />}
-          {!loading && (
+          {!nodesQuery.isFetched && <LinearProgress />}
+          {nodesQuery.isFetched && (
             <Table size="small" style={{ tableLayout: "fixed" }}>
               <TableBody>
                 {rows.map((row) => (
@@ -123,7 +120,7 @@ const FloorPlan = () => {
                           borderColor: "border.main",
                         }}
                       >
-                        {Nodes.find((el) => {
+                        {nodesQuery.data.result.find((el) => {
                           let rack = row.row + col.col
 
                           if (el.name.includes(rack)) return true
