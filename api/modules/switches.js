@@ -123,14 +123,16 @@ const getSwInfoV2 = async (node) => {
     let parsed = raw.map(async (val) => {
       // TODO: better error handling
       let tmp = {}
-      if (val.code === 0) tmp = await parseOutputV2(val.stdout, parseType)
-      else console.error(val.stderr)
+      if (val.code === 0) {
+        tmp = await parseOutputV2(val.stdout, parseType)
+      } else console.error(val.stderr)
       return {
         ...tmp,
       }
     })
     let output = await Promise.all(parsed)
-    return { status: "success", result: output }
+
+    return { status: "success", info: switchCalcs(output, parseType), result: output }
     // return output
   } catch (err) {
     console.error(err)
@@ -336,8 +338,10 @@ const oldSwInfo = async (commands, fqdn, user, pass, parseType) => {
 
       SSH.connect(callback)
     })
+    let info = switchCalcs(output, parseType)
     return {
       status: "success",
+      info: info,
       result: output,
     }
   } catch (err) {
@@ -439,7 +443,7 @@ const parseOldOutput = (data, command, parseType) => {
           else if (tmpSpeed === "1000") speed = "1G"
           else if (tmpSpeed === "100") speed = "100M"
           return {
-            port: port,
+            port: port.toString(),
             status: notNull(val.match("(Up|Down)")).toLowerCase(),
             speed: speed,
             duplex: notNull(val.match("(Full|N/A)")),
@@ -515,6 +519,58 @@ const notNull = (data, pos = 0) => {
   // ensure return of data incase of error
   if (data !== undefined && data !== null && data[pos] !== undefined) return data[pos].trim()
   else return null
+}
+
+const switchCalcs = (data, parseType) => {
+  try {
+    if (parseType !== "EOS") {
+      let count = {
+        total: 0,
+        active: 0,
+        fastestPort: 0,
+        uplinkCount: 0,
+        uplinkSpeed: 0,
+      }
+      let uplinks = []
+
+      if (data[1].output.length > 0) {
+        data[1].output.forEach((val) => {
+          if (val.port.match("[0-9]{1,2}")) {
+            count.total++
+            let portSpeed = val.speed !== "" ? parseInt(val.speed.match("[0-9]{1,3}G")) : 0
+
+            if (val.status === "up" && (val.speed === "1G" || val.speed == "10G") && parseInt(val.port) < 48) {
+              count.active++
+              count.fastestPort = count.fastestPort < portSpeed ? portSpeed : count.fastestPort
+            }
+            if (
+              val.status === "up" &&
+              ((count.fastestPort === 10 && portSpeed > 10) || (count.fastestPort === 1 && portSpeed > 1))
+            ) {
+              uplinks.push(val)
+              count.uplinkCount++
+              count.uplinkSpeed = count.uplinkSpeed < portSpeed ? portSpeed : count.uplinkSpeed
+            }
+          }
+        })
+      }
+      let totalRatio = (count.total * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
+      let activeRatio = (count.active * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
+      return {
+        status: "success",
+        totalOversubscription: totalRatio,
+        activeOversubscription: activeRatio,
+        totalPorts: count.total,
+        activePorts: count.active,
+        fastestPort: count.fastestPort,
+        uplinkCount: count.uplinkCount,
+        uplinkSpeed: count.uplinkSpeed,
+        uplinks: uplinks,
+      }
+    } else return { status: "error" }
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 module.exports = { getSwInfoV2 }

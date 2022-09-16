@@ -93,6 +93,39 @@ const Switches = ({ node }) => {
                   <TableCell>Ports:</TableCell>
                   <TableCell align="right">{query.data.result[0].output.ports}</TableCell>
                 </TableRow>
+                {/* "Info" section */}
+                {query.data.info.status === "success" && (
+                  <>
+                    <TableRow>
+                      <TableCell>Total oversubscription ratio:</TableCell>
+                      <TableCell align="right">{query.data.info.totalOversubscription}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Active oversubscription ratio:</TableCell>
+                      <TableCell align="right">{query.data.info.activeOversubscription}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Total switch ports:</TableCell>
+                      <TableCell align="right">{query.data.info.totalPorts}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Active switch ports:</TableCell>
+                      <TableCell align="right">{query.data.info.activePorts}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Uplink count:</TableCell>
+                      <TableCell align="right">{query.data.info.uplinkCount}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Uplink Speed:</TableCell>
+                      <TableCell align="right">{query.data.info.uplinkSpeed}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Uplink Ports:</TableCell>
+                      <TableCell align="right">{query.data.info.uplinks.map((val) => `${val.port} `)}</TableCell>
+                    </TableRow>
+                  </>
+                )}
               </>
             )}
           </TableBody>
