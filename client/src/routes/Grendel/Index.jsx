@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Divider, Tab, Tabs, Typography } from "@mui/material"
 
 import AddNode from "./AddNode"
 import BgContainer from "../../components/BgContainer"
@@ -42,15 +42,20 @@ const Index = () => {
           sx={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: "10px",
+            marginBottom: "20px",
           }}
         >
-          <Tabs value={value} onChange={(e, newVal) => setValue(newVal)}>
+          <Tabs
+            value={value}
+            onChange={(e, newVal) => setValue(newVal)}
+            sx={{ border: 1, borderColor: "border.main", borderRadius: 2 }}
+          >
             <Tab label="Add Node" />
             <Tab label="Edit Nodes" />
             <Tab label="Bulk Import Nodes" />
           </Tabs>
         </Box>
+        <Divider sx={{ marginBottom: "15px" }} />
         {value === 0 && <AddNode />}
 
         {value === 1 && (

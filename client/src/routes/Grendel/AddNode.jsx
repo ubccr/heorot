@@ -59,8 +59,8 @@ const AddNode = () => {
         <Box
           sx={{
             marginBottom: "30px",
-            marginTop: "30px",
             width: "100%",
+            marginTop: "15px",
           }}
         >
           <Stepper nonLinear activeStep={step}>

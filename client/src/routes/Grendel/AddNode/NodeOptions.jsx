@@ -109,6 +109,7 @@ const NodeOptions = ({ options, setOptions }) => {
         <TextField
           value={options.tags.join(",")}
           label="Tags"
+          placeholder="a01,ubhpc,gpu"
           variant="outlined"
           fullWidth
           onChange={(e) => setOptions({ ...options, tags: e.target.value.split(",") })}

@@ -98,7 +98,7 @@ const ImportNodes = () => {
   }
   return (
     <>
-      <Typography variant="h2" sx={{ fontSize: "16pt", marginTop: "20px", marginBottom: "10px" }}>
+      <Typography variant="h2" sx={{ fontSize: "16pt", marginBottom: "10px" }}>
         Add Nodes:
       </Typography>
       <form onSubmit={handleSubmit}>

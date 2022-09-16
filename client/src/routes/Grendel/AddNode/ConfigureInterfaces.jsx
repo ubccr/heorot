@@ -7,7 +7,7 @@ const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
     <Box>
       <Grid container spacing={2}>
         {ifaces.map((val, index) => (
-          <Grid item xs={6} key={index}>
+          <Grid item xs={12} md={6} key={index}>
             <Box sx={{ border: 1, padding: "10px", borderColor: "border.main", borderRadius: "10px" }}>
               <FormGroup>
                 <Box sx={{ display: "flex" }}>
