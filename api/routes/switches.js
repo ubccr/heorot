@@ -1,8 +1,10 @@
 const express = require("express")
 const app = express.Router()
 const fs = require("fs")
+const Switches = require("../models/Switches")
 
 const { grendelRequest } = require("../modules/grendel")
+const { setCache, getCache, timeComp } = require("../modules/cache")
 const { getSwInfoV2 } = require("../modules/switches")
 
 app.get("/", (req, res) => {
@@ -29,142 +31,29 @@ app.get("/allData", async (req, res) => {
   })
 })
 
-app.get("/coreSwitch/:node", async (req, res) => {
+app.get("/v1/query/:node/:refetch", async (req, res) => {
   const node = req.params.node
+  const refetch = req.params.refetch
 
-  const jsonData = readJsonFile()
-  if (jsonData.status !== "success") {
-    res.json(jsonData)
-    return
+  let getCacheRes = await getCache(Switches, "node", node)
+
+  if (getCacheRes !== null && refetch !== "true" && getCacheRes.cache.status !== "error") {
+    if (timeComp(getCacheRes.updatedAt)) getSw(node)
+    res.json(getCacheRes.cache)
+  } else {
+    let resSw = await getSw(node)
+    res.json(resSw)
   }
+})
+const getSw = async (node) => {
+  let res = await getSwInfoV2(node)
 
-  let portMapping = new Array()
-
-  for (blade = 7; blade <= 10; blade++) {
-    portMapping[blade] = new Array()
-    for (port = 1; port <= 36; port++) {
-      portMapping[blade][port] = new Object({
-        mapping: new Array(5),
-        uplinkSpeed: null,
-      })
-    }
-  }
-
-  const grendel = await grendelRequest(`/v1/host/find/${node}`)
-  if (grendel.result.length === 0) {
-    res.json({ status: "error", message: "No matching node name found in Grendel" })
-    return
-  }
-  if (grendel.status !== "success") {
-    res.json({ status: "error", message: grendel.result })
-    return
-  }
-  let grendelInfo = grendel.result[0]
-  if (!grendelInfo.tags.includes("core-switch")) {
-    res.json({ status: "error", message: "Node name supplied does not have matching 'core-switch' tag" })
-    return
-  }
-  // Height functoin
-  let height =
-    grendelInfo.tags
-      .map((e) => {
-        if (e[e.length - 1] === "u") return e.slice(0, -1)
-      })
-      .filter(Boolean)[0] ?? "1"
-
-  // Port function
-
-  jsonData.result.forEach((racks) => {
-    racks.switches.forEach((sw) => {
-      if (sw.cabling !== undefined) {
-        sw.cabling.ports.forEach((port) => {
-          let spines = port.spine_port.split("/")
-          portMapping[parseInt(spines[0])][parseInt(spines[1])].mapping[parseInt(spines[2])] = {
-            hostname: sw.hostname,
-            port: port.spine_port,
-          }
-          portMapping[parseInt(spines[0])][parseInt(spines[1])].uplinkSpeed = racks.uplink_speed
-        })
-      }
-    })
+  let setCacheRes = await setCache(Switches, {
+    node: node,
+    cache: res,
   })
-
-  res.json({ status: "success", height, portMapping })
-})
-
-app.get("/rack/:rack", async (req, res) => {
-  const rack = req.params.rack
-  const jsonData = readJsonFile()
-  if (jsonData.status !== "success") {
-    res.json(jsonData)
-    return
-  }
-
-  let data = jsonData.result.find((element) => element.rack === rack)
-  if (data === undefined) res.json({ status: "error", message: "Rack not found in dataset" })
-  else {
-    data.ratio = (data.nodes * data.port_speed) / (data.switches.length * 2 * data.uplink_speed)
-    res.json({ status: "success", result: data })
-  }
-})
-
-app.get("/switch/:rack/:node", async (req, res) => {
-  const rack = req.params.rack
-  const node = req.params.node
-  const jsonData = readJsonFile()
-  if (jsonData.status !== "success") {
-    res.json(jsonData)
-    return
-  }
-
-  let data = jsonData.result.find((element) => element.rack === rack)
-  if (data === undefined) res.json({ status: "error", message: "Rack not found in dataset" })
-  else {
-    data.ratio = (data.nodes * data.port_speed) / (data.switches.length * 2 * data.uplink_speed)
-    data.switches = data.switches.find((element) => element.hostname === node)
-    if (data.switches === undefined)
-      res.json({
-        status: "error",
-        message: "Switch not found in dataset",
-      })
-    else res.json({ status: "success", result: data })
-  }
-})
-
-// app.get("/v1/version/:node", async (req, res) => {
-//   const node = req.params.node
-
-//   let resSw = await getSwInfo(node, "show version")
-//   res.json(resSw)
-// })
-
-// app.get("/v1/macAddressTable/:node", async (req, res) => {
-//   const node = req.params.node
-
-//   let resSw = await getSwInfo(node, "show mac address-table")
-//   res.json(resSw)
-// })
-
-// app.get("/v1/interfaces/:node", async (req, res) => {
-//   const node = req.params.node
-
-//   let resSw = await getSwInfo(node, "show interfaces status")
-//   res.json(resSw)
-// })
-
-// app.get("/v1/module/:node", async (req, res) => {
-//   const node = req.params.node
-
-//   let resSw = await getSwInfo(node, "show module")
-//   res.json(resSw)
-// })
-
-app.get("/v1/query/:node", async (req, res) => {
-  const node = req.params.node
-
-  let resSw = await getSwInfoV2(node)
-  res.json(resSw)
-})
+  return res
+}
 
 const readJsonFile = () => {
   try {
