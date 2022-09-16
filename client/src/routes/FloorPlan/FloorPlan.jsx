@@ -103,7 +103,7 @@ const FloorPlan = () => {
             </FormGroup>
           )}
           {!nodesQuery.isFetched && <LinearProgress />}
-          {nodesQuery.isFetched && (
+          {nodesQuery.isFetched && nodesQuery.data.status === "success" && (
             <Table size="small" style={{ tableLayout: "fixed" }}>
               <TableBody>
                 {rows.map((row) => (
