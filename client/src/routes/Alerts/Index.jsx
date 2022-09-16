@@ -1,37 +1,35 @@
 import {
-  Typography,
   Box,
+  LinearProgress,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  LinearProgress,
-  TableContainer,
+  Typography,
 } from "@mui/material"
+
 import AlertEntry from "./AlertEntry"
-import { useQuery } from "react-query"
-import { useContext } from "react"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useContext } from "react"
+import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const Index = () => {
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
-  const query = useQuery("nodes", async ({ signal }) => {
+  const query = useQuery("omNodes", async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
       },
       signal,
     }
-    const res = await (
-      await fetch(`${apiConfig.apiUrl}/openmanage/nodes`, payload)
-    ).json()
-    if (res.status === "error")
-      enqueueSnackbar(res.message, { variant: "error" })
+    const res = await (await fetch(`${apiConfig.apiUrl}/openmanage/nodes`, payload)).json()
+    if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
     return res
   })
   return (
