@@ -1,9 +1,5 @@
-const setCache = async (model, data) => {
-  let newData = new model({ ...data })
-  newData.save((err, data) => {
-    if (err) return { status: "error", message: "An error occured while saving to the DB" }
-    else return { status: "success", message: "Data successfully cached" }
-  })
+const setCache = async (model, key, keyData, data) => {
+  return await model.findOneAndUpdate({ [key]: keyData }, { cache: data }, { new: true, upsert: true })
 }
 const getCache = async (model, key, data) => {
   return await model.findOne({ [key]: data })

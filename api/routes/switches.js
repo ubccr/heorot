@@ -3,7 +3,6 @@ const app = express.Router()
 const fs = require("fs")
 const Switches = require("../models/Switches")
 
-const { grendelRequest } = require("../modules/grendel")
 const { setCache, getCache, timeComp } = require("../modules/cache")
 const { getSwInfoV2 } = require("../modules/switches")
 
@@ -31,12 +30,11 @@ app.get("/allData", async (req, res) => {
   })
 })
 
-app.get("/v1/query/:node/:refetch", async (req, res) => {
+app.get("/v1/query/:node/:refetch?", async (req, res) => {
   const node = req.params.node
   const refetch = req.params.refetch
 
   let getCacheRes = await getCache(Switches, "node", node)
-
   if (getCacheRes !== null && refetch !== "true" && getCacheRes.cache.status !== "error") {
     if (timeComp(getCacheRes.updatedAt)) getSw(node)
     res.json(getCacheRes.cache)
@@ -47,11 +45,8 @@ app.get("/v1/query/:node/:refetch", async (req, res) => {
 })
 const getSw = async (node) => {
   let res = await getSwInfoV2(node)
+  let setCacheRes = await setCache(Switches, "node", node, res)
 
-  let setCacheRes = await setCache(Switches, {
-    node: node,
-    cache: res,
-  })
   return res
 }
 
