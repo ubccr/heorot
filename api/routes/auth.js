@@ -71,9 +71,7 @@ app.post("/signin", async (req, res) => {
 })
 
 app.get("/users", auth, async (req, res) => {
-  let query = await User.find()
-    .select("username privileges createdAt updatedAt")
-    .exec()
+  let query = await User.find().select("username privileges createdAt updatedAt").exec()
   if (query !== null) {
     res.send({
       status: "success",
@@ -94,10 +92,7 @@ app.post("/updateUsers", auth, async (req, res) => {
   })
 
   try {
-    let query = await User.updateMany(
-      { $or: users },
-      { $set: { privileges: action } }
-    )
+    let query = await User.updateMany({ $or: users }, { $set: { privileges: action } })
     res.json({
       status: "success",
       message: "Users have been successfully updated",
