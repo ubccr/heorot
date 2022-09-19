@@ -95,7 +95,7 @@ const FloorPlan = () => {
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
         <TableContainer sx={{ maxHeight: "calc(100vh - 135.5px)" }}>
           {switchesQuery.isFetched && switchesQuery.data.status === "success" && (
-            <FormGroup>
+            <FormGroup sx={{ marginLeft: "10px" }}>
               <FormControlLabel
                 control={<Switch onChange={() => setShowRatios(!showRatios)} />}
                 label="Show oversub ratios"
