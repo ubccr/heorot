@@ -41,14 +41,8 @@ async function dell_systems(uri) {
   let res = await api_request(url, uri)
   let res2 = await api_request(bios_url, uri)
 
-  let bootArr =
-    res.data.Boot.BootOrder === undefined
-      ? null
-      : res.data.Boot.BootOrder.join(",")
-  let bootOrder =
-    res2.data.Attributes.SetBootOrderEn !== undefined
-      ? res2.data.Attributes.SetBootOrderEn
-      : bootArr
+  let bootArr = res.data.Boot.BootOrder === undefined ? null : res.data.Boot.BootOrder.join(",")
+  let bootOrder = res2.data.Attributes.SetBootOrderEn !== undefined ? res2.data.Attributes.SetBootOrderEn : bootArr
   return {
     status: res.status,
     hostStatus: res.data.Status.Health,
@@ -64,9 +58,7 @@ async function dell_systems(uri) {
 
     processorModel: res.data.ProcessorSummary.Model,
     processorCount: res.data.ProcessorSummary.Count,
-    processorCores:
-      res.data.ProcessorSummary.LogicalProcessorCount /
-      res.data.ProcessorSummary.Count,
+    processorCores: res.data.ProcessorSummary.LogicalProcessorCount / res.data.ProcessorSummary.Count,
     processorStatus: res.data.ProcessorSummary.Status.Health,
 
     logicalProc: res2.data.Attributes.LogicalProc,
@@ -112,12 +104,8 @@ async function dell_gpu(uri, version) {
       let physical_gpus = new Array()
 
       tmp_res.data.Members.forEach((val) => {
-        if (val["@odata.id"].substring(49, 54) === "Video")
-          all_gpus.push(uri + val["@odata.id"])
-        if (
-          val["@odata.id"].substring(49, 54) === "Video" &&
-          val["@odata.id"].substring(61, 63) === "-1"
-        )
+        if (val["@odata.id"].substring(49, 54) === "Video") all_gpus.push(uri + val["@odata.id"])
+        if (val["@odata.id"].substring(49, 54) === "Video" && val["@odata.id"].substring(61, 63) === "-1")
           physical_gpus.push(uri + val["@odata.id"])
       })
       let gpu_res = await api_request(physical_gpus, uri)
@@ -266,9 +254,7 @@ async function dell_storage(uri, version) {
 
 async function dell_sel(uri) {
   let top = "20"
-  let url =
-    uri +
-    `/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/?$top=${top}`
+  let url = uri + `/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/?$top=${top}`
 
   let res = await api_request(url, uri)
   if (res.status === "success") {
@@ -284,12 +270,9 @@ async function dell_sel(uri) {
       }),
     }
   } else {
-    top = res.error["@Message.ExtendedInfo"][0].MessageArgs[2]
-      .replace(")", "")
-      .split("-")[1]
-    url =
-      uri +
-      `/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/?$top=${top}`
+    // TODO: error handling
+    top = res.error["@Message.ExtendedInfo"][0].MessageArgs[2].replace(")", "").split("-")[1]
+    url = uri + `/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries/?$top=${top}`
 
     res = await api_request(url, uri)
     return {
@@ -333,10 +316,7 @@ async function sm_systems(uri) {
       processorCount: res.data[0].ProcessorSummary.Count,
       processorCores: res.data[1].TotalCores,
       processorStatus: res.data[0].ProcessorSummary.Status.Health,
-      logicalProc:
-        res.data[1].TotalCores !== res.data[1].TotalThreads
-          ? "Enabled"
-          : "Disabled",
+      logicalProc: res.data[1].TotalCores !== res.data[1].TotalThreads ? "Enabled" : "Disabled",
       pxeDevice1: null,
       pxeDevice1Enabled: null,
       powerRecovery: null,
@@ -344,10 +324,7 @@ async function sm_systems(uri) {
   } else return res
 }
 async function sm_managers(uri) {
-  const urls = [
-    uri + "/redfish/v1/Managers/1",
-    uri + "/redfish/v1/Managers/1/EthernetInterfaces/1",
-  ]
+  const urls = [uri + "/redfish/v1/Managers/1", uri + "/redfish/v1/Managers/1/EthernetInterfaces/1"]
   let res = await api_request(urls, uri)
   if (res.status === "success") {
     return {
@@ -372,8 +349,7 @@ async function sm_gpu(uri) {
   if (res.status === "success") {
     let gpu_urls = res.data.Members.map((val) => {
       let url_arr = val["@odata.id"].split("/")
-      if (url_arr[6].substring(0, 3) === "GPU")
-        return uri + val["@odata.id"] + "/PCIeFunctions/1"
+      if (url_arr[6].substring(0, 3) === "GPU") return uri + val["@odata.id"] + "/PCIeFunctions/1"
     }).filter(Boolean)
 
     let gpu_res = await api_request(gpu_urls, uri)
@@ -450,10 +426,7 @@ async function hpe_systems(uri) {
       processorCount: res.data[0].ProcessorSummary.Count,
       processorCores: res.data[1].TotalCores,
       processorStatus: res.data[0].ProcessorSummary.Status.HealthRollUp,
-      logicalProc:
-        res.data[1].TotalCores !== res.data[1].Oem.Hp.CoresEnabled
-          ? "Enabled"
-          : "Disabled",
+      logicalProc: res.data[1].TotalCores !== res.data[1].Oem.Hp.CoresEnabled ? "Enabled" : "Disabled",
       pxeDevice1: null,
       pxeDevice1Enabled: null,
       powerRecovery: null,
@@ -462,10 +435,7 @@ async function hpe_systems(uri) {
 }
 
 async function hpe_managers(uri) {
-  const urls = [
-    uri + "/redfish/v1/Managers/1",
-    uri + "/redfish/v1/Managers/1/EthernetInterfaces",
-  ]
+  const urls = [uri + "/redfish/v1/Managers/1", uri + "/redfish/v1/Managers/1/EthernetInterfaces"]
   let res = await api_request(urls, uri)
 
   let active_int = res.data[1].Items.map((val) => {
