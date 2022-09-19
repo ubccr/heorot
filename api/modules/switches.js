@@ -558,8 +558,8 @@ const switchCalcs = (data, parseType) => {
       let activeRatio = (count.active * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
       return {
         status: "success",
-        totalOversubscription: totalRatio,
-        activeOversubscription: activeRatio,
+        totalOversubscription: totalRatio.toFixed(2),
+        activeOversubscription: activeRatio.toFixed(2),
         totalPorts: count.total,
         activePorts: count.active,
         fastestPort: count.fastestPort,
