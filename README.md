@@ -137,6 +137,33 @@ You can access the dev Web UI at https://_your_ip_here_
  tail -f /var/log/heorot.log
 ```
 
+## Grendel Tags:
+
+#### There are a few custom Grendel tags that can be added to customize the rack and node view shown in Heorot:
+
+- ["rack name"] ex: u22
+  - displays node in rack u22
+- 2u, 3u, 4u
+  - adds rowspan to rack view for larger nodes
+- 10u
+  - custom rack height for our core switch
+- dual
+  - renders node as a dual chassis, name must match cpn-x01-01-01 | regex: [a-z]{3}-[a-z][0-9]{2}-[0-9]{2}-0[1-2]
+- quad
+  - renders node as a quad chassis, removes 2u tag requirement, name must match cpn-x01-01-01 | regex: [a-z]{3}-[a-z][0-9]{2}-[0-9]{2}-0[1-2]
+- noAPI
+  - disables redfish API queries on node page
+- switch
+  - renders without border color & allows for switch queries:
+    - Dell_OS8, Dell_OS9, Dell_OS10
+      - uses different dell commands and output parsing for switch queries
+    - Dell_PC3
+      - specific for Dell PowerConnect switches like the PC6248, which has different commands
+    - Arista_EOS
+      - for our core switch | TODO: add non core switch EOS queries for older versions
+- pdu
+  - for PDUs, currently skips rendering them in the rack view | TODO: add power queries
+
 ## :memo: License
 
 This project released under the GPLv3 license . For more details, see the [LICENSE](LICENSE.md) file.
