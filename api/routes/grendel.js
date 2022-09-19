@@ -32,7 +32,12 @@ app.get("/host/tags/:tags", async (req, res) => {
 })
 
 app.post("/host", async (req, res) => {
-  res.json(await grendelRequest(`/v1/host`, "POST", req.body))
+  // IP address check:
+  let tmp = req.body.map((val) => {
+    return val.interfaces.every((iface) => iface.ip.match("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"))
+  })
+  if (tmp.every((val) => val)) res.json(await grendelRequest(`/v1/host`, "POST", req.body))
+  else res.json({ status: "error", message: "Interface IP address is invalid or missing" })
 })
 
 app.get("/delete/:nodeset", async (req, res) => {
@@ -144,7 +149,9 @@ app.get("/status/:value/:tags?", async (req, res) => {
 
   const status = spawn("grendel", args)
   let stdout = "",
-    stderr = ""
+    stderr = "",
+    error = ""
+
   status.stdout.on("data", (data) => {
     stdout += data
   })
@@ -152,6 +159,7 @@ app.get("/status/:value/:tags?", async (req, res) => {
     stderr += data
   })
   status.on("error", (err) => {
+    error = err
     res.json({
       status: "error",
       message: err,
