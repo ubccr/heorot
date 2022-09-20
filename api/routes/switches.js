@@ -1,9 +1,11 @@
 const express = require("express")
 const app = express.Router()
 const fs = require("fs")
+const Cache = require("../models/Cache")
 
 const { setCache, getCache, timeComp } = require("../modules/cache")
 const { getSwInfoV2 } = require("../modules/switches")
+const { grendelRequest } = require("../modules/grendel")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -48,6 +50,38 @@ const getSw = async (node) => {
 
   return res
 }
+
+app.get("/v1/refetchAll", async (req, res) => {
+  let grendelRes = await grendelRequest(`/v1/host/tags/switch`)
+
+  if (grendelRes.status === "success") {
+    let output = await Promise.all(grendelRes.result.map(async (val) => await getSw(val.name)))
+    let failed = output
+      .map((val) => {
+        if (val.status !== "success") return val.message
+      })
+      .filter(Boolean)
+
+    let status = failed.length > output.length ? "error" : "success"
+    let message = `Successfully updated ${output.length} switches, Failed to update ${failed.length} switches`
+
+    res.json({ status, message, result: output, failed })
+  } else res.json(grendelRes)
+})
+
+app.get("/v1/allSwitches", async (req, res) => {
+  let switchesQuery = await Cache.find({ node: /^swe/ })
+  if (switchesQuery !== null) {
+    let tmp = switchesQuery
+      .map((val) => {
+        if (val.cache.status !== "error")
+          return { node: val.node, status: val.cache.status, info: val.cache.info, result: val.cache.result[0] }
+      })
+      .filter(Boolean)
+
+    res.json({ status: "success", result: tmp })
+  } else res.json({ status: "error", message: "Failed to load cached switches from the DB", silent: true })
+})
 
 const readJsonFile = () => {
   try {

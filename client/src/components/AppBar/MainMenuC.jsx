@@ -1,7 +1,8 @@
-import IconButton from "@mui/material/IconButton"
-import MenuIcon from "@mui/icons-material/Menu"
 import { Menu, MenuItem } from "@mui/material"
+
+import IconButton from "@mui/material/IconButton"
 import { Link } from "react-router-dom"
+import MenuIcon from "@mui/icons-material/Menu"
 import { useState } from "react"
 
 const MainMenuC = ({ user, query }) => {
@@ -63,6 +64,9 @@ const MainMenuC = ({ user, query }) => {
           )}
         <MenuItem component={Link} to={"/Admin/ManageUsers"}>
           Manage Users
+        </MenuItem>
+        <MenuItem component={Link} to={"/Admin/ManageSwitches"}>
+          Manage Switches
         </MenuItem>
       </Menu>
     </>

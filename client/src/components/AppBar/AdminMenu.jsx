@@ -1,5 +1,6 @@
 import { Button, Menu, MenuItem } from "@mui/material"
 import React, { useState } from "react"
+
 import { Link } from "react-router-dom"
 
 const AdminMenu = ({ query }) => {
@@ -13,33 +14,20 @@ const AdminMenu = ({ query }) => {
   }
   return (
     <>
-      <Button
-        sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-        onClick={handleOpen}
-      >
+      <Button sx={{ my: 2, color: "white", textTransform: "capitalize" }} onClick={handleOpen}>
         Admin
       </Button>
-      <Menu
-        id="admin-menu"
-        anchorEl={anchorEl}
-        open={openMenu}
-        onClose={handleClose}
-      >
+      <Menu id="admin-menu" anchorEl={anchorEl} open={openMenu} onClose={handleClose}>
         {query.isFetched && !query.isError && query.data.warranty === true && (
-          <MenuItem
-            onClick={handleClose}
-            component={Link}
-            to={"/Admin/Warranty"}
-          >
+          <MenuItem onClick={handleClose} component={Link} to={"/Admin/Warranty"}>
             Warranty
           </MenuItem>
         )}
-        <MenuItem
-          onClick={handleClose}
-          component={Link}
-          to={"/Admin/ManageUsers"}
-        >
+        <MenuItem onClick={handleClose} component={Link} to={"/Admin/ManageUsers"}>
           Manage Users
+        </MenuItem>
+        <MenuItem onClick={handleClose} component={Link} to={"/Admin/ManageSwitches"}>
+          Manage Switches
         </MenuItem>
       </Menu>
     </>
