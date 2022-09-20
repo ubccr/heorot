@@ -9,17 +9,19 @@ import { useEffect, useState } from "react"
 import Alerts from "./routes/Alerts/Index"
 import AppBarC from "./components/AppBarC"
 import FloorPlan from "./routes/FloorPlan/FloorPlan"
+import FloorPlanV2 from "./routes/FloorPlan/Index"
 import Grendel from "./routes/Grendel/Index"
 import Home from "./routes/Home"
 import Login from "./routes/Auth/Login"
+import ManageSwitches from "./routes/Admin/ManageSwitches"
 import ManageUsers from "./routes/Admin/ManageUsers"
 import Node from "./routes/Node/Index"
+import { PluginContext } from "./contexts/PluginContext"
 import PrivateRoute from "./components/PrivateRoute"
 import Profile from "./routes/Profile/Profile"
 import Rack from "./routes/Rack/Rack"
 import Signup from "./routes/Auth/Signup"
 import { SnackbarProvider } from "notistack"
-// --- Components ---
 import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
 import Warranty from "./routes/Admin/Warranty"
@@ -40,6 +42,7 @@ function App() {
   })
 
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")))
+  const [plugins, setPlugins] = useState({})
 
   useEffect(() => {
     if (user !== null) {
@@ -58,6 +61,13 @@ function App() {
             setUser(null)
             setMode("light")
             localStorage.clear("user")
+          }
+        })
+      fetch(`${apiConfig.apiUrl}/plugins`)
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.status === "success") {
+            setPlugins(result)
           }
         })
     }
@@ -127,81 +137,99 @@ function App() {
           <SnackbarProvider maxSnack={3} autoHideDuration={7000}>
             <UserContext.Provider value={[user, setUser]}>
               <ThemeContext.Provider value={[mode, setMode]}>
-                <Paper
-                  sx={{
-                    bgcolor: "background.default",
-                    minHeight: "100vh",
-                    maxHeight: "max-content",
-                    backgroundImage: theme.palette.background.img,
-                  }}
-                >
-                  <AppBarC />
-                  <Container maxWidth="xl">
-                    <Routes>
-                      <Route exact path="/" element={<Home />} />
-                      <Route path="/Login" element={<Login />} />
-                      <Route path="/Signup" element={<Signup />} />
-                      <Route path="/Profile" element={<Profile />} />
+                <PluginContext.Provider value={[plugins, setPlugins]}>
+                  <Paper
+                    sx={{
+                      bgcolor: "background.default",
+                      minHeight: "100vh",
+                      maxHeight: "max-content",
+                      backgroundImage: theme.palette.background.img,
+                    }}
+                  >
+                    <AppBarC />
+                    <Container maxWidth="xl">
+                      <Routes>
+                        <Route exact path="/" element={<Home />} />
+                        <Route path="/Login" element={<Login />} />
+                        <Route path="/Signup" element={<Signup />} />
+                        <Route path="/Profile" element={<Profile />} />
 
-                      <Route
-                        path="/FloorPlan"
-                        element={
-                          <PrivateRoute access="user">
-                            <FloorPlan />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/Rack/:rack"
-                        element={
-                          <PrivateRoute access="user">
-                            <Rack />
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/Alerts"
-                        element={
-                          <PrivateRoute access="user">
-                            <Alerts />{" "}
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/Grendel"
-                        element={
-                          <PrivateRoute access="user">
-                            <Grendel />{" "}
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/Node/:node"
-                        element={
-                          <PrivateRoute access="user">
-                            <Node />{" "}
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/Admin/Warranty"
-                        element={
-                          <PrivateRoute access="admin">
-                            <Warranty />{" "}
-                          </PrivateRoute>
-                        }
-                      />
-                      <Route
-                        path="/Admin/ManageUsers"
-                        element={
-                          <PrivateRoute access="admin">
-                            <ManageUsers />{" "}
-                          </PrivateRoute>
-                        }
-                      />
-                    </Routes>
-                  </Container>
-                </Paper>
+                        <Route
+                          path="/FloorPlan"
+                          element={
+                            <PrivateRoute access="user">
+                              <FloorPlan />
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/FloorPlanV2"
+                          element={
+                            <PrivateRoute access="user">
+                              <FloorPlanV2 />
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Rack/:rack"
+                          element={
+                            <PrivateRoute access="user">
+                              <Rack />
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Alerts"
+                          element={
+                            <PrivateRoute access="user">
+                              <Alerts />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Grendel"
+                          element={
+                            <PrivateRoute access="user">
+                              <Grendel />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Node/:node"
+                          element={
+                            <PrivateRoute access="user">
+                              <Node />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Admin/Warranty"
+                          element={
+                            <PrivateRoute access="admin">
+                              <Warranty />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Admin/ManageUsers"
+                          element={
+                            <PrivateRoute access="admin">
+                              <ManageUsers />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Admin/ManageSwitches"
+                          element={
+                            <PrivateRoute access="admin">
+                              <ManageSwitches />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                      </Routes>
+                    </Container>
+                  </Paper>
+                </PluginContext.Provider>
               </ThemeContext.Provider>
             </UserContext.Provider>
           </SnackbarProvider>

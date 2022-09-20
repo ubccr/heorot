@@ -55,12 +55,14 @@ app.get("/plugins", async function (req, res) {
   if (config.auth.WARRANTY_API_ID !== "") warranty = true
   if (config.ome.url !== "") ome = true
   if (config.bmc.DELL_USER !== "") bmc = true
+  let floorplan = config.floorplan
 
   res.json({
     status: "success",
-    warranty: warranty,
-    ome: ome,
-    bmc: bmc,
+    warranty,
+    ome,
+    bmc,
+    floorplan,
   })
 })
 
