@@ -554,8 +554,12 @@ const switchCalcs = (data, parseType) => {
           }
         })
       }
-      let totalRatio = (count.total * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
-      let activeRatio = (count.active * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
+      let totalRatio = 0
+      let activeRatio = 0
+      if (count.uplinkCount > 0 && count.total > 0 && count.active > 0) {
+        totalRatio = (count.total * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
+        activeRatio = (count.active * count.fastestPort) / (count.uplinkCount * count.uplinkSpeed)
+      }
       return {
         status: "success",
         totalOversubscription: totalRatio.toFixed(2),
