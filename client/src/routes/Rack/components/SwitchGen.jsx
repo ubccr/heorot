@@ -26,6 +26,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
   const [refreshCache, setRefreshCache] = useState("false")
+
   const switchQuery = useQuery(
     ["switch", node, refreshCache],
     async ({ signal }) => {
@@ -234,17 +235,27 @@ const SwitchGen = ({ node, u, tags, height }) => {
                     let disabled = false
                     if (port.status === "down") disabled = true
                     let portArr = port.port.split("/")
+                    let link = port.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?")
 
                     return (
-                      <TableCell key={index} align="center">
+                      <TableCell key={index} align="center" sx={{ paddingLeft: "4px", paddingRight: "4px" }}>
                         <Tooltip
                           arrow
                           placement={!(index % 2) ? "top" : "bottom"}
                           title={<TooltipGen port={port} query={switchQuery} />}
                         >
                           <span>
-                            <Button variant="contained" color={color} disabled={disabled} size="small">
-                              {portArr[1]}
+                            <Button
+                              variant="contained"
+                              color={color}
+                              disabled={disabled}
+                              size="small"
+                              component={Link}
+                              to={`/Node/${link[0]}`}
+                              sx={{ textTransform: "lowercase", whiteSpace: "nowrap" }}
+                            >
+                              {/* {portArr[1]} */}
+                              {link[0]}
                             </Button>
                           </span>
                         </Tooltip>
@@ -354,9 +365,10 @@ const SwitchGen = ({ node, u, tags, height }) => {
                     let disabled = false
                     if (port.status === "down") disabled = true
                     let portArr = port.port.split("/")
+                    let link = port.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?")
 
                     return (
-                      <TableCell key={index} align="center">
+                      <TableCell key={index} align="center" sx={{ paddingLeft: "4px", paddingRight: "4px" }}>
                         <Tooltip
                           classes={{ tooltip: { maxWidth: 600 } }}
                           arrow
@@ -364,8 +376,17 @@ const SwitchGen = ({ node, u, tags, height }) => {
                           title={<TooltipGen port={port} query={switchQuery} />}
                         >
                           <span>
-                            <Button variant="contained" color={color} disabled={disabled} size="small">
-                              {portArr[1]}
+                            <Button
+                              variant="contained"
+                              color={color}
+                              disabled={disabled}
+                              size="small"
+                              component={Link}
+                              to={`/Node/${link[0]}`}
+                              sx={{ textTransform: "lowercase", whiteSpace: "nowrap" }}
+                            >
+                              {link[0]}
+                              {/* {portArr[1]} */}
                             </Button>
                           </span>
                         </Tooltip>
@@ -410,6 +431,8 @@ const SwitchGen = ({ node, u, tags, height }) => {
                   disabled={disabled}
                   sx={{ minWidth: "35px", width: "35px" }}
                   size="small"
+                  // component={Link}
+                  // to={`/Node/${nodeLink}`}
                 >
                   {val.port}
                 </Button>
