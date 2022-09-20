@@ -8,8 +8,7 @@ import { useEffect, useState } from "react"
 
 import Alerts from "./routes/Alerts/Index"
 import AppBarC from "./components/AppBarC"
-import FloorPlan from "./routes/FloorPlan/FloorPlan"
-import FloorPlanV2 from "./routes/FloorPlan/Index"
+import FloorPlan from "./routes/FloorPlan/Index"
 import Grendel from "./routes/Grendel/Index"
 import Home from "./routes/Home"
 import Login from "./routes/Auth/Login"
@@ -159,14 +158,6 @@ function App() {
                           element={
                             <PrivateRoute access="user">
                               <FloorPlan />
-                            </PrivateRoute>
-                          }
-                        />
-                        <Route
-                          path="/FloorPlanV2"
-                          element={
-                            <PrivateRoute access="user">
-                              <FloorPlanV2 />
                             </PrivateRoute>
                           }
                         />
