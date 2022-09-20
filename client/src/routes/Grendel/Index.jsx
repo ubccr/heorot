@@ -48,7 +48,7 @@ const Index = () => {
           <Tabs
             value={value}
             onChange={(e, newVal) => setValue(newVal)}
-            sx={{ border: 1, borderColor: "border.main", borderRadius: 2 }}
+            sx={{ border: 1, borderColor: "border.main", borderRadius: 2, boxShadow: 2 }}
           >
             <Tab label="Add Node" />
             <Tab label="Edit Nodes" />
