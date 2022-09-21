@@ -81,7 +81,9 @@ const Index = () => {
                 color="primary"
                 value={outputType}
                 exclusive
-                onChange={(e, val) => setOutputType(val)}
+                onChange={(e, val) => {
+                  if (val !== null) setOutputType(val)
+                }}
                 sx={{
                   boxShadow: 2,
                 }}
