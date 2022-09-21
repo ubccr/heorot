@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import MenuIcon from "@mui/icons-material/Menu"
 import { useState } from "react"
 
-const MainMenuC = ({ user, query }) => {
+const MainMenuC = ({ user, plugins }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const isMenuOpen = Boolean(anchorEl)
   const handleMenuOpen = (event) => {
@@ -45,7 +45,7 @@ const MainMenuC = ({ user, query }) => {
         <MenuItem component={Link} to={"/FloorPlan"}>
           Floor Plan
         </MenuItem>
-        {query.isFetched && !query.isError && query.data.ome === true && (
+        {plugins.status === "success" && plugins.ome === true && (
           <MenuItem component={Link} to={"/Alerts"}>
             Alerts
           </MenuItem>
@@ -53,15 +53,11 @@ const MainMenuC = ({ user, query }) => {
         <MenuItem component={Link} to={"/Grendel"}>
           Grendel
         </MenuItem>
-        {user !== null &&
-          user.privileges === "admin" &&
-          query.isFetched &&
-          !query.isError &&
-          query.data.warranty === true && (
-            <MenuItem component={Link} to={"/Admin/Warranty"}>
-              Warranty
-            </MenuItem>
-          )}
+        {user !== null && user.privileges === "admin" && plugins.status === "success" && plugins.warranty === true && (
+          <MenuItem component={Link} to={"/Admin/Warranty"}>
+            Warranty
+          </MenuItem>
+        )}
         <MenuItem component={Link} to={"/Admin/ManageUsers"}>
           Manage Users
         </MenuItem>

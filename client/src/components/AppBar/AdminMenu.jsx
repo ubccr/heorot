@@ -3,7 +3,7 @@ import React, { useState } from "react"
 
 import { Link } from "react-router-dom"
 
-const AdminMenu = ({ query }) => {
+const AdminMenu = ({ plugins }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const openMenu = Boolean(anchorEl)
   const handleOpen = (event) => {
@@ -18,7 +18,7 @@ const AdminMenu = ({ query }) => {
         Admin
       </Button>
       <Menu id="admin-menu" anchorEl={anchorEl} open={openMenu} onClose={handleClose}>
-        {query.isFetched && !query.isError && query.data.warranty === true && (
+        {plugins.status === "success" && plugins.warranty === true && (
           <MenuItem onClick={handleClose} component={Link} to={"/Admin/Warranty"}>
             Warranty
           </MenuItem>

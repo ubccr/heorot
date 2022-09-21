@@ -1,11 +1,4 @@
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Switch,
-  Toolbar,
-  Typography,
-} from "@mui/material"
+import { Button, Menu, MenuItem, Switch, Toolbar, Typography } from "@mui/material"
 import { useContext, useState } from "react"
 
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
@@ -16,20 +9,21 @@ import IconButton from "@mui/material/IconButton"
 import InfoOutlined from "@mui/icons-material/InfoOutlined"
 import { Link } from "react-router-dom"
 import MainMenuC from "./AppBar/MainMenuC"
+import { PluginContext } from "../contexts/PluginContext"
 import SearchC from "./AppBar/SearchC"
 import Status from "./Status"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
-import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const AppBarC = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [user, setUser] = useContext(UserContext)
-  // Theme switching
   const [mode, setMode] = useContext(ThemeContext)
+  const [plugins] = useContext(PluginContext)
+
   const modeToggle = (e) => {
     let newMode = "light"
     if (mode === "light") newMode = "dark"
@@ -54,23 +48,6 @@ const AppBarC = () => {
     }
   }
 
-  const query = useQuery(
-    ["plugins", user],
-    async ({ signal }) => {
-      let payload = {
-        headers: {
-          "x-access-token": user.accessToken,
-        },
-        signal,
-      }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/plugins`, payload)
-      ).json()
-      return res
-    },
-    { retry: 2, enabled: !!user }
-  )
-
   const [anchorEl, setAnchorEl] = useState(null)
   const [statusOpen, setStatusOpen] = useState(false)
   const isMenuOpen = Boolean(anchorEl)
@@ -93,12 +70,7 @@ const AppBarC = () => {
     <Box>
       <AppBar position="static" id="nav">
         <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
-          >
+          <Typography variant="h6" noWrap component="div" sx={{ mr: 2, display: { xs: "none", md: "flex" } }}>
             <Box
               sx={{
                 bgcolor: "background.main",
@@ -117,41 +89,23 @@ const AppBarC = () => {
             </Box>
           </Typography>
 
-          <MainMenuC user={user} query={query} />
+          <MainMenuC user={user} plugins={plugins} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Button
-              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-              component={Link}
-              to={"/"}
-            >
+            <Button sx={{ my: 2, color: "white", textTransform: "capitalize" }} component={Link} to={"/"}>
               Home
             </Button>
-            <Button
-              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-              component={Link}
-              to={"/FloorPlan"}
-            >
+            <Button sx={{ my: 2, color: "white", textTransform: "capitalize" }} component={Link} to={"/FloorPlan"}>
               Floor Plan
             </Button>
-            {query.isFetched && !query.isError && query.data.ome === true && (
-              <Button
-                sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-                component={Link}
-                to={"/Alerts"}
-              >
+            {plugins.status === "success" && plugins.ome === true && (
+              <Button sx={{ my: 2, color: "white", textTransform: "capitalize" }} component={Link} to={"/Alerts"}>
                 Alerts
               </Button>
             )}
-            <Button
-              sx={{ my: 2, color: "white", textTransform: "capitalize" }}
-              component={Link}
-              to={"/Grendel"}
-            >
+            <Button sx={{ my: 2, color: "white", textTransform: "capitalize" }} component={Link} to={"/Grendel"}>
               Grendel
             </Button>
-            {user !== null && user.privileges === "admin" && (
-              <AdminMenu query={query} />
-            )}
+            {user !== null && user.privileges === "admin" && <AdminMenu plugins={plugins} />}
           </Box>
 
           <Box sx={{ flexGrow: 1 }} />
@@ -194,12 +148,7 @@ const AppBarC = () => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem
-          onClick={handleMenuClose}
-          component={Link}
-          to={"/Profile"}
-          disabled
-        >
+        <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"} disabled>
           Profile
         </MenuItem>
         <MenuItem onClick={handleSignout}>Sign out</MenuItem>
