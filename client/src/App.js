@@ -102,6 +102,9 @@ function App() {
                 four: "#e53935",
               },
             },
+            floorplan: {
+              main: "#9e9e9e",
+            },
           }
         : {
             primary: {
@@ -125,6 +128,9 @@ function App() {
                 quad: "#2196f3",
                 four: "#e53935",
               },
+            },
+            floorplan: {
+              main: "#bdbdbd",
             },
           }),
     },
