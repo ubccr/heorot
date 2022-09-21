@@ -1,6 +1,9 @@
 import {
+  Avatar,
   Box,
+  Chip,
   Divider,
+  Grid,
   LinearProgress,
   Table,
   TableBody,
@@ -11,7 +14,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material"
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 
 import BgContainer from "../../components/BgContainer"
 import Header from "../../components/Header"
@@ -26,7 +29,18 @@ const Index = () => {
   const [plugins] = useContext(PluginContext)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
+
   const [outputType, setOutputType] = useState("rack")
+  const [colorType, setColorType] = useState("default")
+
+  useEffect(() => {
+    if (localStorage.getItem("floorPlanOutputType") !== null) setOutputType(localStorage.getItem("floorPlanOutputType"))
+    if (localStorage.getItem("floorPlanColorType") !== null) setColorType(localStorage.getItem("floorPlanColorType"))
+
+    // return () => {
+    //   second
+    // }
+  }, [user])
 
   const nodesQuery = useQuery(
     ["floorplanNodes"],
@@ -63,6 +77,15 @@ const Index = () => {
     { staleTime: 120000, cacheTime: 120000 }
   )
 
+  let legendProps = {
+    variant: "outlined",
+    size: "small",
+    sx: {
+      marginLeft: "4px",
+      marginRight: "4px",
+    },
+  }
+
   return (
     <>
       <Header header="Floor Plan" />
@@ -82,7 +105,10 @@ const Index = () => {
                 value={outputType}
                 exclusive
                 onChange={(e, val) => {
-                  if (val !== null) setOutputType(val)
+                  if (val !== null) {
+                    setOutputType(val)
+                    localStorage.setItem("floorPlanOutputType", val)
+                  }
                 }}
                 sx={{
                   boxShadow: 2,
@@ -92,8 +118,58 @@ const Index = () => {
                 <ToggleButton value="switchModel">Switch Model</ToggleButton>
                 <ToggleButton value="switchVersion">Switch Version</ToggleButton>
                 <ToggleButton value="switchRatio">Switch Ratios</ToggleButton>
+                <ToggleButton value="nodeCount">Node Count</ToggleButton>
+              </ToggleButtonGroup>
+              <ToggleButtonGroup
+                color="primary"
+                value={colorType}
+                exclusive
+                onChange={(e, val) => {
+                  if (val !== null) {
+                    setColorType(val)
+                    localStorage.setItem("floorPlanColorType", val)
+                  }
+                }}
+                sx={{
+                  boxShadow: 2,
+                }}
+              >
+                <ToggleButton value="default">Default</ToggleButton>
+                <ToggleButton value="colorful">Colorful</ToggleButton>
               </ToggleButtonGroup>
             </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignContent: "center",
+                marginBottom: "10px",
+              }}
+            >
+              {/* TODO: make more inclusive to other naming & datacenter designs */}
+              {colorType === "colorful" && outputType === "rack" && (
+                <>
+                  <Chip label="ubhpc" color="primary" {...legendProps} />
+                  <Chip label="faculty" color="success" {...legendProps} />
+                  <Chip label="mixed" color="error" {...legendProps} />
+                </>
+              )}
+              {colorType === "colorful" && outputType === "switchModel" && (
+                <>
+                  <Chip label="No Management Switch" color="primary" {...legendProps} />
+                  {/* <Chip label="faculty" color="success" /> */}
+                  <Chip label="Management Switch" color="error" {...legendProps} />
+                </>
+              )}
+              {colorType === "colorful" && outputType === "switchVersion" && (
+                <>
+                  <Chip label="OS 10" color="success" {...legendProps} />
+                  <Chip label="OS 9" color="warning" {...legendProps} />
+                  <Chip label="OS 8" color="error" {...legendProps} />
+                </>
+              )}
+            </Box>
+
             {nodesQuery.isFetching && <LinearProgress color="primary" />}
             <Divider sx={{ marginTop: "20px" }} />
             <TableContainer>
@@ -123,6 +199,7 @@ const Index = () => {
                           <Rack
                             rack={row + col}
                             outputType={outputType}
+                            colorType={colorType}
                             nodesQuery={nodesQuery}
                             switchQuery={switchQuery}
                           />
