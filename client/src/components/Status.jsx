@@ -1,13 +1,11 @@
 import {
-  Box,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   IconButton,
+  LinearProgress,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -40,7 +38,7 @@ const Status = ({ open, setOpen }) => {
       if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
-    { enabled: !!user }
+    { enabled: !!user && open }
   )
   return (
     <>
@@ -71,6 +69,7 @@ const Status = ({ open, setOpen }) => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
+          {query.isFetching && <LinearProgress color="primary" />}
           {query.isFetched && query.data.status === "success" && (
             <pre style={{ fontFamily: "Roboto Mono" }}>{query.data.result}</pre>
           )}
