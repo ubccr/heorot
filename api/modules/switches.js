@@ -403,7 +403,7 @@ const parseOldOutput = (data, command, parseType) => {
       ),
     }
   } else if (command.includes("bridge")) {
-    // OS8 show bridge address-table
+    // PC3 show bridge address-table
     let tmp = data.split("\r\n")
     let macAddressTable = tmp
       .map((val) => {
@@ -418,7 +418,9 @@ const parseOldOutput = (data, command, parseType) => {
             mac: val
               .match("[0-9A-Z]{4}.[0-9A-Z]{4}.[0-9A-Z]{4}")[0]
               .replace(/\./g, "")
-              .replace(/.{2}\B/g, "$&:"),
+              .replace(/.{2}\B/g, "$&:")
+              .toLowerCase(),
+            vlan: val.match(/^[0-9]{1,4}/g)[0],
           }
         }
       })
