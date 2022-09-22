@@ -70,7 +70,7 @@ const getSwInfoV2 = async (node) => {
     password: config.switches.pass,
     onKeyboardInteractive(name, instructions, instructionsLang, prompts, finish) {
       if (prompts.length > 0 && prompts[0].prompt.toLowerCase().includes("password")) {
-        finish([pass])
+        finish([config.switches.pass])
       }
     },
     algorithms: {
