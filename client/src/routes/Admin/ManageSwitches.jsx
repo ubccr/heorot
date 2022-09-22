@@ -64,8 +64,8 @@ const ManageSwitches = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {query.data.failed.map((val) => (
-                      <TableRow>
+                    {query.data.failed.map((val, index) => (
+                      <TableRow key={index}>
                         <TableCell align="center">{val}</TableCell>
                       </TableRow>
                     ))}
