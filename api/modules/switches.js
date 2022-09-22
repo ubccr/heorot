@@ -18,15 +18,11 @@ const getSwInfoV2 = async (node) => {
 
   // Switch version logic
   let parseType = ""
-  let user = config.switches.user
-  let pass = config.switches.pass
 
   let commands = ["show version", "show interfaces status", "show mac address-table"]
 
   if (grendel.tags.includes("Arista_EOS")) {
     parseType = "EOS"
-    user = config.switches.userEOS !== "" ? config.switches.userEOS : user
-    pass = config.switches.passEOS !== "" ? config.switches.passEOS : pass
     commands = ["show version | json", "show interfaces status | json", "show mac address-table | json"]
   } else if (grendel.tags.includes("Dell_OS10")) {
     commands = [
@@ -35,30 +31,22 @@ const getSwInfoV2 = async (node) => {
       "show mac address-table | display-xml",
     ]
     parseType = "OS10"
-    user = config.switches.userOS10 !== "" ? config.switches.userOS10 : user
-    pass = config.switches.passOS10 !== "" ? config.switches.passOS10 : pass
   } else if (grendel.tags.includes("Dell_OS9")) {
     // old query
     commands = ["show inventory", "show interface status | no-more", "show mac-address-table | no-more"]
     parseType = "OS9"
-    user = config.switches.userOS9 !== "" ? config.switches.userOS9 : user
-    pass = config.switches.passOS9 !== "" ? config.switches.passOS9 : pass
-    return oldSwInfo(commands, fqdn, user, pass, parseType)
+    return oldSwInfo(commands, fqdn, parseType)
   } else if (grendel.tags.includes("Dell_OS8")) {
     // old query
     commands = ["show inventory | no-more", "show interfaces status | no-more", "show mac-address-table | no-more"]
     parseType = "OS8"
-    user = config.switches.userOS8 !== "" ? config.switches.userOS8 : user
-    pass = config.switches.passOS8 !== "" ? config.switches.passOS8 : pass
-    return oldSwInfo(commands, fqdn, user, pass, parseType)
+    return oldSwInfo(commands, fqdn, parseType)
     // return { status: "error", message: "Dell OS8 switches are not supported" }
   } else if (grendel.tags.includes("Dell_PC3")) {
     // old query
     commands = ["show system", "show interfaces status", "enable", "show bridge address-table"]
     parseType = "PC3"
-    user = config.switches.userOS8 !== "" ? config.switches.userOS8 : user
-    pass = config.switches.passOS8 !== "" ? config.switches.passOS8 : pass
-    return oldSwInfo(commands, fqdn, user, pass, parseType)
+    return oldSwInfo(commands, fqdn, parseType)
   } else if (node.match("^swi")) {
     return {
       status: "error",
@@ -77,9 +65,9 @@ const getSwInfoV2 = async (node) => {
   let conn = new NodeSSH()
   let SSHConfig = {
     host: fqdn,
-    username: user,
+    username: config.switches.user,
     tryKeyboard: true,
-    password: pass,
+    password: config.switches.pass,
     onKeyboardInteractive(name, instructions, instructionsLang, prompts, finish) {
       if (prompts.length > 0 && prompts[0].prompt.toLowerCase().includes("password")) {
         finish([pass])
@@ -265,14 +253,14 @@ const parseOutputV2 = async (data, type) => {
   }
 }
 
-const oldSwInfo = async (commands, fqdn, user, pass, parseType) => {
+const oldSwInfo = async (commands, fqdn, parseType) => {
   try {
     const output = await new Promise((resolve, reject) => {
       let host = {
         server: {
           host: fqdn,
-          userName: user,
-          password: pass,
+          userName: config.switches.user,
+          password: config.switches.pass,
           algorithms: {
             kex: [
               "curve25519-sha256",
