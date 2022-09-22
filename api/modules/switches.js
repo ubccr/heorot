@@ -502,7 +502,7 @@ const parseOldOutput = (data, command, parseType) => {
             port: port,
             mac: val[1].trim(),
             type: val[2].trim(),
-            vlanId: val[0].trim(),
+            vlan: val[0].trim(),
             state: val[4].trim(),
           }
         }
