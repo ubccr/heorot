@@ -69,6 +69,7 @@ const getSwInfoV2 = async (node) => {
     return {
       status: "error",
       message: `Could not determine ${node}'s OS version, please add the appropriate grendel tag entry`,
+      silent: true,
     }
   }
 
