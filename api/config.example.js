@@ -5,6 +5,7 @@ config.origin = "https://localhost:443" // If using separate API & Client change
 config.port = 443 // API port
 
 // Keys - see readme in keys api/keys dir
+// Console redirection can now be used with password based auth
 config.keys = {
   bmcKey: "./keys/bmc.key",
   serverKey: "./keys/server.key",
@@ -51,12 +52,41 @@ config.ome = {
 }
 
 // Grendel pxe firmware list | changes the firmware options shown in lists
-config.firmware = [
-  "ipxe.pxe",
-  "ipxe-i386.efi",
-  "ipxe-x86_64.efi",
-  "snponly-x86_64.efi",
-  "undionly.kpxe",
-]
+config.firmware = ["ipxe.pxe", "ipxe-i386.efi", "ipxe-x86_64.efi", "snponly-x86_64.efi", "undionly.kpxe"]
+
+// Switch login information for switch queries | Should be a user with privileges to run ex: show mac address-table, show interfaces status, show ivnentory
+// Switches will need proper tags | see readme.MD -> Grendel Tags
+config.switches = {
+  user: "",
+  password: "",
+}
+
+// Floorplan loyout modification | allows you to add or remove rows / columns
+config.floorplan = {
+  floorX: [..."defghijklmnopqrstuvw"],
+  floorY: [
+    "28",
+    "27",
+    "26",
+    "25",
+    "24",
+    "23",
+    "22",
+    "21",
+    "17",
+    "16",
+    "15",
+    "14",
+    "13",
+    "12",
+    "11",
+    "10",
+    "09",
+    "08",
+    "07",
+    "06",
+    "05",
+  ],
+}
 
 module.exports = config
