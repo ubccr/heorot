@@ -52,7 +52,7 @@ const Index = () => {
           >
             <Tab label="Add Node" />
             <Tab label="Edit Nodes" />
-            <Tab label="Bulk Import Nodes" />
+            <Tab label="Bulk Import" />
           </Tabs>
         </Box>
         <Divider sx={{ marginBottom: "15px" }} />
