@@ -174,7 +174,7 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
       setColor("primary")
       setPopulatedRack(false)
     }
-  }, [populatedRack])
+  }, [populatedRack, outputType, colorType])
 
   return (
     <>
