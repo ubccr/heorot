@@ -1,6 +1,7 @@
 import { Box, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
+import BgContainer from "../../components/BgContainer.jsx"
 import Body from "./Body.jsx"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
@@ -28,21 +29,8 @@ const Rack = () => {
   }, [rack])
 
   return (
-    <Box
-      sx={{
-        border: 1,
-        borderColor: "primary.main",
-        boxShadow: 12,
-        bgcolor: "background.main",
-        color: "text.primary",
-      }}
-    >
-      <TableContainer
-        sx={{
-          maxHeight: "calc(100vh - 95.5px)",
-          // overflowX: "hidden",
-        }}
-      >
+    <BgContainer>
+      <TableContainer>
         {isRackLoading && <LinearProgress />}
         {!isRackLoading && (
           <Table>
@@ -60,7 +48,7 @@ const Rack = () => {
           </Table>
         )}
       </TableContainer>
-    </Box>
+    </BgContainer>
   )
 }
 
