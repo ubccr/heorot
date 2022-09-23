@@ -1,5 +1,6 @@
-import { TextField, Autocomplete, CircularProgress, Box } from "@mui/material"
+import { Autocomplete, Box, CircularProgress, TextField } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
+
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
 import { useNavigate } from "react-router-dom"
@@ -9,7 +10,7 @@ const SearchC = ({ action, setOutput }) => {
   const [open, setOpen] = useState(false)
   const [options, setOptions] = useState([])
   const loading = open && options.length === 0
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -27,9 +28,7 @@ const SearchC = ({ action, setOutput }) => {
         },
         allowUnauthorized: true,
       }
-      let query = await (
-        await fetch(`${apiConfig.apiUrl}/grendel/host/list`, payload)
-      ).json()
+      let query = await (await fetch(`${apiConfig.apiUrl}/grendel/host/list`, payload)).json()
       if (query.status === "success" && active) {
         let nodes = []
         query.result.forEach((element) => {
@@ -84,8 +83,8 @@ const SearchC = ({ action, setOutput }) => {
         loading={loading}
         clearOnBlur={true}
         onChange={(event, value) => {
-          if (action == "value") {
-            if (value == null) setOutput("")
+          if (action === "value") {
+            if (value === null) setOutput("")
             else setOutput(value.name)
           } else if (value !== null) {
             navigate(`/Node/${value.name}`)
@@ -99,13 +98,7 @@ const SearchC = ({ action, setOutput }) => {
               ...params.InputProps,
               endAdornment: (
                 <>
-                  {loading ? (
-                    <CircularProgress
-                      color="inherit"
-                      size={20}
-                      sx={{ marginRight: 4 }}
-                    />
-                  ) : null}
+                  {loading ? <CircularProgress color="inherit" size={20} sx={{ marginRight: 4 }} /> : null}
                   {params.InputProps.endAdornment}
                 </>
               ),

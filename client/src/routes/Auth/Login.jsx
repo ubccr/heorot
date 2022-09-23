@@ -1,8 +1,9 @@
+import { useContext, useEffect, useState } from "react"
+
 import AuthForm from "./AuthForm"
-import { useState, useEffect, useContext } from "react"
-import { signin } from "../../modules/Auth"
 import { ThemeContext } from "../../contexts/ThemeContext"
 import { UserContext } from "../../contexts/UserContext"
+import { signin } from "../../modules/Auth"
 import { useNavigate } from "react-router-dom"
 import { useSnackbar } from "notistack"
 
@@ -19,16 +20,19 @@ const Login = () => {
   const { enqueueSnackbar } = useSnackbar()
   const navigate = useNavigate()
 
-  useEffect(async () => {
-    if (submit !== undefined && submit.password !== "") {
-      let response = await signin(submit.username, submit.password)
-      if (response.status === "success") {
-        setMode(response.theme)
-        setUser(response)
-        navigate(-1)
+  useEffect(() => {
+    const data = async () => {
+      if (submit !== undefined && submit.password !== "") {
+        let response = await signin(submit.username, submit.password)
+        if (response.status === "success") {
+          setMode(response.theme)
+          setUser(response)
+          navigate(-1)
+        }
+        enqueueSnackbar(response.message, { variant: response.status })
       }
-      enqueueSnackbar(response.message, { variant: response.status })
     }
+    data()
   }, [submit])
   return <AuthForm form={form} setSubmit={setSubmit} />
 }

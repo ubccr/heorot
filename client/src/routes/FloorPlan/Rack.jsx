@@ -1,5 +1,5 @@
-import { Badge, Button, Chip, Tooltip } from "@mui/material"
-import React, { useContext, useEffect, useState } from "react"
+import { Button, Tooltip } from "@mui/material"
+import React, { useEffect, useState } from "react"
 
 import { Link } from "react-router-dom"
 
@@ -56,20 +56,26 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
           let dup = swVersion.reduce((count, current) => ((count[current] = count[current] + 1 || 1), count), {})
 
           setSwitchVersions(
-            Object.keys(dup).map((val) => {
-              let count = dup[val] > 1 ? `(${dup[val]})` : ""
-              if (val !== "undefined") return `${count}${val}\n`
-            })
+            Object.keys(dup)
+              .map((val) => {
+                let count = dup[val] > 1 ? `(${dup[val]})` : ""
+                if (val !== "undefined") return `${count}${val}\n`
+                return null
+              })
+              .filter(Boolean)
           )
         } else setSwitchVersions(rack)
         if (swRatio.length > 0) {
           let dup = swRatio.reduce((count, current) => ((count[current] = count[current] + 1 || 1), count), {})
 
           setSwitchRatio(
-            Object.keys(dup).map((val) => {
-              let count = dup[val] > 1 ? `(${dup[val]})` : ""
-              if (val !== "undefined") return `${count}${val}\n`
-            })
+            Object.keys(dup)
+              .map((val) => {
+                let count = dup[val] > 1 ? `(${dup[val]})` : ""
+                if (val !== "undefined") return `${count}${val}\n`
+                return null
+              })
+              .filter(Boolean)
           )
         } else setSwitchRatio(rack)
 
@@ -80,6 +86,7 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
               if (!val.name.match("^pdu")) count++
               return val
             }
+            return null
           })
           .filter(Boolean)
         setNodeCount(count)
@@ -89,11 +96,12 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
           .map((val) => {
             if (val.tags !== null && val.tags.includes("ubhpc")) return "ubhpc"
             else if (val.tags !== null && val.tags.includes("faculty")) return "faculty"
+            return null
           })
           .filter(Boolean)
         if (allTags.length > 2) {
           let tmp = allTags.sort().filter((item, pos, arr) => {
-            return !pos || item != arr[pos - 1]
+            return !pos || item !== arr[pos - 1]
           })
           if (tmp.length > 1) setRackPartition("mixed")
           else if (tmp.length === 1) setRackPartition(tmp[0])
@@ -156,6 +164,8 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
           setTooltipOutput(rack)
           setColor("primary")
           break
+        default:
+          break
       }
     }
 
@@ -164,7 +174,7 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
       setColor("primary")
       setPopulatedRack(false)
     }
-  }, [populatedRack, outputType, colorType])
+  }, [populatedRack])
 
   return (
     <>

@@ -20,6 +20,8 @@ function toNum(role) {
       return 1
     case "none":
       return 0
+    default:
+      break
   }
   return 0
 }

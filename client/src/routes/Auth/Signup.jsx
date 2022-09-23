@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react"
+
 import AuthForm from "./AuthForm"
-import { useState, useEffect } from "react"
 import { signup } from "../../modules/Auth"
 import { useSnackbar } from "notistack"
 
@@ -13,11 +14,14 @@ const Signup = () => {
   }
   const [submit, setSubmit] = useState()
 
-  useEffect(async () => {
-    if (submit !== undefined) {
-      let response = await signup(submit.username, submit.password)
-      enqueueSnackbar(response.message, { variant: response.status })
+  useEffect(() => {
+    const data = async () => {
+      if (submit !== undefined) {
+        let response = await signup(submit.username, submit.password)
+        enqueueSnackbar(response.message, { variant: response.status })
+      }
     }
+    data()
   }, [submit])
   return <AuthForm form={form} setSubmit={setSubmit} />
 }

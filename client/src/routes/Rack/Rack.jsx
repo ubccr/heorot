@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom"
 
 const Rack = () => {
   const { rack } = useParams()
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
 
   const [isRackLoading, setIsRackLoading] = useState(true)
   const [rows, setRows] = useState()

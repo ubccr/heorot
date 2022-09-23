@@ -1,8 +1,4 @@
-import {
-  CheckBoxOutlined,
-  WarningAmberOutlined,
-  ReportOutlined,
-} from "@mui/icons-material/"
+import { CheckBoxOutlined, ReportOutlined, WarningAmberOutlined } from "@mui/icons-material/"
 
 const IconC = ({ icon }) => {
   let res = ""
@@ -15,6 +11,8 @@ const IconC = ({ icon }) => {
       break
     case "Critical":
       res = <ReportOutlined sx={{ color: "#c62828" }} />
+      break
+    default:
       break
   }
   return res

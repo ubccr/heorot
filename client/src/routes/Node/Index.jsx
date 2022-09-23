@@ -1,10 +1,9 @@
-import { Box, Button, Grid, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
 import Actions from "./components/Actions"
 import BootImage from "./grendel/BootImage"
 import Console from "./redfish/Console"
-import CoreSwitch from "./components/CoreSwitch"
 import Firmware from "./grendel/Firmware"
 import Interfaces from "./grendel/Interfaces"
 import NewGridC from "./components/NewGridC"
@@ -21,11 +20,10 @@ import { useSnackbar } from "notistack"
 const Index = () => {
   const { node } = useParams()
   const [simple, setSimple] = useState(false)
-  const [coreSw, setCoreSw] = useState(false)
   const [apiData, setApiData] = useState()
   const [refetch, setRefetch] = useState(false)
   const [BMC, setBMC] = useState("")
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
 
   const [loading, setLoading] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
@@ -52,8 +50,6 @@ const Index = () => {
             if (val.fqdn.substring(0, 3) === "bmc") setBMC(val.fqdn)
           })
           if (response.bmc === false) setSimple(true)
-          if (data.tags.includes("core-switch")) setCoreSw(true)
-          else setCoreSw(false)
 
           setApiData(data)
           setLoading(false)
@@ -108,7 +104,6 @@ const Index = () => {
           </NewGridC>
 
           {node.substring(0, 3) === "swe" && <Switches node={node} />}
-          {/* {coreSw && <CoreSwitch node={node} />} */}
 
           {!simple && (
             <>

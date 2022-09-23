@@ -1,23 +1,15 @@
-import { useState, useEffect, useContext } from "react"
-import {
-  Typography,
-  TextareaAutosize,
-  FormGroup,
-  Button,
-  Grid,
-  Box,
-  TextField,
-} from "@mui/material"
-import SearchC from "../../components/AppBar/SearchC"
-import { useSnackbar } from "notistack"
+import { Box, Button, FormGroup, TextField, Typography } from "@mui/material"
+import { useContext, useEffect, useState } from "react"
 
+import SearchC from "../../components/AppBar/SearchC"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useSnackbar } from "notistack"
 
 const EditJson = () => {
   const [editNode, setEditNode] = useState("")
   const [nodeJson, setNodeJson] = useState("")
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -30,15 +22,11 @@ const EditJson = () => {
       fetch(`${apiConfig.apiUrl}/grendel/host/find/${editNode}`, payload)
         .then((res) => res.json())
         .then((result) => {
-          if (result.status === "success")
-            setNodeJson(JSON.stringify(result.result, null, 4))
+          if (result.status === "success") setNodeJson(JSON.stringify(result.result, null, 4))
           else if (result.status === "error")
-            enqueueSnackbar(
-              `Failed to fetch node. Response: ${result.result.message}`,
-              {
-                variant: "error",
-              }
-            )
+            enqueueSnackbar(`Failed to fetch node. Response: ${result.result.message}`, {
+              variant: "error",
+            })
         })
     } else setNodeJson("")
     return () => {
@@ -65,12 +53,9 @@ const EditJson = () => {
               variant: "success",
             })
           } else if (result.status === "error")
-            enqueueSnackbar(
-              `Failed to edit node. Response: ${result.result.message}`,
-              {
-                variant: "error",
-              }
-            )
+            enqueueSnackbar(`Failed to edit node. Response: ${result.result.message}`, {
+              variant: "error",
+            })
         })
     } catch (e) {
       enqueueSnackbar(`Error in JSON syntax: ${e}`, { variant: "error" })
@@ -88,12 +73,7 @@ const EditJson = () => {
         }}
       >
         <SearchC action="value" setOutput={setEditNode} />
-        <Button
-          variant="outlined"
-          sx={{ height: "36.5px" }}
-          disabled={!editNode}
-          onClick={handleJson}
-        >
+        <Button variant="outlined" sx={{ height: "36.5px" }} disabled={!editNode} onClick={handleJson}>
           Submit
         </Button>
       </Box>

@@ -1,22 +1,23 @@
 import {
   Box,
+  Button,
   Checkbox,
-  MenuItem,
-  Select,
   FormControl,
   InputLabel,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Button,
 } from "@mui/material"
-import React from "react"
+import { useContext, useState } from "react"
+
 import BgContainer from "../../components/BgContainer"
 import Header from "../../components/Header"
-import { useState, useContext } from "react"
+import React from "react"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
 import { useQuery } from "react-query"
@@ -25,7 +26,7 @@ import { useSnackbar } from "notistack"
 const ManageUsers = () => {
   const [checked, setChecked] = useState([])
   const [action, setAction] = useState("")
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
   const query = useQuery(["users"], async ({ signal }) => {
@@ -35,17 +36,13 @@ const ManageUsers = () => {
       },
       signal,
     }
-    const res = await (
-      await fetch(`${apiConfig.apiUrl}/auth/users`, payload)
-    ).json()
+    const res = await (await fetch(`${apiConfig.apiUrl}/auth/users`, payload)).json()
     return res
   })
 
   const handleChange = (event) => {
-    if (event.target.checked === true)
-      setChecked([...checked, event.target.value])
-    else if (event.target.checked === false)
-      setChecked(checked.filter((e) => e !== event.target.value))
+    if (event.target.checked === true) setChecked([...checked, event.target.value])
+    else if (event.target.checked === false) setChecked(checked.filter((e) => e !== event.target.value))
   }
   const handleUsername = (row) => {
     if (row.username === user.username) return true
@@ -102,16 +99,10 @@ const ManageUsers = () => {
                 query.data.result.map((row) => (
                   <TableRow key={row.username}>
                     <TableCell>{row.username}</TableCell>
-                    <TableCell>
-                      {new Date(row.createdAt).toLocaleString()}
-                    </TableCell>
+                    <TableCell>{new Date(row.createdAt).toLocaleString()}</TableCell>
                     <TableCell>{row.privileges}</TableCell>
                     <TableCell>
-                      <Checkbox
-                        onChange={handleChange}
-                        value={row.username}
-                        disabled={handleUsername(row)}
-                      />
+                      <Checkbox onChange={handleChange} value={row.username} disabled={handleUsername(row)} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -121,12 +112,7 @@ const ManageUsers = () => {
         <Box sx={{ display: "inline-flex", marginTop: "20px" }}>
           <FormControl fullWidth sx={{ minWidth: 120, marginRight: "15px" }}>
             <InputLabel id="select-label">Action</InputLabel>
-            <Select
-              labelId="select-label"
-              value={action}
-              label="action"
-              onChange={handleSelectChange}
-            >
+            <Select labelId="select-label" value={action} label="action" onChange={handleSelectChange}>
               <MenuItem value={"null"}>Disable</MenuItem>
               <MenuItem value={"user"}>Set User</MenuItem>
               <MenuItem value={"admin"}>Set Admin</MenuItem>

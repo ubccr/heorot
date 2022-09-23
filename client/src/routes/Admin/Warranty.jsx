@@ -1,24 +1,17 @@
-import {
-  Box,
-  Button,
-  FormGroup,
-  LinearProgress,
-  TextField,
-  Typography,
-} from "@mui/material"
-import { useQuery } from "react-query"
+import { Box, Button, FormGroup, LinearProgress, TextField, Typography } from "@mui/material"
+import { useContext, useState } from "react"
 
-import Header from "../../components/Header"
 import BgContainer from "../../components/BgContainer"
-import { useState, useContext } from "react"
-import { useSnackbar } from "notistack"
+import Header from "../../components/Header"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 
 const Warranty = () => {
   const [tags, setTags] = useState("")
   const { enqueueSnackbar } = useSnackbar()
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
 
   const query = useQuery(["warranty", tags], queryFunction, {
     enabled: !!tags,
@@ -36,9 +29,7 @@ const Warranty = () => {
         "x-access-token": user.accessToken,
       },
     }
-    const res = await (
-      await fetch(`${apiConfig.apiUrl}/warranty/add/${queryKey[1]}`, payload)
-    ).json()
+    const res = await (await fetch(`${apiConfig.apiUrl}/warranty/add/${queryKey[1]}`, payload)).json()
     enqueueSnackbar(res.message, { variant: res.color })
     return res
   }

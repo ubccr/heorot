@@ -1,9 +1,7 @@
 import {
-  Avatar,
   Box,
   Chip,
   Divider,
-  Grid,
   LinearProgress,
   Table,
   TableBody,
@@ -36,10 +34,6 @@ const Index = () => {
   useEffect(() => {
     if (localStorage.getItem("floorPlanOutputType") !== null) setOutputType(localStorage.getItem("floorPlanOutputType"))
     if (localStorage.getItem("floorPlanColorType") !== null) setColorType(localStorage.getItem("floorPlanColorType"))
-
-    // return () => {
-    //   second
-    // }
   }, [user])
 
   const nodesQuery = useQuery(

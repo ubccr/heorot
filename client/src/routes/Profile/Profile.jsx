@@ -1,9 +1,9 @@
-import { Typography, Container } from "@mui/material"
-import { UserContext } from "../../contexts/UserContext"
-import { useEffect, useState, useContext } from "react"
+import { Container, Typography } from "@mui/material"
+// import { UserContext } from "../../contexts/UserContext"
+// import { useEffect, useState, useContext } from "react"
 
 const Profile = () => {
-  const [user, setUser] = useContext(UserContext)
+  // const [user, setUser] = useContext(UserContext)
   return (
     <>
       <Container style={{ textAlign: "center" }}>

@@ -1,25 +1,18 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Button,
-  Chip,
-  TextField,
-} from "@mui/material"
-import { Box } from "@mui/system"
-import { useState, useContext, useEffect } from "react"
-import { useSnackbar } from "notistack"
+import { Accordion, AccordionDetails, AccordionSummary, Button, Chip, TextField } from "@mui/material"
+import { useContext, useEffect, useState } from "react"
 
-import NewGridC from "../components/NewGridC"
+import { Box } from "@mui/system"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import NewGridC from "../components/NewGridC"
 import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
+import { useSnackbar } from "notistack"
 
 const Tags = ({ node, data, refetch, setRefetch }) => {
   const { enqueueSnackbar } = useSnackbar()
   const [tags, setTags] = useState(data)
   const [addTag, setAddTag] = useState("")
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
 
   useEffect(() => {
     setTags(data)
@@ -74,14 +67,7 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
           enqueueSnackbar(method + "ed: [" + response.result.tags + "] ", {
             variant: "success",
           })
-        else
-          enqueueSnackbar(
-            method +
-              " tags error. Response: " +
-              response.response.message +
-              " ",
-            { variant: "error" }
-          )
+        else enqueueSnackbar(method + " tags error. Response: " + response.response.message + " ", { variant: "error" })
       }
     }
   }
@@ -121,25 +107,13 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
               value={addTag}
               sx={{ margin: "5px" }}
             />
-            <Button
-              variant="outlined"
-              sx={{ margin: "5px" }}
-              onClick={handleAddTag}
-            >
+            <Button variant="outlined" sx={{ margin: "5px" }} onClick={handleAddTag}>
               Add
             </Button>
-            <Button
-              variant="outlined"
-              sx={{ margin: "5px" }}
-              onClick={handleReset}
-            >
+            <Button variant="outlined" sx={{ margin: "5px" }} onClick={handleReset}>
               Reset
             </Button>
-            <Button
-              variant="outlined"
-              sx={{ margin: "5px" }}
-              onClick={handleSubmit}
-            >
+            <Button variant="outlined" sx={{ margin: "5px" }} onClick={handleSubmit}>
               Submit
             </Button>
           </AccordionDetails>
