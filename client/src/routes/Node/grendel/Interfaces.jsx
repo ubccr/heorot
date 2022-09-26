@@ -1,4 +1,5 @@
-import { Divider, Grid, Typography } from "@mui/material"
+import { Divider, Grid, TextField, Typography } from "@mui/material"
+
 import React from "react"
 
 const Interfaces = ({ data }) => {
@@ -40,10 +41,10 @@ const Interfaces = ({ data }) => {
                     {name}
                   </Typography>
                 </Grid>
-                <Grid xs item>
+                <Grid xs={2} item>
                   FQDN:
                 </Grid>
-                <Grid xs item sx={{ textAlign: "end" }}>
+                <Grid xs={10} item sx={{ textAlign: "end" }}>
                   {name !== "BMC:" && val.fqdn}
                   {name === "BMC:" && (
                     <a target="_blank" href={`https://${val.fqdn}`}>
@@ -51,18 +52,14 @@ const Interfaces = ({ data }) => {
                     </a>
                   )}
                 </Grid>
-                <Divider
-                  sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }}
-                />
+                <Divider sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }} />
                 <Grid xs={6} item>
                   IP:
                 </Grid>
                 <Grid xs={6} item sx={{ textAlign: "end" }}>
                   {val.ip}
                 </Grid>
-                <Divider
-                  sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }}
-                />
+                <Divider sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }} />
                 <Grid xs={6} item>
                   MAC:
                 </Grid>
