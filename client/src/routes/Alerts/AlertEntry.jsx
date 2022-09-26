@@ -21,11 +21,8 @@ const AlertEntry = ({ data }) => {
       },
       signal,
     }
-    const res = await (
-      await fetch(`${apiConfig.apiUrl}/openmanage/health/${id}`, payload)
-    ).json()
-    if (res.status === "error")
-      enqueueSnackbar(res.message, { variant: res.status })
+    const res = await (await fetch(`${apiConfig.apiUrl}/openmanage/health/${id}`, payload)).json()
+    if (res.status === "error") enqueueSnackbar(res.message, { variant: res.status })
     return res
   })
 
@@ -33,8 +30,7 @@ const AlertEntry = ({ data }) => {
   if (data.status === 3000) statusColor = "#ff9800"
   else if (data.status === 4000) statusColor = "#f44336"
 
-  if (data.deviceName.length >= 32)
-    data.deviceName = data.deviceName.split(".")[0]
+  data.deviceName = data.deviceName.split(".")[0]
 
   return (
     <TableRow>
@@ -52,33 +48,16 @@ const AlertEntry = ({ data }) => {
           </TableCell>
           <TableCell>{data.serviceTag}</TableCell>
 
-          <SELCustom
-            data={result.data.result}
-            node={data.deviceName}
-            type="SEL/Misc"
-            icon="bi-journal-text"
-          />
+          <SELCustom data={result.data.result} node={data.deviceName} type="SEL/Misc" icon="bi-journal-text" />
           <NodeCellC data={result.data.result} type="Processor" icon="bi-cpu" />
 
           <NodeCellC data={result.data.result} type="Memory" icon="bi-memory" />
 
           <NodeCellC data={result.data.result} type="Fan" icon="bi-fan" />
 
-          <NodeCellC
-            data={result.data.result}
-            type="Storage"
-            icon="bi-device-hdd"
-          />
-          <NodeCellC
-            data={result.data.result}
-            type="Temperature"
-            icon="bi-thermometer-half"
-          />
-          <NodeCellC
-            data={result.data.result}
-            type="Battery"
-            icon="bi-battery-half"
-          />
+          <NodeCellC data={result.data.result} type="Storage" icon="bi-device-hdd" />
+          <NodeCellC data={result.data.result} type="Temperature" icon="bi-thermometer-half" />
+          <NodeCellC data={result.data.result} type="Battery" icon="bi-battery-half" />
         </>
       )}
     </TableRow>
