@@ -1,4 +1,4 @@
-import { Box, Button, FormGroup, TextField, Typography } from "@mui/material"
+import { Box, Button, FormGroup, Grid, TextField, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
 import SearchC from "../../../components/AppBar/SearchC"
@@ -66,27 +66,35 @@ const EditJson = () => {
       <Typography variant="h2" sx={{ fontSize: "16pt", marginTop: "20px" }}>
         Edit JSON:
       </Typography>
-      <Box
-        sx={{
-          display: "inline-flex",
-          alignItems: "center",
-        }}
-      >
-        <SearchC action="value" setOutput={setEditNode} />
-        <Button variant="outlined" sx={{ height: "36.5px" }} disabled={!editNode} onClick={handleJson}>
-          Submit
-        </Button>
-      </Box>
-      <FormGroup>
-        <TextField
-          value={nodeJson}
-          multiline
-          onChange={(e) => {
-            setNodeJson(e.target.value)
+      <Grid container spacing={2}>
+        <Grid
+          item
+          xs={6}
+          sx={{
+            padding: "10px",
+            display: "inline-flex",
+            alignItems: "center",
           }}
-          sx={{ margin: "10px" }}
-        />
-      </FormGroup>
+        >
+          <SearchC action="value" setOutput={setEditNode} />
+          <Button variant="outlined" disabled={!editNode} onClick={handleJson}>
+            Submit
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <FormGroup sx={{ marginRight: "10px", marginLeft: "10px" }}>
+            <TextField
+              value={nodeJson}
+              multiline
+              fullWidth
+              maxRows={25}
+              onChange={(e) => {
+                setNodeJson(e.target.value)
+              }}
+            />
+          </FormGroup>
+        </Grid>
+      </Grid>
     </>
   )
 }
