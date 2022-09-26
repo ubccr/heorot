@@ -1,23 +1,23 @@
 import {
-  Table,
   Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  Button,
-  TableBody,
   Typography,
-  TableContainer,
-  DialogContent,
-  Dialog,
-  Skeleton,
 } from "@mui/material"
-import { useState, useContext } from "react"
-import SELTable from "./SELTable"
+import { useContext, useState } from "react"
+
 import IconC from "../../../components/IconC"
+import SELTable from "./SELTable"
 import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
-
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
@@ -35,11 +35,8 @@ const TableC = ({ node }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/redfish/v1/systems/${node}`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/systems/${node}`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { retry: 2 }
@@ -54,11 +51,8 @@ const TableC = ({ node }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/redfish/v1/managers/${node}`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/managers/${node}`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { retry: 2 }
@@ -73,11 +67,8 @@ const TableC = ({ node }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/redfish/v1/gpu/${node}`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/gpu/${node}`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { retry: 2 }
@@ -92,11 +83,8 @@ const TableC = ({ node }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/redfish/v1/storage/${node}`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/storage/${node}`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { retry: 2 }
@@ -111,11 +99,8 @@ const TableC = ({ node }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)
-      ).json()
-      if (res.status === "error")
-        enqueueSnackbar(res.message, { variant: "error" })
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)).json()
+      if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
     { retry: 2 }
@@ -165,10 +150,9 @@ const TableC = ({ node }) => {
                 <TableCell>Model:</TableCell>
                 <TableCell align="right">
                   {query_systems.isLoading && <Skeleton />}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <>{query_systems.data.model}</>
-                    )}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <>{query_systems.data.model}</>
+                  )}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -176,10 +160,9 @@ const TableC = ({ node }) => {
                 <TableCell>Service Tag:</TableCell>
                 <TableCell align="right">
                   {query_systems.isLoading && <Skeleton />}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <>{query_systems.data.serviceTag}</>
-                    )}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <>{query_systems.data.serviceTag}</>
+                  )}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -187,10 +170,9 @@ const TableC = ({ node }) => {
                 <TableCell>BIOS Version:</TableCell>
                 <TableCell align="right">
                   {query_systems.isLoading && <Skeleton />}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <>{query_systems.data.biosVersion}</>
-                    )}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <>{query_systems.data.biosVersion}</>
+                  )}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -198,29 +180,24 @@ const TableC = ({ node }) => {
                 <TableCell>BMC Version:</TableCell>
                 <TableCell align="right">
                   {query_managers.isLoading && <Skeleton />}
-                  {!query_managers.isLoading &&
-                    query_managers.data.status === "success" && (
-                      <>{query_managers.data.BMCVersion}</>
-                    )}
+                  {!query_managers.isLoading && query_managers.data.status === "success" && (
+                    <>{query_managers.data.BMCVersion}</>
+                  )}
                 </TableCell>
                 <TableCell align="center">
-                  {query_managers.isLoading && (
-                    <Skeleton variant="circular" width={25} height={25} />
+                  {query_managers.isLoading && <Skeleton variant="circular" width={25} height={25} />}
+                  {!query_managers.isLoading && query_managers.data.status === "success" && (
+                    <IconC icon={query_managers.data.BMCStatus} />
                   )}
-                  {!query_managers.isLoading &&
-                    query_managers.data.status === "success" && (
-                      <IconC icon={query_managers.data.BMCStatus} />
-                    )}
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Vlan:</TableCell>
                 <TableCell align="right">
                   {query_managers.isLoading && <Skeleton />}
-                  {!query_managers.isLoading &&
-                    query_managers.data.status === "success" && (
-                      <>{query_managers.data.VLAN.VLANId}</>
-                    )}
+                  {!query_managers.isLoading && query_managers.data.status === "success" && (
+                    <>{query_managers.data.VLAN.VLANId}</>
+                  )}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -228,10 +205,9 @@ const TableC = ({ node }) => {
                 <TableCell>Boot Order:</TableCell>
                 <TableCell align="right">
                   {query_systems.isLoading && <Skeleton />}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <>{query_systems.data.bootOrder}</>
-                    )}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <>{query_systems.data.bootOrder}</>
+                  )}
                 </TableCell>
                 <TableCell></TableCell>
               </TableRow>
@@ -239,47 +215,39 @@ const TableC = ({ node }) => {
                 <TableCell>Memory Size:</TableCell>
                 <TableCell align="right">
                   {query_systems.isLoading && <Skeleton />}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <>{query_systems.data.totalMemory}</>
-                    )}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <>{query_systems.data.totalMemory}</>
+                  )}
                 </TableCell>
                 <TableCell align="center">
-                  {query_systems.isLoading && (
-                    <Skeleton variant="circular" width={25} height={25} />
+                  {query_systems.isLoading && <Skeleton variant="circular" width={25} height={25} />}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <IconC icon={query_systems.data.memoryStatus} />
                   )}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <IconC icon={query_systems.data.memoryStatus} />
-                    )}
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Processor(s):</TableCell>
                 <TableCell align="right">
                   {query_systems.isLoading && <Skeleton />}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <>
-                        {query_systems.data.processorCount}
-                        {"x "}
-                        {query_systems.data.processorModel}
-                        <br />
-                        {"Cores: "}
-                        {query_systems.data.processorCores}
-                        {" |  Logical Processor: "}
-                        {query_systems.data.logicalProc}
-                      </>
-                    )}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <>
+                      {query_systems.data.processorCount}
+                      {"x "}
+                      {query_systems.data.processorModel}
+                      <br />
+                      {"Cores: "}
+                      {query_systems.data.processorCores}
+                      {" |  Logical Processor: "}
+                      {query_systems.data.logicalProc}
+                    </>
+                  )}
                 </TableCell>
                 <TableCell align="center">
-                  {query_systems.isLoading && (
-                    <Skeleton variant="circular" width={25} height={25} />
+                  {query_systems.isLoading && <Skeleton variant="circular" width={25} height={25} />}
+                  {!query_systems.isLoading && query_systems.data.status === "success" && (
+                    <IconC icon={query_systems.data.processorStatus} />
                   )}
-                  {!query_systems.isLoading &&
-                    query_systems.data.status === "success" && (
-                      <IconC icon={query_systems.data.processorStatus} />
-                    )}
                 </TableCell>
               </TableRow>
               {query_gpu.isLoading && (
@@ -300,10 +268,7 @@ const TableC = ({ node }) => {
                       <TableCell>GPU {index + 1}</TableCell>
                       <TableCell align="right">
                         {val.model}
-                        {query_gpu.data.vGPU &&
-                          ` (vGPU: x${
-                            query_gpu.data.virtual / query_gpu.data.physical
-                          })`}
+                        {query_gpu.data.vGPU && ` (vGPU: x${query_gpu.data.virtual / query_gpu.data.physical})`}
                       </TableCell>
                       <TableCell align="center">
                         <IconC icon={val.GPUStatus} />
@@ -316,16 +281,14 @@ const TableC = ({ node }) => {
                 <TableCell>Storage:</TableCell>
                 <TableCell align="right">
                   {query_storage.isLoading && <Skeleton />}
-                  {!query_storage.isLoading &&
-                    query_storage.data.status === "success" && (
-                      <>{query_storage.data.controller}</>
-                    )}
+                  {!query_storage.isLoading && query_storage.data.status === "success" && (
+                    <>{query_storage.data.controller}</>
+                  )}
                 </TableCell>
                 <TableCell align="center">
-                  {!query_storage.isLoading &&
-                    query_storage.data.status === "success" && (
-                      <IconC icon={query_storage.data.cardStatus} />
-                    )}
+                  {!query_storage.isLoading && query_storage.data.status === "success" && (
+                    <IconC icon={query_storage.data.cardStatus} />
+                  )}
                 </TableCell>
               </TableRow>
               {!query_storage.isLoading &&
@@ -349,8 +312,7 @@ const TableC = ({ node }) => {
                 query_storage.data.status === "success" &&
                 query_storage.data.drives.map((val, index) => {
                   let tmp = ""
-                  if (val.rotationSpeed !== null)
-                    tmp = `${val.rotationSpeed} RPM`
+                  if (val.rotationSpeed !== null) tmp = `${val.rotationSpeed} RPM`
                   let output = `${val.manufacturer} ${val.mediaType}:  ${val.capacity} ${tmp}`
                   return (
                     <TableRow key={index}>
@@ -375,9 +337,7 @@ const TableC = ({ node }) => {
                   <Skeleton width={400} />
                 </>
               )}
-              {!query_sel.isLoading && query_sel.data.status === "success" && (
-                <SELTable data={query_sel.data.logs} />
-              )}
+              {!query_sel.isLoading && query_sel.data.status === "success" && <SELTable data={query_sel.data.logs} />}
               <Box
                 sx={{
                   marginTop: "20px",
