@@ -51,21 +51,67 @@ const TooltipGen = ({ port, query, nodeQuery = null }) => {
                 </Grid>
               </React.Fragment>
             ))}
+          {port.description !== "" && (
+            <Grid item xs={12}>
+              Description: {port.description}
+              <Divider sx={{ borderColor: "border.main" }} />
+            </Grid>
+          )}
+          <>
+            {port.status !== "" && (
+              <>
+                <Grid item xs={6}>
+                  Status:
+                </Grid>
+                <Grid item xs={6}>
+                  {port.status}
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ borderColor: "border.main" }} />
+                </Grid>
+              </>
+            )}
+            {port.speed !== "" && port.speed !== "0" && (
+              <>
+                <Grid item xs={6}>
+                  Speed:
+                </Grid>
+                <Grid item xs={6}>
+                  {port.speed}
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ borderColor: "border.main" }} />
+                </Grid>
+              </>
+            )}
+            {port.vlan !== "" && (
+              <>
+                <Grid item xs={6}>
+                  Vlans:
+                </Grid>
+                <Grid item xs={6}>
+                  {port.vlan}
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ borderColor: "border.main" }} />
+                </Grid>
+              </>
+            )}
+            {portMacs.length > 0 && (
+              <>
+                <Grid item xs={6}>
+                  MACs:
+                </Grid>
+                <Grid item xs={6}>
+                  {portMacs.join(", ")}
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider sx={{ borderColor: "border.main" }} />
+                </Grid>
+              </>
+            )}
+          </>
         </Grid>
-        {port.description !== "" && (
-          <>
-            <Typography variant="body2">Description: {port.description}</Typography>
-            <Divider sx={{ borderColor: "border.main" }} />
-          </>
-        )}
-        {nodeMapping.length === 0 && (
-          <>
-            {port.status !== "" && <> Status: {port.status}, </>}
-            {port.speed !== "" && port.speed !== "0" && <> Speed: {port.speed}, </>}
-            {port.vlans !== "" && <> Vlans: {port.vlans}, </>}
-            {portMacs.length > 0 && portMacs.join(", ")}
-          </>
-        )}
       </>
     )
   }
