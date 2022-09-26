@@ -195,7 +195,8 @@ const ImportNodes = () => {
               ip += "128." // our bmc subnet
               fqdn = `bmc${map[0][0].substring(3)}.${form.domain}`
             }
-            ip += val.vlan.slice(-2) + "."
+            let tmpVlan = val.vlan.slice(-2).substring(0, 1) === "0" ? val.vlan.slice(-1) : val.vlan.slice(-2)
+            ip += tmpVlan + "."
             ip += val.port
 
             return {
