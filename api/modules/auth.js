@@ -8,9 +8,7 @@ function auth(req, res, next) {
   } else {
     let token = req.headers["x-access-token"]
     if (!token) {
-      return res
-        .status(403)
-        .send({ status: "error", message: "No auth token provided" })
+      return res.status(403).send({ status: "error", message: "No auth token provided" })
     }
     jwt.verify(token, config.auth.API_JWT_SECRET, async (err, decoded) => {
       if (err) {
@@ -24,9 +22,7 @@ function auth(req, res, next) {
         req.userId = decoded.id
         next()
       } else {
-        return res
-          .status(403)
-          .send({ status: "error", message: "Insufficient privileges" })
+        return res.status(403).send({ status: "error", message: "Insufficient privileges" })
       }
     })
   }
