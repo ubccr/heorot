@@ -75,6 +75,12 @@ app.post("/signin", async (req, res) => {
   } else res.json({ status: "error", message: "Username not found" })
 })
 
+app.post("/changePassword", auth, async (req, res) => {
+  let query = await User.updateOne({ _id: req.userId }, { password: bcrypt.hashSync(req.body.newPassword, 10) })
+  if (query.modifiedCount > 0) res.json({ status: "success", message: "Successfully updated password!" })
+  else res.json({ status: "error", message: "Error, password unchanged" })
+})
+
 app.get("/users", auth, async (req, res) => {
   let query = await User.find().select("username privileges createdAt updatedAt").exec()
   if (query !== null) {
