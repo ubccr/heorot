@@ -157,7 +157,6 @@ function App() {
                         <Route exact path="/" element={<Home />} />
                         <Route path="/Login" element={<Login />} />
                         <Route path="/Signup" element={<Signup />} />
-                        <Route path="/Profile" element={<Profile />} />
 
                         <Route
                           path="/FloorPlan"
@@ -220,6 +219,14 @@ function App() {
                           element={
                             <PrivateRoute access="admin">
                               <ManageSwitches />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Profile"
+                          element={
+                            <PrivateRoute access="none">
+                              <Profile />{" "}
                             </PrivateRoute>
                           }
                         />

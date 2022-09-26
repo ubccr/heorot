@@ -148,7 +148,7 @@ const AppBarC = () => {
         open={isMenuOpen}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"} disabled>
+        <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"}>
           Profile
         </MenuItem>
         <MenuItem onClick={handleSignout}>Sign out</MenuItem>
