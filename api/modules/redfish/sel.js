@@ -21,8 +21,7 @@ async function dell_sel(uri, token, version) {
     } else return res
   } else {
     let top = "10"
-    let url =
-      uri + `/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/?$top=${top}`
+    let url = uri + `/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/?$top=${top}`
 
     let res = await api_request(url, token)
 
@@ -39,12 +38,10 @@ async function dell_sel(uri, token, version) {
         }),
       }
     } else if (
-      res.error["@Message.ExtendedInfo"][0] !== undefined &&
+      res.error["@Message.ExtendedInfo"] !== undefined &&
       res.error["@Message.ExtendedInfo"][0].MessageArgs.length > 0
     ) {
-      top = res.error["@Message.ExtendedInfo"][0].MessageArgs[2]
-        .replace(")", "")
-        .split("-")[1]
+      top = res.error["@Message.ExtendedInfo"][0].MessageArgs[2].replace(")", "").split("-")[1]
       url = uri + `/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/?$top=${top}`
 
       res = await api_request(url, token)
