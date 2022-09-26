@@ -30,7 +30,7 @@ const AlertEntry = ({ data }) => {
   if (data.status === 3000) statusColor = "#ff9800"
   else if (data.status === 4000) statusColor = "#f44336"
 
-  data.deviceName = data.deviceName.split(".")[0]
+  if (data.deviceName.length > 15) data.deviceName = data.deviceName.split(".")[0]
 
   return (
     <TableRow>
