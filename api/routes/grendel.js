@@ -89,58 +89,6 @@ app.get("/firmware/list", async (req, res) => {
   })
 })
 
-// TODO: Error testing
-app.post("/discover", async (req, res) => {
-  let output = {}
-  let stdout = ""
-  let args = [
-    "discover",
-    "switch",
-    `-c ${config.grendel.configPath}`,
-    `-m ${config.grendel.mappingName}`,
-    `--endpoint ${req.body.sw}.${req.body.domain}`,
-    `--domain ${req.body.domain}`,
-    `--subnet ${req.body.subnet}`,
-    `--bmc-subnet ${req.body.bmcSubnet}`,
-  ]
-  fs.writeFile(`${config.grendel.mappingName}`, req.body.mapping, (err) => {
-    if (err) {
-      output.status = "error"
-      output.error = err
-      res.json(output)
-      return
-    } else {
-      const grendel = spawn("grendel", args, {
-        shell: true,
-      })
-      grendel.stdout.on("data", (data) => {
-        stdout += data
-      })
-
-      grendel.stderr.on("data", (data) => {
-        output.error = `stderr: ${data}`
-      })
-
-      grendel.on("error", (error) => {
-        output.error = `error: ${error.message}`
-      })
-
-      grendel.on("close", (code) => {
-        if (output.stderr === undefined) {
-          try {
-            output.node = JSON.parse(stdout)
-            output.status = "success"
-          } catch (e) {
-            output.status = "error"
-            output.message = e
-          }
-        }
-        res.json(output)
-      })
-    }
-  })
-})
-
 app.get("/status/:value/:tags?", async (req, res) => {
   let tags = req.params.tags === undefined ? "" : req.params.tags
   let args = ["status"]
