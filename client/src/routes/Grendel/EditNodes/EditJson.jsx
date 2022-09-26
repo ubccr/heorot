@@ -1,9 +1,9 @@
 import { Box, Button, FormGroup, TextField, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
-import SearchC from "../../components/AppBar/SearchC"
-import { UserContext } from "../../contexts/UserContext"
-import { apiConfig } from "../../config"
+import SearchC from "../../../components/AppBar/SearchC"
+import { UserContext } from "../../../contexts/UserContext"
+import { apiConfig } from "../../../config"
 import { useSnackbar } from "notistack"
 
 const EditJson = () => {

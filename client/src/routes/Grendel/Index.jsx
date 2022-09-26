@@ -2,8 +2,9 @@ import { Box, Divider, Tab, Tabs, Typography } from "@mui/material"
 
 import AddNode from "./AddNode"
 import BgContainer from "../../components/BgContainer"
-import EditJson from "./EditJson"
-import EditNodes from "./EditNodes"
+import DeleteNodes from "./EditNodes/DeleteNodes"
+import EditJson from "./EditNodes/EditJson"
+import EditNodes from "./EditNodes/EditNodes"
 import ImportNodes from "./ImportNodes"
 import { useState } from "react"
 
@@ -61,6 +62,7 @@ const Index = () => {
         {value === 1 && (
           <>
             <EditNodes />
+            <DeleteNodes />
             <EditJson />
           </>
         )}

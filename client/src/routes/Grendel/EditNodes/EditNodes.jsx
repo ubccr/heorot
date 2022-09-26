@@ -12,8 +12,8 @@ import {
 } from "@mui/material"
 import { useContext, useState } from "react"
 
-import { UserContext } from "../../contexts/UserContext"
-import { apiConfig } from "../../config"
+import { UserContext } from "../../../contexts/UserContext"
+import { apiConfig } from "../../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
@@ -25,7 +25,7 @@ const EditNodes = () => {
   })
   const [formError, setFormError] = useState(false)
 
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
   const setField = (field, value) => {
@@ -141,15 +141,12 @@ const EditNodes = () => {
           container
           spacing={2}
           sx={{
-            overflow: "hidden",
             padding: "10px",
+            display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            height: "auto",
-            minHeight: 60,
           }}
         >
-          <Grid item xs>
+          <Grid item xs={6} md={2}>
             <TextField
               error={!!formError.nodeset}
               helperText={formError.nodeset}
@@ -161,7 +158,7 @@ const EditNodes = () => {
               autoComplete="new-password"
             />
           </Grid>
-          <Grid item xs>
+          <Grid item xs={6} md={2}>
             <FormControl fullWidth>
               <InputLabel id="select-label">Action</InputLabel>
               <Select
@@ -186,7 +183,7 @@ const EditNodes = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs>
+          <Grid item xs={6} md={2}>
             {formValues.action === "provision" && (
               <FormControl sx={{ width: "100%" }}>
                 <InputLabel id="value-select-label">Value</InputLabel>
@@ -285,7 +282,7 @@ const EditNodes = () => {
               />
             )}
           </Grid>
-          <Grid item xs>
+          <Grid item xs={6} md={2}>
             <Button variant="outlined" type="submit">
               Submit
             </Button>
