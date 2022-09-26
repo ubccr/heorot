@@ -27,6 +27,11 @@ app.post("/signup", async (req, res) => {
     background: "none",
     theme: "light",
   }
+
+  // Sets first user created as an admin
+  let count = await User.countDocuments({})
+  if (count === 0) data.privileges = "admin"
+
   let query = await User.findOne({ username: data.username }).exec()
   if (query === null) {
     let newUser = new User({ ...data })
