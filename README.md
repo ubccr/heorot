@@ -36,18 +36,18 @@ Checkout the [Screenshots](screenshots.MD) file for an example of the UI.
 :heavy_check_mark: Displays node information from the Redfish API \
 :heavy_check_mark: Integration of OpenMange Enterprise alerts
 
-## :white_check_mark: Requirements
+## :checkered_flag: Production build
+
+This is an opinionated, reference guide to installing Heorot, please follow security best practices.
+
+### :white_check_mark: Requirements
 
 > Installation of requirements will not be covered in this guide
 
 - Git: [git-scm.com](https://git-scm.com)
 - Node: [nodejs.org](https://nodejs.org/en/)
-- MongoDB: [mongodb.com](https://mongodb.com/docs/manual/installation/)
+- Docker: [docs.docker.com](https://docs.docker.com/engine/install/ubuntu/)
 - Grendel: [github.com/ubccr/grendel](https://github.com/ubccr/grendel)
-
-## :checkered_flag: Production build
-
-This is an opinionated, reference guide to installing Heorot, please follow security best practices.
 
 ### Heorot setup:
 
@@ -93,14 +93,11 @@ The /opt/heorot/api/keys directory needs the following:
 
 1. server.cert
 2. server.key
-3. bmc.key
 
 ```bash
 $ cd /opt/heorot/api/keys
 # Change localhost to your server's IP & region info
 $ openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
-
-$ ssh-keygen -f bmc.key
 
 # Ensure keys are readable by grendel user
 $ ls -l
@@ -112,7 +109,7 @@ $ chmod 640 *
 ```bash
 # Copy the service files & edit it if necessary
 $ sudo cp /opt/heorot/heorot.service /etc/systemd/system/
-$ nano /etc/systemd/system/heorot.service
+$ sudo nano /etc/systemd/system/heorot.service
 
 $ sudo systemctl enable heorot.service
 $ sudo systemctl start heorot.service
@@ -124,12 +121,7 @@ $ sudo systemctl start heorot.service
 
 You can access the dev Web UI at https://_your_ip_here_
 
-### MongoDB Initialization:
-
-> :warning: Ubuntu 22.04 does not have a mongosh install candidate, I advise using [MongoDB Compass](https://www.mongodb.com/products/compass) instead
-
-1. Head to https://_your_ip_here_/#/Signup and create an Account
-2. Login to MongoDB and set your user's privileges to "admin"
+Head to the signup page and create an account to get started
 
 ### Log files:
 
