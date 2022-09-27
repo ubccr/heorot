@@ -84,7 +84,7 @@ io.on("connection", function (socket) {
             username: config.bmc.DELL_USER,
             tryKeyboard: true,
             password: config.bmc.DELL_PASS,
-            privateKey: fs.readFileSync("./keys/bmc.key"),
+            // privateKey: fs.readFileSync("./keys/bmc.key"),
             algorithms: {
               kex: [
                 "curve25519-sha256",
