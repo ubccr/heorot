@@ -54,7 +54,7 @@ config.firmware = ["ipxe.pxe", "ipxe-i386.efi", "ipxe-x86_64.efi", "snponly-x86_
 // Switches will need proper tags | see readme.MD -> Grendel Tags
 config.switches = {
   user: "",
-  password: "",
+  pass: "",
 }
 
 // Floorplan loyout modification | allows you to add or remove rows / columns
