@@ -24,7 +24,6 @@ const DeleteNodes = () => {
       const res = await (await fetch(`${apiConfig.apiUrl}/grendel/delete/${nodeset}`, payload)).json()
       if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "success") {
-        console.log(res)
         enqueueSnackbar(`Successfully removed ${res.result.hosts} host(s)`, { variant: "success" })
         setOpen(false)
         setNodeset("")
