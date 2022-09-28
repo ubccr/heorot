@@ -27,76 +27,50 @@ app.get("/", (req, res) => {
   })
 })
 
-// TODO: Deprecate
-app.get("/dell/:node", async (req, res) => {
+app.get("/v1/all/:node", async (req, res) => {
   const node = req.params.node
-  let bmc = ""
+  let bmc = await getBMC(node)
+  if (bmc.status === "success") {
+    const uri = `https://${bmc.address}`
+    let auth = await redfish_auth(uri)
+    if (auth.status === "success") {
+      let api_res = new String()
 
-  //   GPU check
-  let gpu = false
-  let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
-  let grendelNode = grendelRes.result[0]
-  grendelNode.interfaces.forEach((element) => {
-    if (element.fqdn.substring(0, 3) === "bmc") bmc = element.fqdn
-  })
-  if (grendelNode.tags === null) grendelNode.tags = []
-  if (grendelNode.tags.includes("gpu")) gpu = true
+      if (auth.oem === "Dell") {
+        api_res = await Promise.all([
+          await dell_systems(uri, auth.token),
+          await dell_managers(uri, auth.token),
+          await dell_gpu(uri, auth.token, auth.version),
+          await dell_storage(uri, auth.token, auth.version),
+          await dell_sel(uri, auth.token, auth.version),
+        ])
+      } else if (auth.oem === "Supermicro") {
+        api_res = await Promise.all([
+          await sm_systems(uri, auth.token),
+          await sm_managers(uri, auth.token),
+          await sm_gpu(uri, auth.token),
+          await sm_storage(uri, auth.token),
+          await sm_sel(uri, auth.token),
+        ])
+      } else if (auth.oem === "HPE") {
+        api_res = await Promise.all([
+          await hpe_systems(uri, auth.token),
+          await hpe_managers(uri, auth.token),
+          await hpe_gpu(uri, auth.token),
+          await hpe_storage(uri, auth.token),
+          await hpe_sel(uri, auth.token),
+        ])
+      } else
+        api_res = {
+          status: "error",
+          message: "failed to parse OEM from Redfish call",
+        }
 
-  let biosRes = await biosApi(bmc)
-
-  let idracRes = await idracApi(bmc)
-
-  let gpuRes = { status: "error", message: "No GPU tag" }
-  if (grendelNode.tags.includes("gpu")) gpuRes = await gpuApi(bmc)
-
-  let sensorsRes = await sensorsApi(bmc)
-
-  let selRes = await selApi(bmc)
-
-  res.json({
-    status: "success",
-    result: { biosRes, idracRes, gpuRes, sensorsRes, selRes },
-  })
+      await redfish_logout(auth.location, uri, auth.token)
+      res.json(api_res)
+    } else res.json(auth)
+  } else res.json(bmc)
 })
-// TODO: Deprecate
-app.get("/sel/:node", async (req, res) => {
-  const node = req.params.node
-  let bmc = ""
-  let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
-
-  if (grendelRes.status === "success" && grendelRes.result.length !== 0) {
-    let grendelNode = grendelRes.result[0]
-    grendelNode.interfaces.forEach((element) => {
-      if (element.fqdn.substring(0, 3) === "bmc") bmc = element.fqdn
-    })
-
-    let selRes = await selApi(bmc)
-
-    res.json({
-      status: "success",
-      result: { selRes },
-    })
-  } else {
-    res.json({
-      status: "error",
-      message: "Node not found",
-    })
-  }
-})
-// TODO: Deprecate
-app.get("/actions/clearSEL/:node", async (req, res) => {
-  let result = await apiClearSEL(req.params.node)
-
-  res.json(result)
-})
-// TODO: Deprecate
-app.get("/actions/resetBMC/:node", async (req, res) => {
-  let result = await apiResetBMC(req.params.node)
-
-  res.json(result)
-})
-
-// New Routes
 
 app.get("/v1/systems/:node", async (req, res) => {
   const node = req.params.node
