@@ -21,15 +21,9 @@ async function redfish_auth(uri) {
   const header = {
     agent,
   }
-  const urls = [
-    `${uri}/redfish/v1/SessionService/Sessions`,
-    `${uri}/redfish/v1`,
-  ]
+  const urls = [`${uri}/redfish/v1/SessionService/Sessions`, `${uri}/redfish/v1`]
   try {
-    let res_promise = await Promise.all([
-      await fetch(urls[0], payload),
-      await (await fetch(urls[1], header)).json(),
-    ])
+    let res_promise = await Promise.all([await fetch(urls[0], payload), await (await fetch(urls[1], header)).json()])
 
     let token = res_promise[0].headers.get("x-auth-token")
     let status = token !== null ? "success" : "error"
