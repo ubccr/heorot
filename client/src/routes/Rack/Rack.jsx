@@ -33,7 +33,7 @@ const Rack = () => {
       <TableContainer>
         {isRackLoading && <LinearProgress />}
         {!isRackLoading && (
-          <Table>
+          <Table sx={{ tableLayout: "fixed" }}>
             <TableHead>
               <TableRow>
                 <TableCell align={"center"} width={40}>
