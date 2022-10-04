@@ -2,9 +2,10 @@ const express = require("express")
 const app = express.Router()
 
 const { grendelRequest } = require("../modules/grendel")
-
+// const { }
 const { pduFormat, switchFormat, nodeFormat, quadNodeFormat } = require("../modules/client")
 const config = require("../config")
+const Cache = require("../models/Cache")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -17,6 +18,62 @@ app.get("/", (req, res) => {
     availibleRoutes: routes,
   })
 })
+
+app.get("/v1/floorPlan", async (req, res) => {
+  const floorX = config.floorplan.floorX
+  const floorY = config.floorplan.floorY
+
+  let comp_Tags = [
+    { tag: "ubhpc", color: "primary" },
+    { tag: "faculty", color: "success" },
+  ]
+  let grendel_query = await grendelRequest("/v1/host/list")
+  let switch_query = await Cache.find({ node: /^swe/ })
+
+  if (grendel_query.status === "success" && switch_query !== null) {
+    let nodes = new Map()
+
+    // Create map for easy filtering
+    grendel_query.result.forEach((val) => {
+      let rack = val.name.substring(4, 7)
+      let tmp = typeof nodes.get(rack) === "object" ? nodes.get(rack) : []
+      nodes.set(rack, [...tmp, val])
+    })
+
+    // Main floorplan generation
+    let floorplan = floorX.map((row) => {
+      return floorY.map((col) => {
+        let rack = row + col
+        compareTags(nodes.get(rack), comp_Tags)
+        return {
+          rack: rack,
+          nodes: nodes.get(rack) ?? [],
+          slurm_type: 0,
+        }
+      })
+    })
+
+    let tmp2 = Object.fromEntries(nodes)
+    res.json({ status: "success", result: floorplan })
+  } else
+    res.json({
+      status: "error",
+      message: "Failed to fetch Grendel or Switch Data",
+      error: { location: "/api/routes/client.js", grendel_query, switch_query },
+    })
+})
+const compareTags = (arr, tagList) => {
+  let tags = new Set()
+  if (arr !== undefined && arr.length > 0) {
+    arr.forEach((val) => {
+      if (val.tags !== null) val.tags.forEach((tag) => tags.add(tag))
+    })
+
+    let tmp = tagList.map((val) => tags.has(val.tag))
+    // if (tmp.in)
+    console.log(tmp)
+  }
+}
 
 app.get("/rack/:rack", async (req, res) => {
   const rack = req.params.rack
