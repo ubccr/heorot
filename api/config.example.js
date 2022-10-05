@@ -57,8 +57,32 @@ config.switches = {
   pass: "",
 }
 
-// Floorplan loyout modification | allows you to add or remove rows / columns
+// Floorplan page config:
 config.floorplan = {
+  // "Rack" view color mapping
+  tag_mapping: [
+    { tag: "ubhpc", color: "primary" }, // tag: "set to grendel tag of slurm partition" color: "MUI color"
+    { tag: "faculty", color: "success" },
+  ],
+  tag_multiple: { display: "mixed", color: "error" }, // color if there are multiple tag types in a rack
+  color_mapping: {
+    default_color: "floorplan", // if regex doesn't match: set to this color | Must be MUI color or custom color added to theme in app.js
+    model_color: [
+      // switch model coloring array | order matters, last item will take precidence!
+      // display: "Legend text in the UI", color: "MUI or custom color", model: "regex to match switch model"
+      { display: "No Management Switch", color: "primary", model: /^S/ },
+      { display: "Management Switch", color: "error", model: /^PC/ },
+    ],
+    version_color: [
+      // switch version coloring array | order matters, last item will take precidence!
+      // display: "Legend text in the UI", color: "MUI or custom color", version: "regex to match switch versions"
+      { display: "OS8", color: "error", version: /^8/ },
+      { display: "OS9", color: "warning", version: /^9/ },
+      { display: "OS10", color: "primary", version: /^10/ },
+    ],
+  },
+
+  // loyout modification | allows you to add or remove rows / columns
   floorX: [..."defghijklmnopqrstuvw"],
   floorY: [
     "28",
