@@ -1,7 +1,7 @@
 const express = require("express")
 const app = express.Router()
-const fs = require("fs")
 const Cache = require("../models/Cache")
+const Switches = require("../models/Switches")
 
 const { setCache, getCache, timeComp } = require("../modules/cache")
 const { getSwInfoV2 } = require("../modules/switches")
@@ -16,18 +16,6 @@ app.get("/", (req, res) => {
     status: "success",
     currentRoute: "/switches/",
     availibleRoutes: routes,
-  })
-})
-
-app.get("/allData", async (req, res) => {
-  const jsonData = readJsonFile()
-  if (jsonData.status !== "success") {
-    res.json(jsonData)
-    return
-  }
-  res.json({
-    status: "success",
-    result: jsonData.result,
   })
 })
 
@@ -47,6 +35,35 @@ app.get("/v1/query/:node/:refetch?", async (req, res) => {
 const getSw = async (node) => {
   let res = await getSwInfoV2(node)
   let setCacheRes = await setCache(node, res)
+
+  // New switches DB collection
+  if (res.status === "success") {
+    // TODO: modify switch queries to match DB name scheme
+    let data = {
+      node: node,
+      interfaces: res.result[1].output,
+      mac_address_table: res.result[2].output,
+      system: {
+        model: res.result[0].output.model,
+        uptime: res.result[0].output.uptime,
+        version: res.result[0].output.version,
+        vendor: res.result[0].output.vendor,
+        service_tag: res.result[0].output.serviceTag,
+      },
+      info: {
+        total_oversubscription: res.info.totalOversubscription,
+        active_oversubscription: res.info.activeOversubscription,
+        total_ports: res.info.totalPorts,
+        active_ports: res.info.activePorts,
+        fastest_port: res.info.fastestPort,
+        uplink_count: res.info.uplinkCount,
+        uplink_speed: res.info.uplinkSpeed,
+        uplinks: res.info.uplinks,
+      },
+    }
+    // TODO: error handling
+    await Switches.findOneAndUpdate({ node: node }, data, { new: true, upsert: true })
+  }
 
   return res
 }
@@ -82,25 +99,5 @@ app.get("/v1/allSwitches", async (req, res) => {
     res.json({ status: "success", result: tmp })
   } else res.json({ status: "error", message: "Failed to load cached switches from the DB", silent: true })
 })
-
-const readJsonFile = () => {
-  try {
-    const jsonData = JSON.parse(fs.readFileSync("./keys/switch-data.json"))
-    jsonData.forEach((val) => {
-      val.ratio = (val.nodes * val.port_speed) / (val.switches.length * 2 * val.uplink_speed)
-    })
-    let output = {
-      status: "success",
-      result: jsonData,
-    }
-    return output
-  } catch (e) {
-    if (e.errno === -2) e.code = `${e.code} | Error opening '${e.path}'`
-    return {
-      status: "error",
-      message: e.code,
-    }
-  }
-}
 
 module.exports = app
