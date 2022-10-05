@@ -159,12 +159,12 @@ const parseOutputV2 = async (data, type) => {
           if (val[0].match("^Ethernet"))
             return {
               port: val[0].substring(8),
-              vlan: val[1].vlanInformation.vlanId ?? val[1].vlanInformation.vlanExplanation,
+              description: val[1].description,
+              status: status.toLowerCase(),
               speed: `${val[1].bandwidth / 1000000000}G`,
               type: val[1].interfaceType,
-              description: val[1].description,
               duplex: duplex,
-              status: status.toLowerCase(),
+              vlan: val[1].vlanInformation.vlanId ?? val[1].vlanInformation.vlanExplanation,
             }
         })
         .filter(Boolean)
