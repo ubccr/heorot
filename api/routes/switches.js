@@ -44,11 +44,11 @@ const getSw = async (node) => {
       interfaces: res.result[1].output,
       mac_address_table: res.result[2].output,
       system: {
-        model: res.result[0].output.model,
-        uptime: res.result[0].output.uptime,
-        version: res.result[0].output.version,
-        vendor: res.result[0].output.vendor,
-        service_tag: res.result[0].output.serviceTag,
+        model: res.result[0].output.model ?? "",
+        uptime: res.result[0].output.uptime ?? "",
+        version: res.result[0].output.version ?? "",
+        vendor: res.result[0].output.vendor ?? "",
+        service_tag: res.result[0].output.serviceTag ?? "",
       },
       info: {
         total_oversubscription: res.info.totalOversubscription,
