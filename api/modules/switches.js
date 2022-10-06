@@ -32,20 +32,21 @@ const getSwInfoV2 = async (node) => {
     ]
     parseType = "OS10"
   } else if (grendel.tags.includes("Dell_OS9")) {
-    // old query
     commands = ["show inventory", "show interface status | no-more", "show mac-address-table | no-more"]
     parseType = "OS9"
     return oldSwInfo(commands, fqdn, parseType)
   } else if (grendel.tags.includes("Dell_OS8")) {
-    // old query
     commands = ["show inventory | no-more", "show interfaces status | no-more", "show mac-address-table | no-more"]
     parseType = "OS8"
     return oldSwInfo(commands, fqdn, parseType)
     // return { status: "error", message: "Dell OS8 switches are not supported" }
   } else if (grendel.tags.includes("Dell_PC3")) {
-    // old query
     commands = ["show system", "show interfaces status", "enable", "show bridge address-table"]
     parseType = "PC3"
+    return oldSwInfo(commands, fqdn, parseType)
+  } else if (grendel.tags.includes("Dell_PC5")) {
+    commands = ["show system", "show interfaces status", "show mac address-table"]
+    parseType = "PC5"
     return oldSwInfo(commands, fqdn, parseType)
   } else if (node.match("^swi")) {
     return {
@@ -313,7 +314,6 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
         }
       })
       SSH.on("commandComplete", (command, response, sshObj, stream) => {
-        // console.log(response)
         let output = parseOldOutput(response, command, parseType)
         sshObj.firstRun = false
         if (output !== null) responseArr.push({ command: command, output }) // get rid of null from "enable" command
@@ -417,7 +417,7 @@ const parseOldOutput = (data, command, parseType) => {
     // return tmp
     return macAddressTable
   } else if (command.includes("interfaces") && parseType === "PC3") {
-    // OS8 show interfaces status
+    // PC3 show interfaces status
     let tmp = data.split("\r\n")
     let mapping = tmp
       .map((val) => {
@@ -438,6 +438,44 @@ const parseOldOutput = (data, command, parseType) => {
             status: notNull(val.match("(Up|Down)")).toLowerCase(),
             speed: speed,
             duplex: notNull(val.match("(Full|N/A)")),
+          }
+        }
+      })
+      .filter(Boolean)
+    return mapping
+  } else if (command.includes("interfaces") && parseType === "PC5") {
+    // PC5 show interfaces status
+    let tmp = data.split("\r\n")
+    let spacing = {}
+    let mapping = tmp
+      .map((val) => {
+        console.log(val)
+        if (val.match("^(Port)") && !val.match("(Type)")) {
+          spacing.port = val.match("(Port)").index
+          spacing.name = val.match("(Name)").index
+          spacing.duplex = val.match("(Duplex)").index
+          spacing.speed = val.match("(Speed)").index
+          spacing.neg = val.match("(Neg)").index
+          spacing.link = val.match("(Link)").index
+          spacing.flow = val.match("(Flow)").index
+        }
+        if (val.match("(Gi)|(Te)1/0/[0-9]{1,2}")) {
+          let tmpSpeed = val.substring(spacing.speed, spacing.neg).trim()
+          let speed = ""
+
+          if (tmpSpeed === "100000") speed = "100G"
+          else if (tmpSpeed === "40000") speed = "40G"
+          else if (tmpSpeed === "10000") speed = "10G"
+          else if (tmpSpeed === "1000") speed = "1G"
+          else if (tmpSpeed === "100") speed = "100M"
+          else if (tmpSpeed === "10") speed = "10M"
+          return {
+            port: val.substring(spacing.port, spacing.name).trim().substring(6),
+            description: val.substring(spacing.name, spacing.duplex).trim(),
+            status: val.substring(spacing.link, spacing.flow).trim().toLowerCase(),
+            speed: speed,
+            duplex: val.substring(spacing.duplex, spacing.speed).trim(),
+            vlan: "",
           }
         }
       })
@@ -500,6 +538,37 @@ const parseOldOutput = (data, command, parseType) => {
       })
       .filter(Boolean)
     // return tmp
+    return mapping
+  } else if (command.includes("mac address-table") && parseType === "PC5") {
+    // PC5 show mac address-table
+    let tmp = data.split("\r\n")
+    let spacing = {}
+    let mapping = tmp
+      .map((val) => {
+        console.log(val)
+        if (val.match("^(Vlan)")) {
+          spacing.vlan = val.match("(Vlan)").index
+          spacing.mac = val.match("(Mac Address)").index
+          spacing.type = val.match("(Type)").index
+          spacing.port = val.match("(Port)").index
+        }
+        if (val.match("[0-9]{1,4}") && val.match(/(Gi)|(Te)/g)) {
+          let tmpMac = val.substring(spacing.mac, spacing.type).trim()
+          let mac = tmpMac
+            .match("[0-9A-Z]{4}.[0-9A-Z]{4}.[0-9A-Z]{4}")[0]
+            .replace(/\./g, "")
+            .replace(/.{2}\B/g, "$&:")
+            .toLowerCase()
+          return {
+            vlan: val.substring(spacing.vlan, spacing.mac).trim().toLowerCase(),
+            mac: mac,
+            type: val.substring(spacing.type, spacing.port).trim(),
+            port: val.substring(spacing.port).trim().substring(6),
+            status: "",
+          }
+        }
+      })
+      .filter(Boolean)
     return mapping
   } else if (command.includes("enable")) {
     return null
