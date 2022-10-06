@@ -64,9 +64,10 @@ config.floorplan = {
     { tag: "ubhpc", color: "primary" }, // tag: "set to grendel tag of slurm partition" color: "MUI color"
     { tag: "faculty", color: "success" },
   ],
-  tag_multiple: { display: "mixed", color: "error" }, // color if there are multiple tag types in a rack
+  tag_multiple: { tag: "mixed", color: "error" }, // color if there are multiple tag types in a rack
   color_mapping: {
-    default_color: "floorplan", // if regex doesn't match: set to this color | Must be MUI color or custom color added to theme in app.js
+    default_color: "primary",
+    secondary_color: "floorplan", // if regex doesn't match: set to this color | Must be MUI color or custom color added to theme in app.js
     model_color: [
       // switch model coloring array | order matters, last item will take precidence!
       // display: "Legend text in the UI", color: "MUI or custom color", model: "regex to match switch model"
