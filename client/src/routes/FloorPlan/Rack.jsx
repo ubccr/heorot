@@ -16,13 +16,17 @@ const Rack = ({ rack, outputType, colorType, nodesQuery, switchQuery }) => {
   const [nodeCount, setNodeCount] = useState(0)
 
   const shortenName = (name) => {
-    if (name.match("^PowerConnect")) return "PC" + name.substring(13)
-    else if (name.match("-ON")) return name.replace("-ON", "")
-    else return name
+    if (name !== null) {
+      if (name.match("^PowerConnect")) return "PC" + name.substring(13)
+      else if (name.match("-ON")) return name.replace("-ON", "")
+      else return name
+    } else return undefined
   }
   const shortenVersion = (version) => {
-    if (version !== undefined) return version.replace(/ *\([^)]*\) */g, "")
-    else return version
+    if (version !== null) {
+      if (version !== undefined) return version.replace(/ *\([^)]*\) */g, "")
+      else return version
+    } else return undefined
   }
 
   if (nodesQuery.isFetched && nodesQuery.data.status === "success") {
