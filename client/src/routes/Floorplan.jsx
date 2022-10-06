@@ -1,8 +1,17 @@
 import {
   Box,
+  Button,
   Chip,
   Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  InputLabel,
   LinearProgress,
+  MenuItem,
+  Select,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -11,11 +20,14 @@ import {
   TableRow,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
 } from "@mui/material"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 
 import BgContainer from "../components/BgContainer"
+import Cell_rack from "./FloorPlan/Cell_rack"
 import Header from "../components/Header"
+import { Link } from "react-router-dom"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
 import { useQuery } from "react-query"
@@ -24,6 +36,12 @@ import { useSnackbar } from "notistack"
 const Floorplan = () => {
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
+  const [outputType, setOutputType] = useState(
+    localStorage.getItem("floorPlanOutputType") !== null ? localStorage.getItem("floorPlanOutputType") : "rack"
+  )
+  const [color, setColor] = useState(
+    localStorage.getItem("floorPlanColor") !== null ? localStorage.getItem("floorPlanColor") === "true" : false
+  )
 
   const query = useQuery(
     ["floorplan"],
@@ -42,17 +60,90 @@ const Floorplan = () => {
     },
     { staleTime: 120000, cacheTime: 120000 }
   )
+
+  let legendProps = {
+    variant: "outlined",
+    sx: { margin: "4px" },
+  }
   return (
     <>
       <Header header="Floor Plan" />
       <BgContainer>
+        <Grid container spacing={2} sx={{ marginBottom: "20px" }}>
+          <Grid item xs={12} md={7} textAlign="center">
+            {/* Rack */}
+            {query.isFetched &&
+              outputType === "rack" &&
+              color === true &&
+              query.data.config.tag_mapping.map((val, index) => (
+                <Chip index={index} label={val.tag} color={val.color} {...legendProps} />
+              ))}
+            {query.isFetched && outputType === "rack" && color === true && (
+              <Chip
+                label={query.data.config.tag_multiple.tag}
+                color={query.data.config.tag_multiple.color}
+                {...legendProps}
+              />
+            )}
+
+            {/* Model */}
+            {query.isFetched &&
+              outputType === "sw_model" &&
+              color === true &&
+              query.data.config.color_mapping.model_color.map((val, index) => (
+                <Chip index={index} label={val.display} color={val.color} {...legendProps} />
+              ))}
+
+            {/* Version */}
+            {query.isFetched &&
+              outputType === "sw_version" &&
+              color === true &&
+              query.data.config.color_mapping.version_color.map((val, index) => (
+                <Chip index={index} label={val.display} color={val.color} {...legendProps} />
+              ))}
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Display</InputLabel>
+              <Select
+                value={outputType}
+                label="Display"
+                onChange={(e) => {
+                  setOutputType(e.target.value)
+                  localStorage.setItem("floorPlanOutputType", e.target.value)
+                }}
+              >
+                <MenuItem value={"rack"}>Rack</MenuItem>
+                <MenuItem value={"sw_model"}>Switch Model</MenuItem>
+                <MenuItem value={"sw_version"}>Switch Version</MenuItem>
+                <MenuItem value={"sw_ratio"}>Switch Ratio</MenuItem>
+                <MenuItem value={"node_count"}>Node Count</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} md={2} textAlign="center">
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={color}
+                  onChange={(e, val) => {
+                    setColor(val)
+                    localStorage.setItem("floorPlanColor", val)
+                  }}
+                />
+              }
+              label="Color"
+            />
+          </Grid>
+        </Grid>
+
         {query.isFetched && query.data.status === "success" && (
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell padding="none" />
-                  {query.data.floorY.map((col, index) => (
+                  {query.data.config.floorY.map((col, index) => (
                     <TableCell key={index} align="center" sx={{ padding: "2px" }}>
                       {col}
                     </TableCell>
@@ -60,18 +151,23 @@ const Floorplan = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {query.data.floorX.map((row, index) => (
+                {query.data.config.floorX.map((row, index) => (
                   <TableRow key={index} align="center">
                     <TableCell align="center" sx={{ padding: "4px" }}>
                       {row}
                     </TableCell>
-                    {query.data.floorY.map((col, index) => (
-                      <TableCell
-                        key={index}
-                        align="center"
-                        sx={{ border: 1, borderColor: "border.main", padding: "2px", width: 70 }}
-                      ></TableCell>
-                    ))}
+                    {query.data.config.floorY.map((col, index) => {
+                      let rack = query.data.result.find((val) => val.rack === row + col)
+                      return (
+                        <TableCell
+                          key={index}
+                          align="center"
+                          sx={{ border: 1, borderColor: "border.main", padding: "2px", width: 70 }}
+                        >
+                          {rack.u_count > 0 && <Cell_rack rack={rack} outputType={outputType} color={color} />}
+                        </TableCell>
+                      )
+                    })}
                   </TableRow>
                 ))}
               </TableBody>
