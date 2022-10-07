@@ -60,7 +60,7 @@ const ImportNodes = () => {
       const res = await (await fetch(`${apiConfig.apiUrl}/grendel/host`, payload)).json()
       if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "success")
-        enqueueSnackbar(`Successfully added ${res.result.hosts} host.`, { variant: "success" })
+        enqueueSnackbar(`Successfully added ${res.result.hosts} host(s)`, { variant: "success" })
       return res
     },
     { enabled: false }
@@ -127,7 +127,7 @@ const ImportNodes = () => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${sw}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${sw}/true`, payload)).json()
       if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       return res
     },
@@ -195,7 +195,11 @@ const ImportNodes = () => {
               ip += "128." // our bmc subnet
               fqdn = `bmc${map[0][0].substring(3)}.${form.domain}`
             }
-            let tmpVlan = val.vlan.slice(-2).substring(0, 1) === "0" ? val.vlan.slice(-1) : val.vlan.slice(-2)
+            let tmpVlan = "0"
+            if (val.vlan.slice(-3).substring(0, 1) !== "0") tmpVlan = val.vlan.slice(-3)
+            else if (val.vlan.slice(-2).substring(0, 1) !== "0") tmpVlan = val.vlan.slice(-2)
+            else if (val.vlan.slice(-1).substring(0, 1) !== "0") tmpVlan = val.vlan.slice(-1)
+
             ip += tmpVlan + "."
             ip += val.port
 
