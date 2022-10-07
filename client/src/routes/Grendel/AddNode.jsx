@@ -47,7 +47,7 @@ const AddNode = () => {
       const res = await (await fetch(`${apiConfig.apiUrl}/grendel/host`, payload)).json()
       if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "success")
-        enqueueSnackbar(`Successfully added ${res.result.hosts} host.`, { variant: "success" })
+        enqueueSnackbar(`Successfully added ${res.result.hosts} host`, { variant: "success" })
       return res
     },
     { enabled: false }
