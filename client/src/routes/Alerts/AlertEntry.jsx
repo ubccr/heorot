@@ -5,11 +5,13 @@ import NodeCellC from "./NodeCellC"
 import SELCustom from "./SELCustom"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useContext } from "react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const AlertEntry = ({ data }) => {
+  const [testRef] = useAutoAnimate(null)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
@@ -33,7 +35,7 @@ const AlertEntry = ({ data }) => {
   if (data.deviceName.length > 15) data.deviceName = data.deviceName.split(".")[0]
 
   return (
-    <TableRow>
+    <TableRow ref={testRef}>
       {result.isLoading && (
         <TableCell colSpan={9}>
           <LinearProgress />

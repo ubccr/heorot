@@ -14,11 +14,13 @@ import BgContainer from "../../components/BgContainer"
 import Header from "../../components/Header"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useContext } from "react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const ManageSwitches = () => {
+  const [tableRef] = useAutoAnimate()
   const [user] = useContext(UserContext)
 
   const { enqueueSnackbar } = useSnackbar()
@@ -54,7 +56,7 @@ const ManageSwitches = () => {
               Refetch all switches
             </Button>
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} ref={tableRef}>
             {query.isFetched && query.data.failed.length > 0 && (
               <TableContainer>
                 <Table size="small">

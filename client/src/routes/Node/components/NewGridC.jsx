@@ -1,4 +1,5 @@
 import { Grid, Typography } from "@mui/material"
+
 import React from "react"
 
 const NewGridC = ({ heading, children }) => {
@@ -20,13 +21,13 @@ const NewGridC = ({ heading, children }) => {
         minHeight: 60,
       }}
     >
-      <Grid item xs>
+      <Grid item xs={2}>
         <Typography variant="h2" sx={{ fontSize: "18pt", paddingLeft: 2 }}>
           {heading}
         </Typography>
       </Grid>
       {children && (
-        <Grid item xs>
+        <Grid item xs={10}>
           {children}
         </Grid>
       )}

@@ -5,12 +5,14 @@ import NodeOptions from "./AddNode/NodeOptions"
 import ReviewNode from "./AddNode/ReviewNode"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useContext } from "react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 import { useState } from "react"
 
 const AddNode = () => {
+  const [stepperRef] = useAutoAnimate(null)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
@@ -116,7 +118,7 @@ const AddNode = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ margin: "20px" }}>
+        <Box sx={{ margin: "20px" }} ref={stepperRef}>
           {step === 0 && <NodeOptions options={options} setOptions={setOptions} />}
           {step === 1 && <ConfigureInterfaces ifaces={ifaces} setIfaces={setIfaces} />}
           {step === 2 && <ReviewNode options={options} ifaces={ifaces} />}

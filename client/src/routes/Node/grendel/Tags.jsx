@@ -6,9 +6,11 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import NewGridC from "../components/NewGridC"
 import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useSnackbar } from "notistack"
 
 const Tags = ({ node, data, refetch, setRefetch }) => {
+  const [chipRef] = useAutoAnimate(null)
   const { enqueueSnackbar } = useSnackbar()
   const [tags, setTags] = useState(data)
   const [addTag, setAddTag] = useState("")
@@ -86,7 +88,7 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
           }}
         >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box sx={{ width: "100%", textAlign: "end" }}>
+            <Box sx={{ width: "100%", textAlign: "end" }} ref={chipRef}>
               {tags.map((element, index) => (
                 <Chip
                   variant="outlined"

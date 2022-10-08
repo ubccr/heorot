@@ -6,9 +6,11 @@ import DeleteNodes from "./EditNodes/DeleteNodes"
 import EditJson from "./EditNodes/EditJson"
 import EditNodes from "./EditNodes/EditNodes"
 import ImportNodes from "./ImportNodes"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useState } from "react"
 
 const Index = () => {
+  const [tabRef] = useAutoAnimate(null)
   const [value, setValue] = useState(0)
   return (
     <>
@@ -57,16 +59,18 @@ const Index = () => {
           </Tabs>
         </Box>
         <Divider sx={{ marginBottom: "15px" }} />
-        {value === 0 && <AddNode />}
+        <Box ref={tabRef}>
+          {value === 0 && <AddNode />}
 
-        {value === 1 && (
-          <>
-            <EditNodes />
-            <DeleteNodes />
-            <EditJson />
-          </>
-        )}
-        {value === 2 && <ImportNodes />}
+          {value === 1 && (
+            <>
+              <EditNodes />
+              <DeleteNodes />
+              <EditJson />
+            </>
+          )}
+          {value === 2 && <ImportNodes />}
+        </Box>
       </BgContainer>
     </>
   )

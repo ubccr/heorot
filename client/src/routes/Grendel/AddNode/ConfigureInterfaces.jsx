@@ -1,11 +1,13 @@
 import { Box, Checkbox, FormControlLabel, FormGroup, Grid, IconButton, TextField } from "@mui/material"
 
 import CloseIcon from "@mui/icons-material/Close"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
+  const [ifaceRef] = useAutoAnimate()
   return (
     <Box>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} ref={ifaceRef}>
         {ifaces.map((val, index) => (
           <Grid item xs={12} md={6} key={index}>
             <Box sx={{ border: 1, padding: "10px", borderColor: "border.main", borderRadius: "10px" }}>

@@ -12,7 +12,7 @@ const Cell_rack = ({ rack, outputType, color }) => {
   if (rack.switchInfo.sw_models === undefined) console.log(rack)
   useEffect(() => {
     if (outputType === "rack") {
-      setOutput_t(rack.node_count)
+      setOutput_t(`Nodes: ${rack.node_count} | Rack U: ${rack.u_count}`)
       setOutput_b(rack.rack)
       setOutput_c(color === true ? rack.slurm.color : rack.default_color)
     } else if (outputType === "sw_model") {
@@ -32,17 +32,13 @@ const Cell_rack = ({ rack, outputType, color }) => {
       setOutput_b(rack.node_count)
       setOutput_c(color === true ? rack.switchInfo.sw_ratios_color : rack.default_color)
     }
-
-    // return () => {
-    //   second
-    // }
   }, [outputType, color])
 
   return (
     <Tooltip title={output_t} placement="top" arrow>
       <Button
         component={Link}
-        to={`/Rack/${rack}`}
+        to={`/Rack/${rack.rack}`}
         size="small"
         variant="outlined"
         color={output_c}

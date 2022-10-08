@@ -13,11 +13,13 @@ import {
 import AlertEntry from "./AlertEntry"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useContext } from "react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const Index = () => {
+  const [tableRef, bodyRef] = useAutoAnimate(null)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 
@@ -73,7 +75,7 @@ const Index = () => {
           boxShadow: 12,
         }}
       >
-        <TableContainer>
+        <TableContainer ref={tableRef}>
           {query.isLoading && <LinearProgress />}
           {query.isFetched && query.data.status !== "error" && (
             <Table>
