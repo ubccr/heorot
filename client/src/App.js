@@ -8,8 +8,7 @@ import { useEffect, useState } from "react"
 
 import Alerts from "./routes/Alerts/Index"
 import AppBarC from "./components/AppBarC"
-import FloorPlan from "./routes/FloorPlan/Index"
-import FloorPlanV2 from "./routes/Floorplan"
+import FloorPlan from "./routes/Floorplan"
 import Grendel from "./routes/Grendel/Index"
 import Home from "./routes/Home"
 import Login from "./routes/Auth/Login"
@@ -28,8 +27,10 @@ import Warranty from "./routes/Admin/Warranty"
 import { apiConfig } from "./config"
 // import darkTriangles from "./backgrounds/large-triangles-dark.svg"
 import largeTriangles from "./backgrounds/large-triangles.svg"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 function App() {
+  const [appRef] = useAutoAnimate({ duration: 150 })
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -153,7 +154,7 @@ function App() {
                     }}
                   >
                     <AppBarC />
-                    <Container maxWidth="xl">
+                    <Container maxWidth="xl" ref={appRef}>
                       <Routes>
                         <Route exact path="/" element={<Home />} />
                         <Route path="/Login" element={<Login />} />
@@ -164,14 +165,6 @@ function App() {
                           element={
                             <PrivateRoute access="user">
                               <FloorPlan />
-                            </PrivateRoute>
-                          }
-                        />
-                        <Route
-                          path="/FloorPlanV2"
-                          element={
-                            <PrivateRoute access="user">
-                              <FloorPlanV2 />
                             </PrivateRoute>
                           }
                         />
