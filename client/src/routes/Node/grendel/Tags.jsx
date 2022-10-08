@@ -101,7 +101,7 @@ const Tags = ({ node, data, refetch, setRefetch }) => {
               ))}
             </Box>
           </AccordionSummary>
-          <AccordionDetails sx={{ textAlign: "center" }}>
+          <AccordionDetails sx={{ textAlign: "end" }}>
             <TextField
               size="small"
               name="newTag"
