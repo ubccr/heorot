@@ -10,14 +10,12 @@ async function dell_systems(uri, token) {
     if (res.status === "error") throw res.error
     if (res2.status === "error") throw res2.error
 
-    let bootArr =
-      res.data.Boot.BootOrder === undefined
-        ? null
-        : res.data.Boot.BootOrder.join(",")
-    let bootOrder =
-      res2.data.Attributes.SetBootOrderEn !== undefined
-        ? res2.data.Attributes.SetBootOrderEn
-        : bootArr
+    let bootArr = res.data.Boot.BootOrder === undefined ? null : res.data.Boot.BootOrder.join(",")
+    let bootOrder = res2.data.Attributes.SetBootOrderEn !== undefined ? res2.data.Attributes.SetBootOrderEn : bootArr
+    let cores =
+      res2.data.Attributes.LogicalProc === "Disabled"
+        ? res.data.ProcessorSummary.LogicalProcessorCount / res.data.ProcessorSummary.Count
+        : res.data.ProcessorSummary.LogicalProcessorCount / res.data.ProcessorSummary.Count / 2
     return {
       status: res.status,
       hostStatus: res.data.Status.Health,
@@ -33,9 +31,7 @@ async function dell_systems(uri, token) {
 
       processorModel: res.data.ProcessorSummary.Model,
       processorCount: res.data.ProcessorSummary.Count,
-      processorCores:
-        res.data.ProcessorSummary.LogicalProcessorCount /
-        res.data.ProcessorSummary.Count,
+      processorCores: cores,
       processorStatus: res.data.ProcessorSummary.Status.Health,
 
       logicalProc: res2.data.Attributes.LogicalProc,
@@ -73,15 +69,13 @@ async function sm_systems(uri, token) {
       memoryStatus: res.data[0].MemorySummary.Status.Health,
       totalMemory: res.data[0].MemorySummary.TotalSystemMemoryGiB,
       memorySpeed: res.data[2].OperatingSpeedMhz + " Mhz",
+      indicator_led: null,
 
       processorModel: res.data[1].Model,
       processorCount: res.data[0].ProcessorSummary.Count,
       processorCores: res.data[1].TotalCores,
       processorStatus: res.data[0].ProcessorSummary.Status.Health,
-      logicalProc:
-        res.data[1].TotalCores !== res.data[1].TotalThreads
-          ? "Enabled"
-          : "Disabled",
+      logicalProc: res.data[1].TotalCores !== res.data[1].TotalThreads ? "Enabled" : "Disabled",
       pxeDevice1: null,
       pxeDevice1Enabled: null,
       powerRecovery: null,
@@ -110,15 +104,13 @@ async function hpe_systems(uri, token) {
       memoryStatus: res.data[0].MemorySummary.Status.HealthRollUp,
       totalMemory: res.data[0].MemorySummary.TotalSystemMemoryGiB,
       memorySpeed: res.data[2].MaximumFrequencyMHz + " Mhz",
+      indicator_led: null,
 
       processorModel: res.data[1].Model,
       processorCount: res.data[0].ProcessorSummary.Count,
       processorCores: res.data[1].TotalCores,
       processorStatus: res.data[0].ProcessorSummary.Status.HealthRollUp,
-      logicalProc:
-        res.data[1].TotalCores !== res.data[1].Oem.Hp.CoresEnabled
-          ? "Enabled"
-          : "Disabled",
+      logicalProc: res.data[1].TotalCores !== res.data[1].Oem.Hp.CoresEnabled ? "Enabled" : "Disabled",
       pxeDevice1: null,
       pxeDevice1Enabled: null,
       powerRecovery: null,
