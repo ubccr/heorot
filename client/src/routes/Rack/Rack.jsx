@@ -1,15 +1,13 @@
-import { Box, LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+import { LinearProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
 import BgContainer from "../../components/BgContainer.jsx"
 import Body from "./Body.jsx"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
-import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useParams } from "react-router-dom"
 
 const Rack = () => {
-  const [tableRef] = useAutoAnimate(null)
   const { rack } = useParams()
   const [user] = useContext(UserContext)
 
@@ -32,7 +30,7 @@ const Rack = () => {
 
   return (
     <BgContainer>
-      <TableContainer ref={tableRef}>
+      <TableContainer>
         {isRackLoading && <LinearProgress />}
         {!isRackLoading && (
           <Table sx={{ tableLayout: "fixed" }}>
