@@ -1,9 +1,10 @@
 const express = require("express")
 const app = express.Router()
+const Nodes = require("../models/Nodes")
 
 // TODO: Deprecate
 const { getBMC } = require("../modules/grendel")
-
+const { timeComp, redfishMapping } = require("../modules/cache")
 const { redfish_auth, redfish_logout } = require("../modules/redfish/auth")
 const { dell_systems, sm_systems, hpe_systems } = require("../modules/redfish/systems")
 const { dell_managers, sm_managers, hpe_managers } = require("../modules/redfish/managers")
@@ -26,8 +27,10 @@ app.get("/", (req, res) => {
   })
 })
 
-app.get("/v1/all/:node", async (req, res) => {
+app.get("/v1/all/:node/:refetch?", async (req, res) => {
   const node = req.params.node
+  const refetch = req.params.node
+
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
     const uri = `https://${bmc.address}`
@@ -36,13 +39,26 @@ app.get("/v1/all/:node", async (req, res) => {
       let api_res = new String()
 
       if (auth.oem === "Dell") {
-        api_res = await Promise.all([
-          await dell_systems(uri, auth.token),
-          await dell_managers(uri, auth.token),
-          await dell_gpu(uri, auth.token, auth.version),
-          await dell_storage(uri, auth.token, auth.version),
-          await dell_sel(uri, auth.token, auth.version),
-        ])
+        let cache_res = await Nodes.findOne({ node: node })
+        console.log(cache_res !== null && refetch !== "true")
+        if (cache_res !== null && refetch !== "true") {
+          api_res = cache_res
+        } else {
+          api_res = await Promise.all([
+            await dell_systems(uri, auth.token),
+            await dell_managers(uri, auth.token),
+            await dell_gpu(uri, auth.token, auth.version),
+            await dell_storage(uri, auth.token, auth.version),
+            await dell_sel(uri, auth.token, auth.version),
+          ])
+          let redfish = redfishMapping(api_res, "toDB")
+          let update_res = await Nodes.findOneAndUpdate(
+            { node: node },
+            { redfish: redfish },
+            { new: true, upsert: true }
+          )
+          console.log("refetched")
+        }
       } else if (auth.oem === "Supermicro") {
         api_res = await Promise.all([
           await sm_systems(uri, auth.token),
