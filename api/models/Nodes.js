@@ -54,7 +54,6 @@ const nodesSchema = new Schema(
         {
           status: { type: String },
           model: { type: String },
-          count: { type: String },
           cores: { type: String },
           logical_proc: { type: String },
         },
@@ -78,6 +77,14 @@ const nodesSchema = new Schema(
         drive_count: { type: String },
         slot_count: { type: String },
         speed: { type: Number },
+        volumes: [
+          {
+            name: { type: String },
+            drive_status: { type: String },
+            raid: { type: String },
+            capacity: { type: String },
+          },
+        ],
         drives: [
           {
             status: { type: String },
@@ -89,7 +96,7 @@ const nodesSchema = new Schema(
             description: { type: String },
             serial_number: { type: String },
             protocol: { type: String },
-            capabe_speed: { type: Number },
+            capable_speed: { type: Number },
             rotation_speed: { type: Number },
             failure_predicted: { type: Boolean },
             hotspare_type: { type: String },
