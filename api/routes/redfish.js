@@ -2,8 +2,7 @@ const express = require("express")
 const app = express.Router()
 
 // TODO: Deprecate
-const { grendelRequest, getBMC } = require("../modules/grendel")
-const { biosApi, idracApi, gpuApi, sensorsApi, selApi, apiClearSEL, apiResetBMC } = require("../modules/nodeApi")
+const { getBMC } = require("../modules/grendel")
 
 const { redfish_auth, redfish_logout } = require("../modules/redfish/auth")
 const { dell_systems, sm_systems, hpe_systems } = require("../modules/redfish/systems")
