@@ -2,7 +2,7 @@ const express = require("express")
 const app = express.Router()
 
 const { grendelRequest } = require("../modules/grendel")
-const { pduFormat, switchFormat, nodeFormat, quadNodeFormat, floorplan } = require("../modules/client")
+const { rackGen, pduFormat, switchFormat, nodeFormat, quadNodeFormat, floorplan } = require("../modules/client")
 const config = require("../config")
 const Switches = require("../models/Switches")
 
@@ -23,7 +23,7 @@ app.get("/v1/floorPlan", async (req, res) => {
   let switch_query = await Switches.find({ node: /^swe/ })
 
   if (grendel_query.status === "success" && switch_query !== null) {
-    let funcRes = await floorplan(grendel_query, switch_query, config)
+    let funcRes = floorplan(grendel_query, switch_query, config)
     res.json(funcRes)
   } else
     res.json({
@@ -137,6 +137,29 @@ app.get("/rack/:rack", async (req, res) => {
       result: { nodes: nodes, pdu: pdu },
     })
   }
+})
+
+app.get("/v1/rack/:rack", async (req, res) => {
+  const rack = req.params.rack
+
+  let grendel_res = await grendelRequest(`/v1/host/tags/${rack}`)
+  if (grendel_res.status === "error") res.json(grendel_res)
+  let rackArr = []
+  for (let x = config.rack.min; x <= config.rack.max; x++) {
+    rackArr[x] = {
+      u: x,
+      type: "",
+    }
+  }
+
+  let nodes = await rackGen(grendel_res, rackArr.filter(Boolean))
+
+  res.json({
+    status: "success",
+    rack: rack,
+    nodes: nodes,
+    // pdu: [],
+  })
 })
 
 app.get("/node/:node", async (req, res) => {

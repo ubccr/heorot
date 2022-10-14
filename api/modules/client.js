@@ -1,5 +1,24 @@
 const config = require("../config.js")
 
+const rackGen = async (grendel, rackArr) => {
+  return rackArr.map((val, index) => {
+    let node = grendel.result.filter((n) => parseInt(n.name.split("-")[2]) === val.u && n.name.split("-")[0] !== "pdu")
+    if (node !== undefined) {
+      node.forEach((n) => {
+        let nodeset = n.name.split("-")
+        config.rack.prefix.forEach((p) => {
+          val.type = p.prefix.includes(nodeset[0]) ? p.type : val.type
+        })
+      })
+    }
+    if (node.length > 1) val.type = "multi"
+    return {
+      ...val,
+      grendel: node,
+    }
+  })
+}
+
 // TODO: pdu integration
 function pduFormat(grendel, nodeset) {}
 
@@ -224,4 +243,4 @@ const shortenVersion = (version) => {
   else return "undefined"
 }
 
-module.exports = { pduFormat, switchFormat, nodeFormat, quadNodeFormat, floorplan }
+module.exports = { rackGen, pduFormat, switchFormat, nodeFormat, quadNodeFormat, floorplan }
