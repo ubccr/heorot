@@ -46,9 +46,9 @@ const nodesSchema = new Schema(
         dns: { type: Array },
       },
       memory: {
-        memory_status: { type: String },
-        memory_size: { type: String },
-        memory_speed: { type: String },
+        status: { type: String },
+        size: { type: String },
+        speed: { type: String },
       },
       processor: [
         {
