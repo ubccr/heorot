@@ -1,17 +1,15 @@
 const fetch = require("node-fetch")
 const https = require("https")
 
+const { redfish_auth, redfish_logout } = require("./auth")
+const { dell_query } = require("./dell")
+const { getBMC } = require("../grendel")
+
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
 
-async function api_request(
-  url,
-  token,
-  method = "GET",
-  json = true,
-  body = undefined
-) {
+async function api_request(url, token, method = "GET", json = true, body = undefined) {
   try {
     let header = {
       method: method,
@@ -47,6 +45,28 @@ async function api_request(
   }
 }
 
+const redfishRequest = async (node) => {
+  let bmc = await getBMC(node)
+  if (bmc.status !== "success") return bmc
+
+  let url = `https://${bmc.address}`
+
+  let auth = await redfish_auth(url) // authenticate to BMC and collect info
+  if (auth.status !== "success") return auth
+  let output = { status: "error", message: "default redfishRequest object" }
+
+  if (auth.oem === "Dell") {
+    output = await dell_query(auth)
+  } else if (auth.oem === "Supermicro") {
+  } else if (auth.oem === "HPE") {
+  } else return { status: "error", message: "Failed to parse OEM from Redfish request" }
+
+  let logout_res = await redfish_logout(auth.location, url, auth.token)
+  if (logout_res.status !== 200) console.error(`Failed to logout of ${node}'s bmc`, await logout_res.json()) // Catch logout errors
+  return output
+}
+
 module.exports = {
   api_request,
+  redfishRequest,
 }
