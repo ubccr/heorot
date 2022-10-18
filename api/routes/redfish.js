@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 
 app.get("/v1/all/:node/:refetch?", async (req, res) => {
   const node = req.params.node
-  const refetch = req.params.node
+  const refetch = req.params.refetch
 
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
@@ -40,8 +40,7 @@ app.get("/v1/all/:node/:refetch?", async (req, res) => {
 
       if (auth.oem === "Dell") {
         let cache_res = await Nodes.findOne({ node: node })
-        console.log(cache_res !== null && refetch !== "true")
-        if (cache_res !== null && refetch !== "true") {
+        if (cache_res !== null && refetch !== "true" && !timeComp(cache_res.updatedAt)) {
           api_res = cache_res
         } else {
           api_res = await Promise.all([
@@ -81,7 +80,8 @@ app.get("/v1/all/:node/:refetch?", async (req, res) => {
           message: "failed to parse OEM from Redfish call",
         }
 
-      await redfish_logout(auth.location, uri, auth.token)
+      let logout_res = await redfish_logout(auth.location, uri, auth.token)
+      if (logout_res.status !== 200) console.error(`Failed to logout of ${node}'s bmc`, await logout_res.json())
       res.json(api_res)
     } else res.json(auth)
   } else res.json(bmc)
