@@ -8,6 +8,7 @@ const fetch_node = async (node) => {
   if (grendel.status !== "success") return grendel
 
   let redfish = await redfishRequest(node)
+  // TODO: cache in DB
 
   return {
     status: "success",
