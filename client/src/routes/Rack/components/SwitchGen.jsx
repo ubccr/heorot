@@ -365,7 +365,14 @@ const SwitchGen = ({ node, u, tags, height }) => {
                     let disabled = false
                     if (port.status === "down") disabled = true
                     let portArr = port.port.split("/")
-                    let link = port.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?")
+
+                    let link,
+                      port_name = ""
+                    if (port.description === "") port_name = port.port
+                    else {
+                      link = port.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?")
+                      port_name = link
+                    }
 
                     return (
                       <TableCell key={index} align="center" sx={{ paddingLeft: "4px", paddingRight: "4px" }}>
@@ -382,10 +389,10 @@ const SwitchGen = ({ node, u, tags, height }) => {
                               disabled={disabled}
                               size="small"
                               component={Link}
-                              to={`/Node/${link[0]}`}
+                              to={`/Node/${link}`}
                               sx={{ textTransform: "lowercase", whiteSpace: "nowrap" }}
                             >
-                              {link[0]}
+                              {port_name}
                               {/* {portArr[1]} */}
                             </Button>
                           </span>
