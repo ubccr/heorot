@@ -17,7 +17,6 @@ const dell_query = async (auth) => {
   let s_bios = query_res.data[1].Attributes
   let managers = query_res.data[2]
   let sel = query_res.data[6]
-
   let cpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/CPU/))
   let gpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/Video/))
   let storage_urls = query_res.data[5].Members.map((val) => val["@odata.id"])
@@ -143,7 +142,7 @@ const dell_query = async (auth) => {
     }),
     processor: cpu.map((val) => {
       return {
-        status: val.Status.Health,
+        status: val.Status?.Health,
         model: val.Model,
         cores: val.TotalCores,
         turbo: val.TurboState ?? s_bios.ProcTurboMode,
