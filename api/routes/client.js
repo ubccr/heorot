@@ -139,8 +139,9 @@ app.get("/rack/:rack", async (req, res) => {
   }
 })
 
-app.get("/v1/rack/:rack", async (req, res) => {
+app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
   const rack = req.params.rack
+  const refetch = req.params.refetch ?? "false"
 
   let grendel_res = await grendelRequest(`/v1/host/tags/${rack}`)
   if (grendel_res.status === "error") res.json(grendel_res)
@@ -152,7 +153,14 @@ app.get("/v1/rack/:rack", async (req, res) => {
     }
   }
 
-  let nodes = await rackGen(grendel_res, rackArr.filter(Boolean))
+  let nodes = await rackGen(grendel_res, rackArr.filter(Boolean), refetch)
+
+  nodes.forEach((node, index) => {
+    if (node.height > 1)
+      for (let x = 1; x < node.height; x++) {
+        nodes[index + x].type = "rowSpan"
+      }
+  })
 
   res.json({
     status: "success",
