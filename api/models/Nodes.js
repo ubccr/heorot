@@ -21,6 +21,10 @@ const nodesSchema = new Schema(
       tags: { type: Array },
     },
     redfish: {
+      status: { type: String },
+      message: { type: String },
+      error: { type: Object },
+
       model: { type: String },
       manufacturer: { type: String },
       service_tag: { type: String },
@@ -135,6 +139,7 @@ const nodesSchema = new Schema(
         ],
       },
     },
+    notes: { type: String },
   },
   { timestamps: true }
 )
