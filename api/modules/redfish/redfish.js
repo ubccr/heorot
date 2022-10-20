@@ -58,7 +58,9 @@ const redfishRequest = async (node) => {
   if (auth.oem === "Dell") {
     output = await dell_query(auth)
   } else if (auth.oem === "Supermicro") {
+    output = { status: "error", message: "Supermicro nodes are not supported yet", silent: true }
   } else if (auth.oem === "HPE") {
+    output = { status: "error", message: "HPE nodes are not supported yet", silent: true }
   } else return { status: "error", message: "Failed to parse OEM from Redfish request" }
 
   let logout_res = await redfish_logout(auth.location, url, auth.token)
