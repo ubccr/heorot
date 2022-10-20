@@ -47,7 +47,7 @@ const dell_query = async (auth) => {
   let storage = query_res_2[3].data.find((val) => val.Drives.length > 0)
   let ib = pci_devices.filter(
     (val) => ["Mellanox Technologies"].includes(val.Manufacturer) || val.Description.match(/Omni/g)
-  )
+  ) // find Mellanox IB & Omni path cards
 
   let network_port_urls = []
   if (query_res_2[6].data.length > 0)
@@ -71,7 +71,6 @@ const dell_query = async (auth) => {
 
   // network ports
   let ports = query_res_3[4].data
-  console.log(ports)
 
   // storage
   let drives = query_res_3[1].data
@@ -92,7 +91,7 @@ const dell_query = async (auth) => {
   let physical_gpu = 0
   let virtual_gpu = 0
   gpu.forEach((val) => {
-    if (val.Id.slice(-2) === "-1" || val.Id.slice(-2) === "-0") physical_gpu++ // -0 is for older versions
+    if (val.Id.slice(-2) === "-1" || val.Id.slice(-2) === "-0") physical_gpu++ // -0 is for older versions (~13th gen)
     else virtual_gpu++
   })
 
@@ -110,21 +109,13 @@ const dell_query = async (auth) => {
       vlan: bmc.VLAN.VLANId,
       mac: bmc.MACAddress,
       addresses: {
+        // assuming one IP address per bmc
         ip: bmc.IPv4Addresses[0].Address,
         type: bmc.IPv4Addresses[0].AddressOrigin,
         gateway: bmc.IPv4Addresses[0].Gateway,
         subnet_mask: bmc.IPv4Addresses[0].SubnetMask,
       },
-      // incase of multiple ipv4 addresses: (will need to change DB schema)
-      // bmc.IPv4Addresses.map((val) => {
-      //   return {
-      //     ip: val.Address,
-      //     origin: val.AddressOrigin,
-      //     gateway: val.Gateway,
-      //     subnet_mask: val.SubnetMask,
-      //   }
-      // }),
-      dns: bmc.NameServers.filter((val) => !["::", "0.0.0.0"].includes(val)),
+      dns: bmc.NameServers.filter((val) => !["::", "0.0.0.0"].includes(val)), // filter out garbage DNS data
     },
     memory: {
       status: systems.MemorySummary.Status.Health,
@@ -158,12 +149,11 @@ const dell_query = async (auth) => {
         turbo: val.TurboState ?? s_bios.ProcTurboMode,
         threads: val.TotalThreads,
         max_frequency: val.MaxSpeedMHz,
-        frequency: val.OperatingSpeedMHz ?? parseFloat(val.Model.match(/[0-9]\.[0-9]{2}/g)[0]) * 1000,
+        frequency: val.OperatingSpeedMHz ?? parseFloat(val.Model.match(/[0-9]\.[0-9]{2}/g)[0]) * 1000, // fix for some nodes not having OperatingSpeedMHz object | converts speed at end of proccessor model name
         logical_proc: val.TotalCores !== val.TotalThreads ? "Enabled" : "Disabled",
       }
     }),
     gpu: {
-      // old nodes
       vGPU: virtual_gpu === 0 ? false : true,
       physical: physical_gpu,
       virtual: virtual_gpu,
@@ -186,14 +176,14 @@ const dell_query = async (auth) => {
           description: val.Description,
           status: val.Status.Health,
           volume_type: val.VolumeType,
-          raid_type: val.RAIDType, //
+          raid_type: val.RAIDType ?? "",
           capacity: val.CapacityBytes,
         }
       }),
       drives: drives.map((val) => {
         return {
           status: val.Status.Health,
-          slot: val.PhysicalLocation?.PartLocation.LocationOrdinalValue ?? null, //
+          slot: val.PhysicalLocation?.PartLocation.LocationOrdinalValue, // doesn't work on older nodes
           capacity: val.CapacityBytes,
           type: val.MediaType,
           name: val.Name,
@@ -205,7 +195,7 @@ const dell_query = async (auth) => {
           capable_speed: val.CapableSpeedGbs,
           rotation_speed: val.RotationSpeedRPM,
           predicted_write_endurance: val.PredictedMediaLifeLeftPercent,
-          failure_predicted: val.Failurepredicted, //
+          failure_predicted: val.Failurepredicted, // doesn't work on older nodes
           hotspare_type: val.HotspareType,
         }
       }),
