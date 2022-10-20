@@ -1,20 +1,43 @@
 const config = require("../config.js")
+const { fetch_node } = require("./nodes.js")
 
-const rackGen = async (grendel, rackArr) => {
+const rackGen = async (grendel, rackArr, refetch) => {
+  let nodes_arr = grendel.result.filter((val) => config.rack.node_prefix.includes(val.name.split("-")[0]))
+  let redfish_arr = await Promise.all(nodes_arr.map((val) => fetch_node(val.name, refetch)))
+
   return rackArr.map((val, index) => {
     let node = grendel.result.filter((n) => parseInt(n.name.split("-")[2]) === val.u && n.name.split("-")[0] !== "pdu")
+    let redfish_res = null
     if (node !== undefined) {
       node.forEach((n) => {
         let nodeset = n.name.split("-")
         config.rack.prefix.forEach((p) => {
           val.type = p.prefix.includes(nodeset[0]) ? p.type : val.type
         })
+        redfish_res = redfish_arr.find((val) => val.node === n.name)
       })
     }
     if (node.length > 1) val.type = "multi"
+    let height = 0,
+      width = 0
+    if (redfish_res !== null && redfish_res !== undefined && redfish_res.redfish.status !== "error") {
+      let node_model = redfish_res.redfish.model
+      config.rack.node_size.forEach((size) => {
+        size.models.forEach((models) => {
+          if (node_model.match(models)) {
+            height = size.height
+            width = size.width
+          }
+        })
+      })
+    }
     return {
       ...val,
+      height,
+      width,
       grendel: node,
+      redfish: redfish_res?.redfish,
+      notes: redfish_res?.notes,
     }
   })
 }
