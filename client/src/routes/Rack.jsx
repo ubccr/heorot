@@ -32,7 +32,7 @@ const Rack = () => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/client/Rack/${rack}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/rack/${rack}`, payload)).json()
       if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "error" && res.hasOwnProperty("silent")) console.error(`${res.message}`)
 
@@ -52,23 +52,41 @@ const Rack = () => {
                 U
               </TableCell>
               <TableCell align={"center"}>{rack}</TableCell>
-              <TableCell></TableCell>
+              <TableCell width={40}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {query.isFetched &&
               query.data.status === "success" &&
-              query.data.result.nodes
-                .map((val, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{val.u}</TableCell>
-                    <TableCell>{val.node}</TableCell>
-                    <TableCell>
-                      <Checkbox />
-                    </TableCell>
-                  </TableRow>
-                ))
-                .reverse()}
+              query.data.nodes.map((val, index) => (
+                <TableRow key={index}>
+                  {val.type === "rowSpan" && (
+                    <>
+                      <TableCell align="center">{val.u}</TableCell>
+                    </>
+                  )}
+                  {val.type !== "rowSpan" && val.height > 0 && (
+                    <>
+                      <TableCell align={"center"}>{val.u}</TableCell>
+                      <TableCell align={"center"} rowSpan={val.height}>
+                        {val.grendel[0]?.name}
+                      </TableCell>
+                      <TableCell align={"center"} rowSpan={val.height}>
+                        <Checkbox />
+                      </TableCell>
+                    </>
+                  )}
+                  {val.type !== "rowSpan" && val.height === 0 && (
+                    <>
+                      <TableCell align={"center"}>{val.u}</TableCell>
+                      <TableCell align={"center"}>{val.grendel[0]?.name}</TableCell>
+                      <TableCell align={"center"}>
+                        <Checkbox />
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
