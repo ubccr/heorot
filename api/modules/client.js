@@ -20,6 +20,15 @@ const rackGen = async (grendel, rackArr, refetch) => {
     if (node.length > 1) val.type = "multi"
     let height = 0,
       width = 0
+    if (node.length > 0 && val.type !== "multi") {
+      str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "0"
+      height = parseInt(str_height.replace("u", ""))
+      width = 1
+    } else if (node.length > 0) {
+      str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "0"
+      height = parseInt(str_height.replace("u", ""))
+      width = node.length
+    }
     if (redfish_res !== null && redfish_res !== undefined && redfish_res.redfish.status !== "error") {
       let node_model = redfish_res.redfish.model
       config.rack.node_size.forEach((size) => {
