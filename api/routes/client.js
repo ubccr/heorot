@@ -155,17 +155,28 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
 
   let nodes = await rackGen(grendel_res, rackArr.filter(Boolean), refetch)
 
-  nodes.forEach((node, index) => {
-    if (node.height > 1)
-      for (let x = 1; x < node.height; x++) {
-        nodes[index + x].type = "rowSpan"
+  // offset function | needed because of how html tables generate, multi u nodes need their data in the top most u, all other u's must be a rowspan cell
+  for (let i = 0; i < nodes.length; i++) {
+    if (nodes[i].height > 1) {
+      let offset = i + nodes[i].height - 1
+      let offsetU = nodes[offset].u
+
+      nodes[offset] = { ...nodes[i], u: offsetU }
+      nodes[i] = { u: nodes[i].u, type: "rowSpan", height: nodes[i].height, width: nodes[i].width, grendel: [] }
+
+      // set other el to rowspan
+      for (let x = 1; x < nodes[i].height; x++) {
+        nodes[i + x - 1].type = "rowSpan"
       }
-  })
+
+      i += nodes[i].height - 1 // skip
+    }
+  }
 
   res.json({
     status: "success",
     rack: rack,
-    nodes: nodes,
+    nodes: nodes.reverse(),
     // pdu: [],
   })
 })
