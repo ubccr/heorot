@@ -53,7 +53,8 @@ const dell_query = async (auth) => {
     query_res_2[6].data.forEach((val) => val.Members.forEach((val2) => network_port_urls.push(val2["@odata.id"])))
 
   // third query
-  let enclosure_url = storage.Links.Enclosures.find((val) => val["@odata.id"].match(/Enclosure/g))["@odata.id"]
+  let storage_link = storage.Links.Enclosures.find((val) => val["@odata.id"].match(/Enclosure/g))
+  let enclosure_url = storage_link !== undefined ? storage_link["@odata.id"] : null
   let drive_urls = storage.Drives.map((val) => val["@odata.id"])
   let volume_urls = []
   query_res_2[4].data.forEach((val) => {
@@ -77,7 +78,7 @@ const dell_query = async (auth) => {
   let slotCount = 0
 
   // fix for certain dell models with different object naming
-  let tmp_oem = query_res_3[0].data.Oem?.Dell
+  let tmp_oem = query_res_3[0].data?.Oem?.Dell
   if (tmp_oem !== undefined && tmp_oem.DellChassisEnclosure !== undefined)
     slotCount = tmp_oem.DellChassisEnclosure.SlotCount
   else if (tmp_oem !== undefined && tmp_oem.DellEnclosure !== undefined) slotCount = tmp_oem.DellEnclosure.SlotCount
@@ -156,13 +157,16 @@ const dell_query = async (auth) => {
       vGPU: virtual_gpu === 0 ? false : true,
       physical: physical_gpu,
       virtual: virtual_gpu,
-      gpus: gpu.map((val) => {
-        return {
-          status: val.Status.Health,
-          manufacturer: val.Manufacturer,
-          model: val.Model ?? val.Name,
-        }
-      }),
+      gpus: gpu
+        .map((val) => {
+          if (val.Id.slice(-2) === "-1" || val.Id.slice(-2) === "-0")
+            return {
+              status: val.Status.Health,
+              manufacturer: val.Manufacturer,
+              model: val.Model ?? val.Name,
+            }
+        })
+        .filter(Boolean),
     },
     storage: {
       controller: storage.Name,
