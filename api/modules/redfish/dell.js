@@ -1,3 +1,4 @@
+const { formatBytes } = require("../math")
 const { api_request } = require("./api_request")
 
 const dell_query = async (auth) => {
@@ -180,14 +181,14 @@ const dell_query = async (auth) => {
           status: val.Status.Health,
           volume_type: val.VolumeType,
           raid_type: val.RAIDType ?? "",
-          capacity: val.CapacityBytes,
+          capacity: formatBytes(val.CapacityBytes, 0),
         }
       }),
       drives: drives.map((val) => {
         return {
           status: val.Status.Health,
           slot: val.PhysicalLocation?.PartLocation.LocationOrdinalValue, // doesn't work on older nodes
-          capacity: val.CapacityBytes,
+          capacity: formatBytes(val.CapacityBytes, 0),
           type: val.MediaType,
           name: val.Name,
           model: val.Model,
