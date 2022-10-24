@@ -112,7 +112,7 @@ const nodesSchema = new Schema(
           {
             status: { type: String },
             slot: { type: String },
-            capacity: { type: Number },
+            capacity: { type: String },
             type: { type: String },
             name: { type: String },
             model: { type: String },
