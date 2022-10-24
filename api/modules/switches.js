@@ -449,7 +449,6 @@ const parseOldOutput = (data, command, parseType) => {
     let spacing = {}
     let mapping = tmp
       .map((val) => {
-        console.log(val)
         if (val.match("^(Port)") && !val.match("(Type)")) {
           spacing.port = val.match("(Port)").index
           spacing.name = val.match("(Name)").index
@@ -545,7 +544,6 @@ const parseOldOutput = (data, command, parseType) => {
     let spacing = {}
     let mapping = tmp
       .map((val) => {
-        console.log(val)
         if (val.match("^(Vlan)")) {
           spacing.vlan = val.match("(Vlan)").index
           spacing.mac = val.match("(Mac Address)").index

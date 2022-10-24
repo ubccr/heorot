@@ -56,7 +56,6 @@ app.get("/v1/all/:node/:refetch?", async (req, res) => {
             { redfish: redfish },
             { new: true, upsert: true }
           )
-          console.log("refetched")
         }
       } else if (auth.oem === "Supermicro") {
         api_res = await Promise.all([
