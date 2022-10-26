@@ -111,7 +111,7 @@ const Rack = () => {
                         <>
                           <TableCell align={"center"}>{val.u}</TableCell>
                           <TableCell align={"center"} rowSpan={val.height} sx={{ border: 1 }}>
-                            <Node grendel={val.grendel} redfish={val.redfish} />
+                            <Node node={val} />
                           </TableCell>
                           <TableCell align={"center"} rowSpan={val.height}>
                             <Checkbox />
