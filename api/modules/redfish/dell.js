@@ -181,14 +181,14 @@ const dell_query = async (auth) => {
           status: val.Status.Health,
           volume_type: val.VolumeType,
           raid_type: val.RAIDType ?? "",
-          capacity: formatBytes(val.CapacityBytes, 0),
+          capacity: formatBytes(val.CapacityBytes, 1),
         }
       }),
       drives: drives.map((val) => {
         return {
           status: val.Status.Health,
           slot: val.PhysicalLocation?.PartLocation.LocationOrdinalValue, // doesn't work on older nodes
-          capacity: formatBytes(val.CapacityBytes, 0),
+          capacity: formatBytes(val.CapacityBytes, 1),
           type: val.MediaType,
           name: val.Name,
           model: val.Model,
