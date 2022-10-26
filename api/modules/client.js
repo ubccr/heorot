@@ -29,7 +29,18 @@ const rackGen = async (grendel, rackArr, refetch) => {
       height = parseInt(str_height.replace("u", ""))
       width = node.length
     }
+
+    let latest_bios = ""
+    let latest_bmc = ""
     if (redfish_res !== null && redfish_res !== undefined && redfish_res.redfish.status !== "error") {
+      let latest_firmwareArr = config.bmc.firmware_versions
+      latest_firmwareArr.forEach((val) => {
+        if (redfish_res.redfish.model.match(val.model)) {
+          latest_bios = val.bios
+          latest_bmc = val.bmc
+        }
+      })
+
       let node_model = redfish_res.redfish.model
       config.rack.node_size.forEach((size) => {
         size.models.forEach((models) => {
@@ -44,6 +55,8 @@ const rackGen = async (grendel, rackArr, refetch) => {
       ...val,
       height,
       width,
+      latest_bios,
+      latest_bmc,
       grendel: node,
       redfish: redfish_res?.redfish,
       notes: redfish_res?.notes,
