@@ -18,8 +18,7 @@ import Node from "./routes/Node/Index"
 import { PluginContext } from "./contexts/PluginContext"
 import PrivateRoute from "./components/PrivateRoute"
 import Profile from "./routes/Profile/Profile"
-import Rack from "./routes/Rack/Rack"
-import RackV2 from "./routes/Rack"
+import Rack from "./routes/Rack"
 import Signup from "./routes/Auth/Signup"
 import { SnackbarProvider } from "notistack"
 import { ThemeContext } from "./contexts/ThemeContext"
@@ -174,14 +173,6 @@ function App() {
                           element={
                             <PrivateRoute access="user">
                               <Rack />
-                            </PrivateRoute>
-                          }
-                        />
-                        <Route
-                          path="/RackV2/:rack"
-                          element={
-                            <PrivateRoute access="user">
-                              <RackV2 />
                             </PrivateRoute>
                           }
                         />
