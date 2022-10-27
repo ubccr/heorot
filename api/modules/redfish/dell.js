@@ -124,7 +124,7 @@ const dell_query = async (auth) => {
       size: s_bios.SysMemSize,
       speed: s_bios.SysMemSpeed,
     },
-    network: ports.map((val) => {
+    network: ports?.map((val) => {
       return {
         status: val.Status.Health,
         link: val.LinkStatus,
@@ -174,16 +174,19 @@ const dell_query = async (auth) => {
       status: storage.Status.Health,
       drive_count: storage["Drives@odata.count"],
       slot_count: slotCount,
-      volumes: volumes.map((val) => {
-        return {
-          name: val.Name,
-          description: val.Description,
-          status: val.Status.Health,
-          volume_type: val.VolumeType,
-          raid_type: val.RAIDType ?? "",
-          capacity: formatBytes(val.CapacityBytes, 1),
-        }
-      }),
+      volumes: volumes
+        ?.map((val) => {
+          if (!val.Name.match(/NonRAID/g))
+            return {
+              name: val.Name,
+              description: val.Description,
+              status: val.Status.Health,
+              volume_type: val.VolumeType,
+              raid_type: val.RAIDType ?? "",
+              capacity: formatBytes(val.CapacityBytes, 1),
+            }
+        })
+        .filter(Boolean),
       drives: drives.map((val) => {
         return {
           status: val.Status.Health,
