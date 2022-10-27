@@ -24,6 +24,7 @@ import MenuIcon from "@mui/icons-material/Menu"
 import Node from "./Rack/Node"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useParams } from "react-router-dom"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
@@ -36,6 +37,7 @@ const Rack = () => {
   const [open, setOpen] = useState(false)
   const [colorDisplay, setColorDisplay] = useState("")
   const [textDisplay, setTextDisplay] = useState("name")
+  const [tableRef] = useAutoAnimate(null)
 
   const query = useQuery(
     ["rack", rack],
@@ -80,7 +82,7 @@ const Rack = () => {
           </Box>
         </Drawer>
         <Box component="main">
-          <TableContainer>
+          <TableContainer ref={tableRef}>
             {query.isFetching && <LinearProgress />}
             <Table sx={{ tableLayout: "fixed" }}>
               <TableHead>
