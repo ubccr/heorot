@@ -2,64 +2,77 @@ const config = require("../config.js")
 const { fetch_node } = require("./nodes.js")
 
 const rackGen = async (grendel, rackArr, refetch) => {
+  // find all nodes with matching rack name and send redfish requests
   let nodes_arr = grendel.result.filter((val) => config.rack.node_prefix.includes(val.name.split("-")[0]))
   let redfish_arr = await Promise.all(nodes_arr.map((val) => fetch_node(val.name, refetch)))
 
-  return rackArr.map((val, index) => {
+  // loop through arr generated in routes/client.js
+  return rackArr.map((val) => {
+    // get all nodes matching the same u that are not pdus
     let node = grendel.result.filter((n) => parseInt(n.name.split("-")[2]) === val.u && n.name.split("-")[0] !== "pdu")
-    let redfish_res = null
+    let node_output = []
+
     if (node !== undefined) {
-      node.forEach((n) => {
+      // loop through nodes
+      node.forEach((n, index) => {
         let nodeset = n.name.split("-")
+
+        // set type from config file
         config.rack.prefix.forEach((p) => {
           val.type = p.prefix.includes(nodeset[0]) ? p.type : val.type
         })
-        redfish_res = redfish_arr.find((val) => val.node === n.name)
-      })
-    }
-    if (node.length > 1) val.type = "multi"
-    let height = 0,
-      width = 0
-    if (node.length > 0 && val.type !== "multi") {
-      str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "0"
-      height = parseInt(str_height.replace("u", ""))
-      width = 1
-    } else if (node.length > 0) {
-      str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "0"
-      height = parseInt(str_height.replace("u", ""))
-      width = node.length
-    }
+        // get redfish query based on node name
+        let redfish_output = redfish_arr.find((val) => val.node === n.name)
 
-    let latest_bios = ""
-    let latest_bmc = ""
-    if (redfish_res !== null && redfish_res !== undefined && redfish_res.redfish.status !== "error") {
-      let latest_firmwareArr = config.bmc.firmware_versions
-      latest_firmwareArr.forEach((val) => {
-        if (redfish_res.redfish.model.match(val.model)) {
-          latest_bios = val.bios
-          latest_bmc = val.bmc
-        }
-      })
-
-      let node_model = redfish_res.redfish.model
-      config.rack.node_size.forEach((size) => {
-        size.models.forEach((models) => {
-          if (node_model.match(models)) {
-            height = size.height
-            width = size.width
+        // get latest firmware versions
+        let latest_bios = ""
+        let latest_bmc = ""
+        config.bmc.firmware_versions.forEach((val) => {
+          if (redfish_output?.redfish.model?.match(val.model)) {
+            latest_bios = val.bios
+            latest_bmc = val.bmc
           }
         })
+
+        node_output[index] = {
+          grendel: n,
+          latest_bios,
+          latest_bmc,
+          redfish: redfish_output?.redfish,
+          notes: redfish_output?.notes,
+        }
       })
     }
+
+    let height = 0,
+      width = 0
+
+    if (node.length > 0) {
+      // try to calculate height and width from model name
+      if (node_output[0].redfish !== undefined) {
+        let node_model = node_output[0].redfish.model ?? ""
+        config.rack.node_size.forEach((size) => {
+          size.models.forEach((models) => {
+            if (node_model.match(models)) {
+              height = size.height
+              width = size.width
+            }
+          })
+        })
+      }
+      // fallback function to use grendel tags for height
+      if (height === 0 || width === 0) {
+        str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "1"
+        height = parseInt(str_height.replace("u", "")) ?? 1
+        width = node.length ?? 1
+      }
+    }
+
     return {
       ...val,
       height,
       width,
-      latest_bios,
-      latest_bmc,
-      grendel: node,
-      redfish: redfish_res?.redfish,
-      notes: redfish_res?.notes,
+      nodes: node_output,
     }
   })
 }
