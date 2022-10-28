@@ -9,3 +9,7 @@ a {
 button {
   text-transform: capitalize !important;
 }
+.bi {
+  vertical-align: -0.125em;
+  margin-bottom: calc(-0.125em / 2);
+}
