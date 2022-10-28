@@ -1,26 +1,18 @@
 import {
   Box,
   Checkbox,
-  Drawer,
-  FormControl,
-  IconButton,
-  InputLabel,
+  Grid,
   LinearProgress,
-  MenuItem,
-  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Toolbar,
 } from "@mui/material"
 import React, { useContext, useState } from "react"
 
 import BgContainer from "../components/BgContainer"
-import ChevronRightIcon from "@mui/icons-material/ChevronRight"
-import MenuIcon from "@mui/icons-material/Menu"
 import Node from "./Rack/Node"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
@@ -60,75 +52,86 @@ const Rack = () => {
   return (
     <BgContainer>
       <Box sx={{ display: "flex" }}>
-        <Drawer variant="persistent" anchor="right" open={open} width={240}>
-          <Box>
-            <FormControl size="small" fullWidth>
-              <InputLabel>Display</InputLabel>
-              <Select
-                value={textDisplay}
-                label="Display"
-                onChange={(e) => {
-                  setTextDisplay(e.target.value)
-                  // localStorage.setItem("floorPlanOutputType", e.target.value)
-                }}
-              >
-                <MenuItem value={"name"}>Name</MenuItem>
-                <MenuItem value={"interfaces"}>Interfaces</MenuItem>
-                <MenuItem value={"compute"}>Compute Resources</MenuItem>
-                <MenuItem value={"gpus"}>GPUs</MenuItem>
-                <MenuItem value={"storage"}>Storage</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-        </Drawer>
         <Box component="main">
           <TableContainer ref={tableRef}>
             {query.isFetching && <LinearProgress />}
-            <Table sx={{ tableLayout: "fixed" }}>
+            <Table sx={{ tableLayout: "fixed" }} size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell align={"center"} width={40}>
+                  <TableCell align={"center"} width={30}>
                     U
                   </TableCell>
                   <TableCell align={"center"}>{rack}</TableCell>
-                  <TableCell width={40}>
-                    <IconButton color="inherit" onClick={() => setOpen(!open)} edge="start" sx={{ mr: 2 }}>
-                      {!open && <MenuIcon />}
-                      {open && <ChevronRightIcon />}
-                    </IconButton>
-                  </TableCell>
+                  <TableCell width={30}></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {query.isFetched &&
                   query.data.status === "success" &&
-                  query.data.nodes.map((val, index) => (
-                    <TableRow key={index}>
-                      {val.type === "rowSpan" && (
-                        <>
-                          <TableCell align="center">{val.u}</TableCell>
-                        </>
-                      )}
-                      {val.type === "node" && val.height > 0 && (
-                        <>
-                          <TableCell align={"center"}>{val.u}</TableCell>
-                          <TableCell align={"center"} rowSpan={val.height} sx={{ border: 1 }}>
-                            <Node node={val} />
-                          </TableCell>
-                          <TableCell align={"center"} rowSpan={val.height}>
-                            <Checkbox />
-                          </TableCell>
-                        </>
-                      )}
-                      {val.type === "" && (
-                        <>
-                          <TableCell align={"center"}>{val.u}</TableCell>
-                          <TableCell align={"center"}></TableCell>
-                          <TableCell align={"center"}></TableCell>
-                        </>
-                      )}
-                    </TableRow>
-                  ))}
+                  query.data.nodes.map((node, index) => {
+                    let border_color = "border.main"
+                    let background_color = "border.main"
+
+                    if (node.height === 1 && node.width === 1) {
+                      border_color = "border.table.single"
+                      background_color = "background.table.single"
+                    } else if (node.height === 1 && node.width >= 2) {
+                      border_color = "border.table.quad"
+                      background_color = "background.table.quad"
+                    } else if (node.height >= 3) {
+                    } else if (node.height === 2) {
+                      border_color = "border.table.double"
+                      background_color = "background.table.double"
+                    } else if (node.height >= 3) {
+                      border_color = "border.table.four"
+                      background_color = "background.table.four"
+                    }
+
+                    return (
+                      <TableRow key={index}>
+                        {node.type === "rowSpan" && (
+                          <>
+                            <TableCell align="center">{node.u}</TableCell>
+                          </>
+                        )}
+                        {node.type === "node" && node.height > 0 && (
+                          <>
+                            <TableCell align={"center"}>{node.u}</TableCell>
+                            <TableCell align={"center"} rowSpan={node.height} sx={{ padding: 0 }}>
+                              <Grid container>
+                                {node.nodes.map((val, index) => (
+                                  <Grid
+                                    item
+                                    xs={12}
+                                    md={12 / node.nodes.length}
+                                    key={index}
+                                    sx={{
+                                      border: 1,
+                                      borderWidth: 2,
+                                      borderColor: border_color,
+                                      backgroundColor: background_color,
+                                    }}
+                                  >
+                                    <Node node={val} />
+                                  </Grid>
+                                ))}
+                              </Grid>
+                            </TableCell>
+                            <TableCell align={"center"} rowSpan={node.height}>
+                              <Checkbox />
+                            </TableCell>
+                          </>
+                        )}
+                        {node.type === "" && (
+                          <>
+                            <TableCell align={"center"}>{node.u}</TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                          </>
+                        )}
+                      </TableRow>
+                    )
+                  })}
               </TableBody>
             </Table>
           </TableContainer>
