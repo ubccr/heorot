@@ -11,7 +11,7 @@ import StorageIcon from "@mui/icons-material/Storage"
 const Node = ({ node }) => {
   const [expandDrives, setExpandDrives] = useState(false)
   let powerColor = node.redfish.power_state === "On" ? "success" : "error"
-  if (node.redfish.status === "error") return <div>{node.grendel[0].name}</div>
+  if (node.redfish.status === "error") return <div>{node.grendel.name}</div>
 
   let biosColor = "default"
   if (node.latest_bios === node.redfish.bios_version) biosColor = "success"
@@ -41,16 +41,16 @@ const Node = ({ node }) => {
       { name: "Speed:", data: node.redfish.memory.speed },
       { name: "Status:", data: node.redfish.memory.status },
     ],
-    icon: <i className="bi bi-memory" style={{ marginLeft: "8px", marginBottom: "0", fontSize: "15pt" }} />,
+    icon: <i className="bi bi-memory" style={{ marginLeft: "5px", fontSize: "12pt" }} />,
     color: statusColor(node.redfish.memory.status),
     label: node.redfish.memory.size,
   }
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid container spacing={0}>
         <Grid item xs={12}>
-          <Link to={`/Node/${node.grendel[0].name}`}>{node.grendel[0].name}</Link>
+          <Link to={`/Node/${node.grendel.name}`}>{node.grendel.name}</Link>
           <PowerSettingsNewIcon color={powerColor} sx={{ float: "right" }} />
         </Grid>
         <Grid item xs={6} sx={{ display: "flex", justifyContent: "flex-start", flexWrap: "wrap" }}>
@@ -96,19 +96,9 @@ const Node = ({ node }) => {
                   {node.redfish.storage.drives.map((val, index) => {
                     let icon = <></>
                     if (val.type === "SSD")
-                      icon = (
-                        <i
-                          className="bi bi-device-ssd"
-                          style={{ marginLeft: "8px", marginBottom: "0", fontSize: "15pt" }}
-                        />
-                      )
+                      icon = <i className="bi bi-device-ssd" style={{ marginLeft: "5px", fontSize: "12pt" }} />
                     if (val.type === "HDD")
-                      icon = (
-                        <i
-                          className="bi-device-hdd"
-                          style={{ marginLeft: "8px", marginBottom: "0", fontSize: "15pt" }}
-                        />
-                      )
+                      icon = <i className="bi-device-hdd" style={{ marginLeft: "5px", fontSize: "12pt" }} />
 
                     let titleArr = [
                       { name: "Name:", data: val.name },
@@ -144,7 +134,7 @@ const Node = ({ node }) => {
         </Grid>
         <Grid item xs={8} sx={{ display: "flex", justifyContent: "flex-start", flexWrap: "wrap" }}>
           {node.redfish.processor.map((val, index) => {
-            let icon = <i className="bi bi-cpu" style={{ marginLeft: "8px", marginBottom: "0", fontSize: "15pt" }} />
+            let icon = <i className="bi bi-cpu" style={{ marginLeft: "5px", fontSize: "12pt" }} />
             let titleArr = [
               { name: "Model:", data: val.model },
               { name: "Hyper-Threading:", data: val.logical_proc },
@@ -160,9 +150,7 @@ const Node = ({ node }) => {
           })}
           <DataDisplay titleArr={memory.titleArr} icon={memory.icon} color={memory.color} label={memory.label} />
           {node.redfish.gpu.gpus.map((val, index) => {
-            let icon = (
-              <i className="bi bi-gpu-card" style={{ marginLeft: "8px", marginBottom: "0", fontSize: "15pt" }} />
-            )
+            let icon = <i className="bi bi-gpu-card" style={{ marginLeft: "5px", fontSize: "12pt" }} />
             let titleArr = [
               { name: "Model:", data: val.model },
               { name: "Manufacturer:", data: val.manufacturer },
@@ -173,9 +161,7 @@ const Node = ({ node }) => {
             )
           })}
           {node.redfish.pcie.map((val, index) => {
-            let icon = (
-              <i className="bi bi-pci-card" style={{ marginLeft: "8px", marginBottom: "0", fontSize: "15pt" }} />
-            )
+            let icon = <i className="bi bi-pci-card" style={{ marginLeft: "5px", fontSize: "12pt" }} />
             let titleArr = [
               { name: "Status:", data: val.status },
               { name: "Manufacturer:", data: val.manufacturer },

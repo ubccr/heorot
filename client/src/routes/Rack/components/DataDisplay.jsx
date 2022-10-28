@@ -47,7 +47,7 @@ const DataDisplay = ({
 
   return (
     <Tooltip title={title}>
-      <Chip icon={icon} color={color} label={label} variant="outlined" sx={{ margin: "3px" }} />
+      <Chip size="small" icon={icon} color={color} label={label} variant="outlined" sx={{ margin: "3px" }} />
     </Tooltip>
   )
 }
