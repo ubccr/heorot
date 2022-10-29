@@ -4,7 +4,7 @@ const BgContainer = ({ children }) => {
   return (
     <Box
       sx={{
-        padding: "20px",
+        padding: "10px",
         border: 1,
         borderRadius: 3,
         borderColor: "primary.main",

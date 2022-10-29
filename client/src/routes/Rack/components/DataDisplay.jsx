@@ -38,7 +38,7 @@ const DataDisplay = ({
     return (
       <Badge anchorOrigin={{ vertical: "top", horizontal: "right" }} color={color} variant="dot">
         <Tooltip title={title}>
-          <Avatar variant="rounded" sx={{ bgcolor: backgroundColor }}>
+          <Avatar variant="rounded" sx={{ bgcolor: backgroundColor, height: "25px", width: "25px" }}>
             {icon}
           </Avatar>
         </Tooltip>

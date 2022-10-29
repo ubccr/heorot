@@ -51,92 +51,97 @@ const Rack = () => {
 
   return (
     <BgContainer>
-      <Box sx={{ display: "flex" }}>
-        <Box component="main">
-          <TableContainer ref={tableRef}>
-            {query.isFetching && <LinearProgress />}
-            <Table sx={{ tableLayout: "fixed" }} size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell align={"center"} width={30}>
-                    U
-                  </TableCell>
-                  <TableCell align={"center"}>{rack}</TableCell>
-                  <TableCell width={30}></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {query.isFetched &&
-                  query.data.status === "success" &&
-                  query.data.nodes.map((node, index) => {
-                    let border_color = "border.main"
-                    let background_color = "border.main"
+      <TableContainer ref={tableRef}>
+        {query.isFetching && <LinearProgress />}
+        <Table sx={{ tableLayout: "fixed" }} size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell align={"center"} width={1}>
+                U
+              </TableCell>
+              <TableCell align={"center"}>{rack}</TableCell>
+              <TableCell width={5}></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {query.isFetched &&
+              query.data.status === "success" &&
+              query.data.nodes.map((node, index) => {
+                let border_color = "border.main"
+                // let background_color = "border.main"
 
-                    if (node.height === 1 && node.width === 1) {
-                      border_color = "border.table.single"
-                      background_color = "background.table.single"
-                    } else if (node.height === 1 && node.width >= 2) {
-                      border_color = "border.table.quad"
-                      background_color = "background.table.quad"
-                    } else if (node.height >= 3) {
-                    } else if (node.height === 2) {
-                      border_color = "border.table.double"
-                      background_color = "background.table.double"
-                    } else if (node.height >= 3) {
-                      border_color = "border.table.four"
-                      background_color = "background.table.four"
-                    }
+                if (node.height === 1 && node.width === 1) {
+                  border_color = "border.table.single"
+                  // background_color = "background.table.single"
+                } else if (node.height === 1 && node.width >= 2) {
+                  border_color = "border.table.quad"
+                  // background_color = "background.table.quad"
+                } else if (node.height >= 3) {
+                } else if (node.height === 2) {
+                  border_color = "border.table.double"
+                  // background_color = "background.table.double"
+                } else if (node.height >= 3) {
+                  border_color = "border.table.four"
+                  // background_color = "background.table.four"
+                }
 
-                    return (
-                      <TableRow key={index}>
-                        {node.type === "rowSpan" && (
-                          <>
-                            <TableCell align="center">{node.u}</TableCell>
-                          </>
-                        )}
-                        {node.type === "node" && node.height > 0 && (
-                          <>
-                            <TableCell align={"center"}>{node.u}</TableCell>
-                            <TableCell align={"center"} rowSpan={node.height} sx={{ padding: 0 }}>
-                              <Grid container>
-                                {node.nodes.map((val, index) => (
-                                  <Grid
-                                    item
-                                    xs={12}
-                                    md={12 / node.nodes.length}
-                                    key={index}
-                                    sx={{
-                                      border: 1,
-                                      borderWidth: 2,
-                                      borderColor: border_color,
-                                      backgroundColor: background_color,
-                                    }}
-                                  >
-                                    <Node node={val} />
-                                  </Grid>
-                                ))}
+                return (
+                  <TableRow key={index}>
+                    {node.type === "rowSpan" && (
+                      <>
+                        <TableCell align="center" sx={{ padding: 0, height: "80px" }}>
+                          {node.u}
+                        </TableCell>
+                      </>
+                    )}
+                    {node.type === "node" && node.height > 0 && (
+                      <>
+                        <TableCell align={"center"} sx={{ padding: 0, height: "80px" }}>
+                          {node.u}
+                        </TableCell>
+                        <TableCell align={"center"} sx={{ padding: 0 }} rowSpan={node.height}>
+                          <Grid container sx={{ minHeight: 80 * node.height }}>
+                            {node.nodes.map((val, index) => (
+                              <Grid
+                                item
+                                xs={12}
+                                md={12 / node.nodes.length}
+                                key={index}
+                                sx={{
+                                  border: 1,
+                                  borderWidth: 2,
+                                  borderColor: border_color,
+                                  padding: "4px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  // backgroundColor: background_color,
+                                }}
+                              >
+                                <Node node={val} />
                               </Grid>
-                            </TableCell>
-                            <TableCell align={"center"} rowSpan={node.height}>
-                              <Checkbox />
-                            </TableCell>
-                          </>
-                        )}
-                        {node.type === "" && (
-                          <>
-                            <TableCell align={"center"}>{node.u}</TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </>
-                        )}
-                      </TableRow>
-                    )
-                  })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      </Box>
+                            ))}
+                          </Grid>
+                        </TableCell>
+                        <TableCell align={"center"} sx={{ padding: 0 }} rowSpan={node.height}>
+                          <Checkbox size="small" />
+                        </TableCell>
+                      </>
+                    )}
+                    {node.type === "" && (
+                      <>
+                        <TableCell align={"center"} sx={{ padding: 0, height: "80px" }}>
+                          {node.u}
+                        </TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                )
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </BgContainer>
   )
 }
