@@ -20,8 +20,8 @@ const dell_query = async (auth) => {
   let sel = query_res.data[6]
   let cpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/CPU/))
   let gpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/Video/))
-  let storage_urls = query_res.data[5].Members.map((val) => val["@odata.id"])
-  let s_volume_urls = query_res.data[5].Members.map((val) => val["@odata.id"] + "/Volumes")
+  let storage_urls = query_res.data[5].Members?.map((val) => val["@odata.id"])
+  let s_volume_urls = query_res.data[5].Members?.map((val) => val["@odata.id"] + "/Volumes")
   let pci_urls = systems.PCIeDevices.map((val) => val["@odata.id"])
   let network_urls = query_res.data[7].Members?.map((val) => val["@odata.id"] + "/NetworkPorts")
 
