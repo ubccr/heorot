@@ -251,17 +251,18 @@ app.put("/v1/resetBmc/:node", async (req, res) => {
   } else res.json(bmc)
 })
 
-app.put("/v1/resetNode/:node", async (req, res) => {
+app.put("/v1/resetNode/:node/:pxe?", async (req, res) => {
   const node = req.params.node
+  const pxe = req.params.pxe ?? "false"
 
   let bmc = await getBMC(node)
   if (bmc.status === "success") {
     const uri = `https://${bmc.address}`
     let auth = await redfish_auth(uri)
     if (auth.status === "success") {
-      if (auth.oem === "Dell") api_res = await dell_resetNode(uri, auth.token)
-      else if (auth.oem === "Supermicro") api_res = await sm_resetNode(uri, auth.token)
-      else if (auth.oem === "HPE") api_res = await hpe_resetNode(uri, auth.token)
+      if (auth.oem === "Dell") api_res = await dell_resetNode(uri, auth.token, pxe)
+      else if (auth.oem === "Supermicro") api_res = await sm_resetNode(uri, auth.token, pxe)
+      else if (auth.oem === "HPE") api_res = await hpe_resetNode(uri, auth.token, pxe)
       else
         api_res = {
           status: "error",
