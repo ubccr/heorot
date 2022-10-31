@@ -57,8 +57,8 @@ const Node = ({ node }) => {
         <Grid item xs={12}>
           <Grid container>
             <Grid item xs={4}>
-              <IconButton color={powerColor} small="small" sx={{ float: "left", height: "20px", width: "20px" }}>
-                <PowerSettingsNewIcon sx={{ height: "15px", width: "15px" }} />
+              <IconButton color={powerColor} small="small" sx={{ float: "left", height: "25px", width: "25px" }}>
+                <PowerSettingsNewIcon sx={{ height: "20px", width: "20px" }} />
               </IconButton>
             </Grid>
 
@@ -145,17 +145,16 @@ const Node = ({ node }) => {
               />
             )
           })}
-          {node.grendel.tags.map((val, index) => (
-            <DataDisplay
-              // titleArr={val.tooltip}
-              // icon={val.icon}
-              color={"primary"}
-              label={val}
-              key={index}
-            />
+          {node.grendel.tags.sort().map((val, index) => (
+            <DataDisplay titleArr={""} color={"primary"} label={val} key={index} />
           ))}
         </Grid>
-        <Grid item xs={12} md={12 / node.width} sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Grid
+          item
+          xs={12}
+          md={12 / node.width}
+          sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}
+        >
           <Box>
             {node.redfish.processor.map((val, index) => {
               let icon = <i className="bi bi-cpu" style={{ marginLeft: "5px", fontSize: "12pt" }} />

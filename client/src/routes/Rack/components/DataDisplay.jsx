@@ -37,7 +37,7 @@ const DataDisplay = ({
   if (type === "avatar")
     return (
       <Badge anchorOrigin={{ vertical: "top", horizontal: "right" }} color={color} variant="dot">
-        <Tooltip title={title}>
+        <Tooltip title={title} arrow>
           <Avatar variant="rounded" sx={{ bgcolor: backgroundColor, height: "25px", width: "25px" }}>
             {icon}
           </Avatar>
@@ -46,7 +46,7 @@ const DataDisplay = ({
     )
 
   return (
-    <Tooltip title={title}>
+    <Tooltip title={title} arrow>
       <Chip size="small" icon={icon} color={color} label={label} variant="outlined" sx={{ margin: "3px" }} />
     </Tooltip>
   )
