@@ -31,7 +31,7 @@ const ResetBmc = ({ node }) => {
   )
   return (
     <>
-      <Button variant="outlined" onClick={() => setOpenNode(true)}>
+      <Button variant="outlined" color="warning" onClick={() => setOpenNode(true)}>
         Reboot Node
       </Button>
       <Dialog open={openNode} onClose={() => setOpenNode(false)}>

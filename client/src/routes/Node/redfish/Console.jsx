@@ -1,16 +1,9 @@
-import {
-  Button,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material"
 
-import { useState } from "react"
-
-import TerminalC from "./TerminalC"
 import NewGridC from "../components/NewGridC"
+import ResetNode from "../components/ResetNode"
+import TerminalC from "./TerminalC"
+import { useState } from "react"
 
 const Console = ({ node, BMC }) => {
   const [openDialog, setShowDialog] = useState(false)
@@ -37,6 +30,7 @@ const Console = ({ node, BMC }) => {
           <TerminalC node={node} BMC={BMC} />
         </DialogContent>
         <DialogActions>
+          <ResetNode node={node} />
           <Button variant="outlined" onClick={handleCloseConsole}>
             Close
           </Button>
