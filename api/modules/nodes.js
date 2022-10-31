@@ -7,7 +7,8 @@ const { redfishRequest } = require("./redfish/redfish")
 const fetch_node = async (node, refetch) => {
   let status = "error"
   let db_res = await Nodes.findOne({ node: node })
-  if (refetch === "true" || db_res === null || db_res?.redfish.status === "error") {
+  // || db_res?.redfish.status === "error"
+  if (refetch === "true" || db_res === null) {
     let grendel = await grendelRequest(`/v1/host/find/${node}`)
     if (grendel.status !== "success") return grendel
 
