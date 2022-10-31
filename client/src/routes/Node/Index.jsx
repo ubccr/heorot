@@ -7,6 +7,7 @@ import Console from "./redfish/Console"
 import Firmware from "./grendel/Firmware"
 import Interfaces from "./grendel/Interfaces"
 import NewGridC from "./components/NewGridC"
+import Notes from "./components/Notes"
 import Provision from "./grendel/Provision"
 import Switches from "./components/Switches"
 import TableC from "./components/TableC"
@@ -110,6 +111,8 @@ const Index = () => {
               <Console node={node} BMC={BMC} />
 
               <Actions node={node} />
+
+              <Notes />
 
               <WarrantyDisplay node={node} bmc={BMC} />
 
