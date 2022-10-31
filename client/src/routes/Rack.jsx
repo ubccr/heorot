@@ -1,7 +1,9 @@
 import {
   Box,
+  Button,
   Checkbox,
   Grid,
+  IconButton,
   LinearProgress,
   Table,
   TableBody,
@@ -13,10 +15,16 @@ import {
 import React, { useContext, useState } from "react"
 
 import BgContainer from "../components/BgContainer"
+import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined"
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
+import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import Node from "./Rack/Node"
+import { PluginContext } from "../contexts/PluginContext"
+import SwitchGen from "./Rack/components/SwitchGen"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
+import { useNavigate } from "react-router-dom"
 import { useParams } from "react-router-dom"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
@@ -26,13 +34,33 @@ const Rack = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [user] = useContext(UserContext)
-  const [open, setOpen] = useState(false)
-  const [colorDisplay, setColorDisplay] = useState("")
-  const [textDisplay, setTextDisplay] = useState("name")
   const [tableRef] = useAutoAnimate(null)
+  const [refreshCache, setRefreshCache] = useState("false")
+  const [plugins] = useContext(PluginContext)
+  let navigate = useNavigate()
+
+  let leftRack = () => {
+    let row = rack.slice(0, 1)
+    let col = rack.slice(1)
+    let floorY = plugins.floorplan.floorY
+    let leftRack = floorY[floorY.indexOf(col) - 1]
+    navigate(`/Rack/${row + leftRack}`)
+  }
+  let rightRack = () => {
+    let row = rack.slice(0, 1)
+    let col = rack.slice(1)
+    let floorY = plugins.floorplan.floorY
+    let rightRack = floorY[floorY.indexOf(col) + 1]
+    navigate(`/Rack/${row + rightRack}`)
+  }
+
+  const refetchQuery = () => {
+    setRefreshCache("true")
+    query.refetch()
+  }
 
   const query = useQuery(
-    ["rack", rack],
+    ["rack", rack, refreshCache],
     async ({ signal }) => {
       let payload = {
         headers: {
@@ -40,7 +68,7 @@ const Rack = () => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/rack/${rack}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/rack/${rack}/${refreshCache}`, payload)).json()
       if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "error" && res.hasOwnProperty("silent")) console.error(`${res.message}`)
 
@@ -56,11 +84,33 @@ const Rack = () => {
         <Table sx={{ tableLayout: "fixed" }} size="small">
           <TableHead>
             <TableRow>
-              <TableCell align={"center"} width={1}>
-                U
+              <TableCell align={"center"} width={40} sx={{ padding: 0 }}>
+                <IconButton variant="outlined" onClick={() => leftRack()} sx={{ float: "left" }}>
+                  <ChevronLeftIcon />
+                </IconButton>
               </TableCell>
-              <TableCell align={"center"}>{rack}</TableCell>
-              <TableCell width={5}></TableCell>
+              <TableCell align={"center"}>
+                <Grid container>
+                  <Grid item xs={4}>
+                    <IconButton onClick={() => refetchQuery()} size="small" sx={{ float: "left" }}>
+                      <CachedOutlinedIcon />
+                    </IconButton>
+                  </Grid>
+                  <Grid item xs={4}>
+                    {rack}
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button disabled variant="outlined" size="small">
+                      Actions
+                    </Button>
+                  </Grid>
+                </Grid>
+              </TableCell>
+              <TableCell width={40} sx={{ padding: 0 }}>
+                <IconButton variant="outlined" onClick={() => rightRack()} sx={{ float: "right" }}>
+                  <ChevronRightIcon />
+                </IconButton>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -68,62 +118,53 @@ const Rack = () => {
               query.data.status === "success" &&
               query.data.nodes.map((node, index) => {
                 let border_color = "border.main"
-                // let background_color = "border.main"
 
-                if (node.height === 1 && node.width === 1) {
-                  border_color = "border.table.single"
-                  // background_color = "background.table.single"
-                } else if (node.height === 1 && node.width >= 2) {
-                  border_color = "border.table.quad"
-                  // background_color = "background.table.quad"
-                } else if (node.height >= 3) {
-                } else if (node.height === 2) {
-                  border_color = "border.table.double"
-                  // background_color = "background.table.double"
-                } else if (node.height >= 3) {
-                  border_color = "border.table.four"
-                  // background_color = "background.table.four"
-                }
+                if (node.height === 1 && node.width === 1) border_color = "border.table.single"
+                else if (node.height === 1 && node.width >= 2) border_color = "border.table.quad"
+                else if (node.height >= 3) border_color = "border.table.four"
+                else if (node.height === 2) border_color = "border.table.double"
+                else if (node.height >= 3) border_color = "border.table.four"
 
                 return (
                   <TableRow key={index}>
                     {node.type === "rowSpan" && (
-                      <>
-                        <TableCell align="center" sx={{ padding: 0, height: "80px" }}>
-                          {node.u}
-                        </TableCell>
-                      </>
+                      <TableCell align="center" sx={{ padding: 0, height: "80px" }}>
+                        {node.u}
+                      </TableCell>
                     )}
-                    {node.type === "node" && node.height > 0 && (
+                    {(node.type === "node" || node.type === "switch") && node.height > 0 && (
                       <>
                         <TableCell align={"center"} sx={{ padding: 0, height: "80px" }}>
                           {node.u}
                         </TableCell>
                         <TableCell align={"center"} sx={{ padding: 0 }} rowSpan={node.height}>
                           <Grid container sx={{ minHeight: 80 * node.height }}>
-                            {node.nodes.map((val, index) => (
-                              <Grid
-                                item
-                                xs={12}
-                                md={12 / node.nodes.length}
-                                key={index}
-                                sx={{
-                                  border: 1,
-                                  borderWidth: 2,
-                                  borderColor: border_color,
-                                  padding: "4px",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  // backgroundColor: background_color,
-                                }}
-                              >
-                                <Node node={val} />
-                              </Grid>
-                            ))}
+                            {node.type === "node" &&
+                              node.nodes.map((val, index) => (
+                                <Grid
+                                  item
+                                  xs={12}
+                                  md={12 / node.width}
+                                  key={index}
+                                  sx={{
+                                    border: 1,
+                                    borderWidth: 2,
+                                    borderColor: border_color,
+                                    padding: "4px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <Node node={val} />
+                                </Grid>
+                              ))}
+                            {node.type === "switch" && <SwitchGen data={node} />}
                           </Grid>
                         </TableCell>
                         <TableCell align={"center"} sx={{ padding: 0 }} rowSpan={node.height}>
-                          <Checkbox size="small" />
+                          {node.nodes.map((val, index) => (
+                            <Checkbox size="small" key={index} disabled />
+                          ))}
                         </TableCell>
                       </>
                     )}

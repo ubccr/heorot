@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Checkbox,
+  Grid,
   Grow,
   IconButton,
   LinearProgress,
@@ -22,7 +24,10 @@ import { apiConfig } from "../../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
-const SwitchGen = ({ node, u, tags, height }) => {
+const SwitchGen = ({ data }) => {
+  let node = data.nodes[0].grendel.name
+  let tags = data.nodes[0].grendel.tags
+
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
   const [refreshCache, setRefreshCache] = useState("false")
@@ -46,7 +51,7 @@ const SwitchGen = ({ node, u, tags, height }) => {
     { staleTime: 120000, cacheTime: 120000 }
   )
 
-  const nodeQuery = useQuery(["nodes", node], async ({ signal }) => {
+  const nodeQuery = useQuery("nodes", async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
@@ -452,52 +457,53 @@ const SwitchGen = ({ node, u, tags, height }) => {
   }
   return (
     <>
-      <TableRow>
-        <TableCell align="center">
-          {u}
-          <IconButton onClick={() => refetchQuery()} size="small">
+      <Grid container>
+        <Grid item xs={1}>
+          <IconButton onClick={() => refetchQuery()} size="small" sx={{ float: "left" }}>
             <CachedOutlinedIcon />
           </IconButton>
-        </TableCell>
-        <TableCell align="center" sx={{ paddingRight: 0, paddingLeft: 0 }} rowSpan={height}>
-          {switchQuery.isFetching && <LinearProgress color="primary" sx={{ marginBottom: "10px" }} />}
-
+        </Grid>
+        <Grid item xs={10} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Link to={`/Node/${node}`}>{node}</Link>
-          <TableContainer>
-            <Table>
-              {!tags.includes("core-switch") && (
-                <TableBody>
-                  <TableRow>
-                    {switchQuery.isFetched &&
-                      switchQuery.data.status === "success" &&
-                      switchQuery.data.client.map((val, index) => {
-                        if (!(index % 2)) return <React.Fragment key={index}>{val}</React.Fragment>
-                        else return undefined
-                      })}
-                  </TableRow>
-                  <TableRow>
-                    {switchQuery.isFetched &&
-                      switchQuery.data.status === "success" &&
-                      switchQuery.data.client.map((val, index) => {
-                        if (index % 2) return <React.Fragment key={index}>{val}</React.Fragment>
-                        else return undefined
-                      })}
-                  </TableRow>
-                </TableBody>
-              )}
-              {tags.includes("core-switch") && (
-                <TableBody>
-                  {switchQuery.isFetched &&
-                    switchQuery.data.status === "success" &&
-                    switchQuery.data.client.map((val, index) => {
-                      return <React.Fragment key={index}>{val}</React.Fragment>
-                    })}
-                </TableBody>
-              )}
-            </Table>
-          </TableContainer>
-        </TableCell>
-      </TableRow>
+        </Grid>
+        <Grid item xs={1}></Grid>
+        <Grid item xs={12}>
+          {switchQuery.isFetching && <LinearProgress color="primary" sx={{ marginBottom: "10px" }} />}
+        </Grid>
+      </Grid>
+      <TableContainer sx={{ paddingRight: "5px", paddingLeft: "5px" }}>
+        <Table>
+          {!tags.includes("core-switch") && (
+            <TableBody>
+              <TableRow>
+                {switchQuery.isFetched &&
+                  switchQuery.data.status === "success" &&
+                  switchQuery.data.client.map((val, index) => {
+                    if (!(index % 2)) return <React.Fragment key={index}>{val}</React.Fragment>
+                    else return undefined
+                  })}
+              </TableRow>
+              <TableRow>
+                {switchQuery.isFetched &&
+                  switchQuery.data.status === "success" &&
+                  switchQuery.data.client.map((val, index) => {
+                    if (index % 2) return <React.Fragment key={index}>{val}</React.Fragment>
+                    else return undefined
+                  })}
+              </TableRow>
+            </TableBody>
+          )}
+          {tags.includes("core-switch") && (
+            <TableBody>
+              {switchQuery.isFetched &&
+                switchQuery.data.status === "success" &&
+                switchQuery.data.client.map((val, index) => {
+                  return <React.Fragment key={index}>{val}</React.Fragment>
+                })}
+            </TableBody>
+          )}
+        </Table>
+      </TableContainer>
     </>
   )
 }
