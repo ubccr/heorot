@@ -16,14 +16,19 @@ async function redfish_auth(uri) {
       Password: config.bmc.DELL_PASS,
     }),
     agent,
+    timeout: 3000,
   }
 
   const header = {
     agent,
+    timeout: 3000,
   }
   const urls = [`${uri}/redfish/v1/SessionService/Sessions`, `${uri}/redfish/v1`]
   try {
-    let res_promise = await Promise.all([await fetch(urls[0], payload), await (await fetch(urls[1], header)).json()])
+    let res_promise = await Promise.all([
+      await fetch_timeout(urls[0], payload),
+      await (await fetch_timeout(urls[1], header)).json(),
+    ])
 
     let token = res_promise[0].headers.get("x-auth-token")
     let status = token !== null ? "success" : "error"
@@ -76,6 +81,19 @@ async function redfish_logout(url, uri, token) {
     agent,
   }
   return await fetch(logout_url, header)
+}
+
+async function fetch_timeout(url, options = {}) {
+  const { timeout = 8000 } = options
+
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeout)
+  const response = await fetch(url, {
+    ...options,
+    signal: controller.signal,
+  })
+  clearTimeout(id)
+  return response
 }
 
 module.exports = {
