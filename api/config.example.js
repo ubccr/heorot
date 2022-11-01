@@ -22,6 +22,14 @@ config.auth = {
 config.bmc = {
   DELL_USER: "", // set to your nodes idrac/redfish user
   DELL_PASS: "", // set to your nodes idrac/redfish password
+  firmware_versions: [
+    // latest bios and bmc version mapping to node type | will need to be changed when newer firmwares release
+    { model: /(R|C)[0-9]5[0-9]{1,2}/g, bios: "1.6.5", bmc: "5.10.50.00" }, // dell 15th gen
+    { model: /(R|C)[0-9]5[0-9]5/g, bios: "2.8.4", bmc: "5.10.50.00" }, // dell 15th gen - AMD
+    { model: /(R|C)[0-9]4[0-9]{1,2}/g, bios: "2.15.1", bmc: "5.10.50.00" }, // dell 14th gen
+    { model: /(R|C)[0-9]3[0-9]{1,2}/g, bios: "2.15.0", bmc: "2.83.83.83" }, // dell 13th gen
+    { model: /(R|C)[0-9]2[0-9]{1,2}/g, bios: "2.9.0", bmc: "2.65.65.65" }, // dell 12th gen
+  ],
 }
 
 // Database - configure for your MongoDB install
@@ -107,6 +115,26 @@ config.floorplan = {
     "07",
     "06",
     "05",
+  ],
+}
+
+// Rack page config
+config.rack = {
+  max: 42,
+  min: 1,
+  prefix: [
+    // prefix mapping | modify if your prefix naming scheme varies from the default
+    { type: "switch", prefix: ["swe", "swi"] },
+    { type: "node", prefix: ["cpn", "srv"] },
+    { type: "pdu", prefix: ["pdu"] },
+  ],
+  node_size: [
+    // node model size mapping | sets height and width of nodes based on their model (from redfish query)
+    { models: ["R2", "R3", "R4", "R6", "C4"], height: 1, width: 1 },
+    { models: ["R5", "R7", "R8"], height: 2, width: 1 },
+    { models: ["R9"], height: 4, width: 1 },
+    { models: ["C6"], height: 1, width: 2 }, // dell 6 series cloud nodes are technically 2u per chassis but rendering 2x 1u nodes makes the data manipulation much easier
+    // other high density blade enclosures like the Dell M1000 are not officially supported, though they *should* render if added to the array
   ],
 }
 
