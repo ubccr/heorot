@@ -1,9 +1,12 @@
-import { Box, Typography } from "@mui/material"
+import { Box, IconButton, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 
 import Actions from "./components/Actions"
 import BootImage from "./grendel/BootImage"
 import Console from "./redfish/Console"
+import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Firmware from "./grendel/Firmware"
 import Interfaces from "./grendel/Interfaces"
 import NewGridC from "./components/NewGridC"
@@ -15,19 +18,23 @@ import Tags from "./grendel/Tags"
 import { UserContext } from "../../contexts/UserContext"
 import WarrantyDisplay from "./redfish/WarrantyDisplay"
 import { apiConfig } from "../../config"
-import { useParams } from "react-router-dom"
 import { useSnackbar } from "notistack"
 
 const Index = () => {
   const { node } = useParams()
   const [simple, setSimple] = useState(false)
   const [apiData, setApiData] = useState()
+  const [rackData, setRackData] = useState({
+    previous_node: "",
+    next_node: "",
+  })
   const [refetch, setRefetch] = useState(false)
   const [BMC, setBMC] = useState("")
   const [user] = useContext(UserContext)
 
   const [loading, setLoading] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
+  let navigate = useNavigate()
 
   useEffect(() => {
     const types = ["swi", "swe", "pdu"]
@@ -52,6 +59,11 @@ const Index = () => {
           })
           if (response.bmc === false) setSimple(true)
 
+          setRackData({
+            previous_node: response.previous_node,
+            next_node: response.next_node,
+          })
+
           setApiData(data)
           setLoading(false)
         } else {
@@ -59,6 +71,13 @@ const Index = () => {
         }
       })
   }, [refetch, node])
+
+  const prevNode = () => {
+    navigate(`/Node/${rackData.previous_node}`)
+  }
+  const nextNode = () => {
+    navigate(`/Node/${rackData.next_node}`)
+  }
 
   return (
     <Box>
@@ -87,7 +106,13 @@ const Index = () => {
                 width: "300px",
               }}
             >
+              <IconButton variant="outlined" onClick={() => prevNode()} sx={{ float: "left" }}>
+                <ExpandLessIcon />
+              </IconButton>
               {node}
+              <IconButton variant="outlined" onClick={() => nextNode()} sx={{ float: "right" }}>
+                <ExpandMoreIcon />
+              </IconButton>
             </Typography>
           </Box>
           <Provision node={node} data={apiData.provision} refetch={refetch} setRefetch={setRefetch} />
