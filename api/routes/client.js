@@ -38,7 +38,10 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
   const refetch = req.params.refetch ?? "false"
 
   let grendel_res = await grendelRequest(`/v1/host/tags/${rack}`)
+  // let grendel_res_all = await grendelRequest(`/v1/host/list`) need to change filter functions in rackGen
   if (grendel_res.status === "error") res.json(grendel_res)
+  // let grendel_res = grendel_res_all.result.filter((node) => node.name.split("-")[1] === rack)
+
   let rackArr = []
   for (let x = config.rack.min; x <= config.rack.max; x++) {
     rackArr[x] = {
@@ -78,9 +81,14 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
 app.get("/node/:node", async (req, res) => {
   const node = req.params.node
   let result = []
-
+  let rack = node.split("-")[1] ?? ""
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
-  if (nodeRes.status === "success") {
+  let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
+
+  if (nodeRes.status === "success" && rack_res.status === "success") {
+    let nodeList = rack_res.result.map((val) => val.name).sort((a, b) => a.split("-")[2] - b.split("-")[2])
+    let prevNode = nodeList.indexOf(node) < nodeList.length - 1 ? nodeList[nodeList.indexOf(node) + 1] : nodeList[0]
+    let nextNode = nodeList.indexOf(node) > 0 ? nodeList[nodeList.indexOf(node) - 1] : nodeList[nodeList.length - 1]
     let nodes = nodeRes.result
     if (nodes.length > 0) {
       nodes.forEach((element) => {
@@ -92,6 +100,8 @@ app.get("/node/:node", async (req, res) => {
       res.json({
         status: "success",
         node: node,
+        previous_node: prevNode,
+        next_node: nextNode,
         result: result,
         bmc: bmcPlugin,
       })
