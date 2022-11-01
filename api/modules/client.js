@@ -3,7 +3,10 @@ const { fetch_node } = require("./nodes.js")
 
 const rackGen = async (grendel, rackArr, refetch) => {
   // find all nodes with matching rack name and send redfish requests
-  let nodes_arr = grendel.result.filter((val) => config.rack.node_prefix.includes(val.name.split("-")[0]))
+  let node_prefix = config.rack.prefix.find((val) => val.type === "node")?.prefix ?? []
+  if (node_prefix.length === 0) console.error("Could not map array: 'config.rack.prefix' to a type of node")
+
+  let nodes_arr = grendel.result.filter((val) => node_prefix.includes(val.name.split("-")[0]))
   let redfish_arr = await Promise.all(nodes_arr.map((val) => fetch_node(val.name, refetch)))
 
   // loop through arr generated in routes/client.js
