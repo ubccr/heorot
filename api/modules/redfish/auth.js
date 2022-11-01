@@ -16,12 +16,12 @@ async function redfish_auth(uri) {
       Password: config.bmc.DELL_PASS,
     }),
     agent,
-    timeout: 3000,
+    timeout: 8000,
   }
 
   const header = {
     agent,
-    timeout: 3000,
+    timeout: 8000,
   }
   const urls = [`${uri}/redfish/v1/SessionService/Sessions`, `${uri}/redfish/v1`]
   try {

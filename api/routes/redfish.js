@@ -1,10 +1,8 @@
 const express = require("express")
 const app = express.Router()
-const Nodes = require("../models/Nodes")
 
 // TODO: Deprecate
 const { getBMC } = require("../modules/grendel")
-const { timeComp, redfishMapping } = require("../modules/cache")
 const { redfish_auth, redfish_logout } = require("../modules/redfish/auth")
 const { dell_systems, sm_systems, hpe_systems } = require("../modules/redfish/systems")
 const { dell_managers, sm_managers, hpe_managers } = require("../modules/redfish/managers")
@@ -25,65 +23,6 @@ app.get("/", (req, res) => {
     currentRoute: "/redfish/",
     availibleRoutes: routes,
   })
-})
-
-app.get("/v1/all/:node/:refetch?", async (req, res) => {
-  const node = req.params.node
-  const refetch = req.params.refetch
-
-  let bmc = await getBMC(node)
-  if (bmc.status === "success") {
-    const uri = `https://${bmc.address}`
-    let auth = await redfish_auth(uri)
-    if (auth.status === "success") {
-      let api_res = new String()
-
-      if (auth.oem === "Dell") {
-        let cache_res = await Nodes.findOne({ node: node })
-        if (cache_res !== null && refetch !== "true" && !timeComp(cache_res.updatedAt)) {
-          api_res = cache_res
-        } else {
-          api_res = await Promise.all([
-            await dell_systems(uri, auth.token),
-            await dell_managers(uri, auth.token),
-            await dell_gpu(uri, auth.token, auth.version),
-            await dell_storage(uri, auth.token, auth.version),
-            await dell_sel(uri, auth.token, auth.version),
-          ])
-          let redfish = redfishMapping(api_res, "toDB")
-          let update_res = await Nodes.findOneAndUpdate(
-            { node: node },
-            { redfish: redfish },
-            { new: true, upsert: true }
-          )
-        }
-      } else if (auth.oem === "Supermicro") {
-        api_res = await Promise.all([
-          await sm_systems(uri, auth.token),
-          await sm_managers(uri, auth.token),
-          await sm_gpu(uri, auth.token),
-          await sm_storage(uri, auth.token),
-          await sm_sel(uri, auth.token),
-        ])
-      } else if (auth.oem === "HPE") {
-        api_res = await Promise.all([
-          await hpe_systems(uri, auth.token),
-          await hpe_managers(uri, auth.token),
-          await hpe_gpu(uri, auth.token),
-          await hpe_storage(uri, auth.token),
-          await hpe_sel(uri, auth.token),
-        ])
-      } else
-        api_res = {
-          status: "error",
-          message: "failed to parse OEM from Redfish call",
-        }
-
-      let logout_res = await redfish_logout(auth.location, uri, auth.token)
-      if (logout_res.status !== 200) console.error(`Failed to logout of ${node}'s bmc`, await logout_res.json())
-      res.json(api_res)
-    } else res.json(auth)
-  } else res.json(bmc)
 })
 
 app.get("/v1/systems/:node", async (req, res) => {
