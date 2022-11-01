@@ -12,7 +12,12 @@ const rackGen = async (grendel, rackArr, refetch) => {
   // loop through arr generated in routes/client.js
   return rackArr.map((val) => {
     // get all nodes matching the same u that are not pdus
-    let node = grendel.result.filter((n) => parseInt(n.name.split("-")[2]) === val.u && n.name.split("-")[0] !== "pdu")
+    let pdu_prefix = config.rack.prefix.find((val) => val.type === "pdu")?.prefix ?? []
+    if (node_prefix.length === 0) console.error("Could not map array: 'config.rack.prefix' to a type of pdu")
+
+    let node = grendel.result.filter(
+      (n) => parseInt(n.name.split("-")[2]) === val.u && !pdu_prefix.includes(n.name.split("-")[0])
+    )
     let node_output = []
 
     if (node !== undefined) {
@@ -231,12 +236,14 @@ const swDuplicates = (duplicates) => {
 }
 
 const shortenName = (name) => {
-  if (name.match("^PowerConnect")) return "PC" + name.substring(13)
-  else if (name.match("-ON")) return name.replace("-ON", "")
-  else return name
+  if (name !== null || name !== undefined) {
+    if (name.match("^PowerConnect")) return "PC" + name.substring(13)
+    else if (name.match("-ON")) return name.replace("-ON", "")
+    else return name
+  } else return "undefined"
 }
 const shortenVersion = (version) => {
-  if (version !== undefined) return version.replace(/ *\([^)]*\) */g, "")
+  if (version !== null || version !== undefined) return version.replace(/ *\([^)]*\) */g, "")
   else return "undefined"
 }
 
