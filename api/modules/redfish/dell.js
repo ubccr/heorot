@@ -142,7 +142,7 @@ const dell_query = async (auth) => {
         name: val.Name,
       }
     }),
-    processor: cpu.map((val) => {
+    processor: cpu?.map((val) => {
       return {
         status: val.Status?.Health,
         model: val.Model,
