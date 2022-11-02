@@ -22,7 +22,7 @@ const dell_query = async (auth) => {
   let gpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/Video/))
   let storage_urls = query_res.data[5].Members?.map((val) => val["@odata.id"])
   let s_volume_urls = query_res.data[5].Members?.map((val) => val["@odata.id"] + "/Volumes")
-  let pci_urls = systems.PCIeDevices.map((val) => val["@odata.id"])
+  let pci_urls = systems.PCIeDevices?.map((val) => val["@odata.id"])
   let network_urls = query_res.data[7].Members?.map((val) => val["@odata.id"] + "/NetworkPorts")
 
   // second query
@@ -56,7 +56,7 @@ const dell_query = async (auth) => {
   // third query
   let storage_link = storage.Links.Enclosures.find((val) => val["@odata.id"].match(/Enclosure/g))
   let enclosure_url = storage_link !== undefined ? storage_link["@odata.id"] : null
-  let drive_urls = storage.Drives.map((val) => val["@odata.id"])
+  let drive_urls = storage.Drives?.map((val) => val["@odata.id"])
   let volume_urls = []
   query_res_2[4].data.forEach((val) => {
     if (val["Members@odata.count"] > 0) val.Members.forEach((vol) => volume_urls.push(vol["@odata.id"]))
