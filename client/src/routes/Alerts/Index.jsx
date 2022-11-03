@@ -19,7 +19,7 @@ import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const Index = () => {
-  const [tableRef, bodyRef] = useAutoAnimate(null)
+  const [tableRef] = useAutoAnimate(null)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
 

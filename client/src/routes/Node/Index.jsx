@@ -103,7 +103,6 @@ const Index = () => {
                 bgcolor: "background.main",
                 color: "text.primary",
                 boxShadow: 16,
-                width: "300px",
               }}
             >
               <IconButton variant="outlined" onClick={() => prevNode()} sx={{ float: "left" }}>

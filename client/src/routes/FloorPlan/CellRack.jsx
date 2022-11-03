@@ -4,7 +4,7 @@ import React, { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useState } from "react"
 
-const Cell_rack = ({ rack, outputType, color }) => {
+const CellRack = ({ rack, outputType, color }) => {
   const [output_t, setOutput_t] = useState("")
   const [output_b, setOutput_b] = useState("")
   const [output_c, setOutput_c] = useState(rack.default_color)
@@ -55,4 +55,4 @@ const Cell_rack = ({ rack, outputType, color }) => {
   )
 }
 
-export default Cell_rack
+export default CellRack

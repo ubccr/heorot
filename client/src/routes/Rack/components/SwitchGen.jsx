@@ -1,7 +1,5 @@
 import {
-  Box,
   Button,
-  Checkbox,
   Grid,
   Grow,
   IconButton,
@@ -239,7 +237,7 @@ const SwitchGen = ({ data }) => {
                     else if (port.speed === "100G") color = "error"
                     let disabled = false
                     if (port.status === "down") disabled = true
-                    let portArr = port.port.split("/")
+                    // let portArr = port.port.split("/")
                     let link = port.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?")
 
                     return (
@@ -369,7 +367,7 @@ const SwitchGen = ({ data }) => {
                     else if (port.speed === "100G") color = "error"
                     let disabled = false
                     if (port.status === "down") disabled = true
-                    let portArr = port.port.split("/")
+                    // let portArr = port.port.split("/")
 
                     let link,
                       port_name = ""

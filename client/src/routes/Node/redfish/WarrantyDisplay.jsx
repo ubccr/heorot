@@ -1,11 +1,12 @@
-import { useContext } from "react"
-import { useQuery } from "react-query"
 import { Grid, Typography } from "@mui/material"
+
 import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
+import { useContext } from "react"
+import { useQuery } from "react-query"
 
 const WarrantyDisplay = ({ node }) => {
-  const [user, setUser] = useContext(UserContext)
+  const [user] = useContext(UserContext)
   const query = useQuery(
     node,
     async ({ signal }) => {
@@ -15,9 +16,7 @@ const WarrantyDisplay = ({ node }) => {
         },
         signal,
       }
-      const res = await (
-        await fetch(`${apiConfig.apiUrl}/warranty/get/${node}`, payload)
-      ).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/warranty/get/${node}`, payload)).json()
       return res
     },
     { cacheTime: 0 }
@@ -48,7 +47,7 @@ const WarrantyDisplay = ({ node }) => {
             </Typography>
           </Grid>
 
-          <Grid item xs sx={{ textAlign: "center", textAlign: "end" }}>
+          <Grid item xs>
             {query.isFetched && query.data.status === "success" && (
               <Typography
                 variant="h2"
@@ -59,16 +58,10 @@ const WarrantyDisplay = ({ node }) => {
                 }}
               >
                 {query.data.result.warranty === "invalid" && (
-                  <i
-                    className="bi bi-exclamation-square"
-                    style={{ color: "#f44336", marginRight: "5px" }}
-                  />
+                  <i className="bi bi-exclamation-square" style={{ color: "#f44336", marginRight: "5px" }} />
                 )}
                 {query.data.result.warranty === "valid" && (
-                  <i
-                    className="bi bi-check2-square"
-                    style={{ color: "#4caf50", marginRight: "5px" }}
-                  />
+                  <i className="bi bi-check2-square" style={{ color: "#4caf50", marginRight: "5px" }} />
                 )}{" "}
                 {query.data.result.endDate.substring(0, 10)}
               </Typography>

@@ -1,4 +1,4 @@
-import { Divider, Grid, TextField, Typography } from "@mui/material"
+import { Divider, Grid, Typography } from "@mui/material"
 
 import React from "react"
 
@@ -21,7 +21,6 @@ const Interfaces = ({ data }) => {
                   borderRadius: "10px",
                   marginTop: "12px",
                   border: 1,
-                  borderRadius: "10px",
                   borderColor: "border.main",
                   bgcolor: "background.main",
                   color: "text.primary",
@@ -47,7 +46,7 @@ const Interfaces = ({ data }) => {
                 <Grid xs={10} item sx={{ textAlign: "end" }}>
                   {name !== "BMC:" && val.fqdn}
                   {name === "BMC:" && (
-                    <a target="_blank" href={`https://${val.fqdn}`}>
+                    <a target="_blank" rel="noreferrer" href={`https://${val.fqdn}`}>
                       {val.fqdn}
                     </a>
                   )}

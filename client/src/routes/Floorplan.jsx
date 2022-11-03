@@ -20,7 +20,7 @@ import {
 import React, { useContext, useState } from "react"
 
 import BgContainer from "../components/BgContainer"
-import Cell_rack from "./FloorPlan/Cell_rack"
+import CellRack from "./FloorPlan/CellRack"
 import Header from "../components/Header"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
@@ -164,7 +164,7 @@ const Floorplan = () => {
                             align="center"
                             sx={{ border: 1, borderColor: "border.main", padding: "2px", width: 70 }}
                           >
-                            {rack.u_count > 0 && <Cell_rack rack={rack} outputType={outputType} color={color} />}
+                            {rack.u_count > 0 && <CellRack rack={rack} outputType={outputType} color={color} />}
                           </TableCell>
                         )
                       })}

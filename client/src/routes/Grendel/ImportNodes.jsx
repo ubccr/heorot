@@ -1,14 +1,10 @@
 import {
-  Box,
   Button,
-  Checkbox,
   CircularProgress,
-  Divider,
   FormControl,
   FormGroup,
   Grid,
   InputLabel,
-  LinearProgress,
   MenuItem,
   Select,
   TextField,
@@ -159,7 +155,7 @@ const ImportNodes = () => {
     if (swQueryRes !== null && swQueryRes.data.status === "success") {
       if (swQueryRes.data.result.length > 1 && swQueryRes.data.result[2].output.length > 1) {
         let nodeJSON = []
-        mapping.map((map) => {
+        mapping.forEach((map) => {
           let MAT = swQueryRes.data.result[2].output
           let port = MAT.map((val) => {
             if (val.port === map[1][0]) return val

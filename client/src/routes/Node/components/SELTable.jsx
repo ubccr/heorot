@@ -1,15 +1,9 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material"
-import React from "react"
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material"
+
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined"
-import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined"
+import React from "react"
 import ReportOutlinedIcon from "@mui/icons-material/ReportOutlined"
+import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined"
 
 const SELTable = ({ data }) => {
   return (
@@ -34,6 +28,9 @@ const SELTable = ({ data }) => {
                 break
               case "Critical":
                 icon = <ReportOutlinedIcon sx={{ color: "#c62828" }} />
+                break
+              default:
+                icon = ""
                 break
             }
             return (

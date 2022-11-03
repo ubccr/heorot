@@ -1,4 +1,4 @@
-import { Box, Button, FormGroup, Grid, TextField, Typography } from "@mui/material"
+import { Button, FormGroup, Grid, TextField, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 
 import SearchC from "../../../components/AppBar/SearchC"
@@ -36,7 +36,7 @@ const EditJson = () => {
 
   const handleJson = () => {
     try {
-      let a = JSON.parse(nodeJson) // just to generate an error
+      JSON.parse(nodeJson) // just to generate an error
       let payload = {
         method: "POST",
         headers: {
