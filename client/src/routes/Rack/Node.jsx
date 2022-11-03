@@ -1,5 +1,5 @@
-import { Box, Collapse, Grid, Icon, IconButton } from "@mui/material"
-import React, { useState } from "react"
+import { Badge, Box, Collapse, Grid, Icon, IconButton } from "@mui/material"
+import React, { useEffect, useState } from "react"
 
 import DataDisplay from "./components/DataDisplay"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
@@ -10,6 +10,17 @@ import StorageIcon from "@mui/icons-material/Storage"
 
 const Node = ({ node }) => {
   const [expandDrives, setExpandDrives] = useState(false)
+  const [hideButton, setHideButton] = useState(false)
+  useEffect(() => {
+    if (node.redfish.storage.drives.length + node.redfish.storage.volumes.length < 3) {
+      setHideButton(true)
+      setExpandDrives(true)
+    }
+
+    return () => {
+      setExpandDrives(false)
+    }
+  }, [node])
 
   // default display for faild queries
   if (node.redfish.status === "error")
@@ -257,13 +268,15 @@ const Node = ({ node }) => {
                 })}
               </Box>
             </Collapse>
-            <IconButton
-              size="small"
-              sx={{ width: "25px", height: "25px" }}
-              onClick={() => setExpandDrives(!expandDrives)}
-            >
-              {expandDrives ? <KeyboardArrowDownIcon /> : <KeyboardArrowLeftIcon />}
-            </IconButton>
+            {!hideButton && (
+              <IconButton
+                size="small"
+                sx={{ width: "25px", height: "25px" }}
+                onClick={() => setExpandDrives(!expandDrives)}
+              >
+                {expandDrives ? <KeyboardArrowDownIcon /> : <KeyboardArrowLeftIcon />}
+              </IconButton>
+            )}
           </Box>
         </Grid>
       </Grid>
