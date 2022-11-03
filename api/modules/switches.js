@@ -14,6 +14,7 @@ const getSwInfoV2 = async (node) => {
     return { status: "error", message: grendelRes.result }
   }
   let grendel = grendelRes.result[0]
+  if (grendel.interfaces.length === 0) return { status: "error", message: `${node} has no interfaces to query` }
   const fqdn = grendel.interfaces[0].fqdn !== "" ? grendel.interfaces[0].fqdn : grendel.interfaces[0].ip
 
   // Switch version logic
