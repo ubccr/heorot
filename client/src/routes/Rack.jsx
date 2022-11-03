@@ -17,8 +17,8 @@ import BgContainer from "../components/BgContainer"
 import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
-import Node from "./Rack/Node"
 import { PluginContext } from "../contexts/PluginContext"
+import RenderNode from "./Rack/RenderNode"
 import SwitchGen from "./Rack/components/SwitchGen"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
@@ -154,7 +154,7 @@ const Rack = () => {
                                     alignItems: "center",
                                   }}
                                 >
-                                  <Node node={val} />
+                                  <RenderNode node={val} />
                                 </Grid>
                               ))}
                             {node.type === "switch" && <SwitchGen data={node} />}
