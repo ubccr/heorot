@@ -1,4 +1,4 @@
-import { Badge, Box, Collapse, Grid, Icon, IconButton } from "@mui/material"
+import { Box, Collapse, Grid, Icon, IconButton } from "@mui/material"
 import React, { useEffect, useState } from "react"
 
 import DataDisplay from "./components/DataDisplay"
@@ -12,7 +12,10 @@ const Node = ({ node }) => {
   const [expandDrives, setExpandDrives] = useState(false)
   const [hideButton, setHideButton] = useState(false)
   useEffect(() => {
-    if (node.redfish.storage.drives.length + node.redfish.storage.volumes.length < 3) {
+    if (
+      node.redfish.status !== "error" &&
+      node.redfish.storage.drives.length + node.redfish.storage.volumes.length < 3
+    ) {
       setHideButton(true)
       setExpandDrives(true)
     }
@@ -33,12 +36,18 @@ const Node = ({ node }) => {
   let powerColor = node.redfish.power_state === "On" ? "success" : "error"
 
   let biosColor = "default"
-  if (node.latest_bios === node.redfish.bios_version) biosColor = "success"
-  else if (node.latest_bios !== node.redfish.bios_version && node.latest_bios !== "") biosColor = "warning"
+  let latest_bios_int = parseInt(node.latest_bios.replace(/\./g, "")) ?? 0
+  let bios_int = parseInt(node.redfish.bios_version.replace(/\./g, "")) ?? 0
+
+  if (latest_bios_int <= bios_int) biosColor = "success"
+  else if (latest_bios_int > bios_int && bios_int !== 0) biosColor = "warning"
 
   let bmcColor = "default"
-  if (node.latest_bmc === node.redfish.bmc.version) bmcColor = "success"
-  else if (node.latest_bmc !== node.redfish.bmc.version && node.latest_bmc !== "") bmcColor = "warning"
+  let latest_bmc_int = parseInt(node.latest_bmc.replace(/\./g, "")) ?? 0
+  let bmc_int = parseInt(node.redfish.bmc.version.replace(/\./g, "")) ?? 0
+
+  if (latest_bmc_int <= bmc_int) bmcColor = "success"
+  else if (latest_bmc_int > bmc_int && bmc_int !== 0) bmcColor = "warning"
 
   let node_info = [
     { name: "", data: node.redfish.model, bColor: "default", tooltip: "" },
