@@ -39,12 +39,12 @@ const dell_query = async (auth) => {
   let pci_devices = query_res_2[5].data ?? []
   let bmc = query_res_2[0].data
   let cpu = query_res_2[1].data
-  let hdd = query_res_2[3].data.length !== 0 ? query_res_2[3].data : []
+  let hdd = query_res_2[3].data.length !== undefined ? query_res_2[3].data : []
   let gpu =
     query_res_2[2].data.length > 0
       ? query_res_2[2].data
       : pci_devices.filter((val) => ["NVIDIA Corporation"].includes(val.Manufacturer)) // add AMD?
-  let storage = hdd.find((val) => val.Drives.length > 0)
+  let storage = hdd.find((val) => val.Drives.length > 0) ?? []
   let ib = pci_devices.filter(
     (val) => ["Mellanox Technologies"].includes(val.Manufacturer) || val.Description.match(/Omni/g)
   ) // find Mellanox IB & Omni path cards
@@ -54,18 +54,19 @@ const dell_query = async (auth) => {
     query_res_2[6].data.forEach((val) => val.Members.forEach((val2) => network_port_urls.push(val2["@odata.id"])))
 
   // third query
-  let storage_link = storage.Links.Enclosures.find((val) => val["@odata.id"].match(/Enclosure/g))
+  let storage_link = storage.Links?.Enclosures.find((val) => val["@odata.id"].match(/Enclosure/g))
   let enclosure_url = storage_link !== undefined ? storage_link["@odata.id"] : null
   let drive_urls = storage.Drives?.map((val) => val["@odata.id"])
   let volume_urls = []
-  query_res_2[4].data.forEach((val) => {
+  let vol = query_res_2[4].data.length !== undefined ? query_res_2[4].data : []
+  vol.forEach((val) => {
     if (val["Members@odata.count"] > 0) val.Members.forEach((vol) => volume_urls.push(vol["@odata.id"]))
   })
 
   let query_res_3 = await Promise.all([
     await api_request(enclosure_url, auth),
     await api_request(drive_urls, auth),
-    await api_request(storage.Volumes["@odata.id"], auth),
+    await api_request(storage?.Volumes["@odata.id"], auth),
     await api_request(volume_urls, auth),
     await api_request(network_port_urls, auth),
   ])

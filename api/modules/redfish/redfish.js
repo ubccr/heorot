@@ -64,8 +64,11 @@ const redfishRequest = async (node) => {
   } else return { status: "error", message: "Failed to parse OEM from Redfish request" }
 
   let logout_res = await redfish_logout(auth.location, url, auth.token)
-  if (logout_res.status !== 200)
-    console.error(`Failed to logout of ${node}'s bmc`, await logout_res.json().error["@Message.ExtendedInfo"]) // Catch logout errors
+  if (logout_res.status !== 200) {
+    let error = await logout_res.json()
+    let extended = error.error["@Message.ExtendedInfo"] !== undefined ? error.error["@Message.ExtendedInfo"] : ""
+    console.error(`Failed to logout of ${node}'s bmc`, error, extended) // Catch logout errors
+  }
   return output
 }
 
