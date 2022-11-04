@@ -36,15 +36,15 @@ const dell_query = async (auth) => {
     await api_request(network_urls, auth),
   ])
 
-  let pci_devices = query_res_2[5].data
-
+  let pci_devices = query_res_2[5].data ?? []
   let bmc = query_res_2[0].data
   let cpu = query_res_2[1].data
+  let hdd = query_res_2[3].data.length !== 0 ? query_res_2[3].data : []
   let gpu =
     query_res_2[2].data.length > 0
       ? query_res_2[2].data
       : pci_devices.filter((val) => ["NVIDIA Corporation"].includes(val.Manufacturer)) // add AMD?
-  let storage = query_res_2[3].data.find((val) => val.Drives.length > 0)
+  let storage = hdd.find((val) => val.Drives.length > 0)
   let ib = pci_devices.filter(
     (val) => ["Mellanox Technologies"].includes(val.Manufacturer) || val.Description.match(/Omni/g)
   ) // find Mellanox IB & Omni path cards
@@ -95,7 +95,6 @@ const dell_query = async (auth) => {
     if (val.Id.slice(-2) === "-1" || val.Id.slice(-2) === "-0") physical_gpu++ // -0 is for older versions (~13th gen)
     else virtual_gpu++
   })
-
   let response = {
     model: systems.Model,
     manufacturer: systems.Manufacturer,
