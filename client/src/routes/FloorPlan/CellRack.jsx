@@ -9,7 +9,6 @@ const CellRack = ({ rack, outputType, color }) => {
   const [output_b, setOutput_b] = useState("")
   const [output_c, setOutput_c] = useState(rack.default_color)
 
-  if (rack.switchInfo.sw_models === undefined) console.log(rack)
   useEffect(() => {
     if (outputType === "rack") {
       setOutput_t(`Nodes: ${rack.node_count} | Rack U: ${rack.u_count}`)
