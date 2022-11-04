@@ -221,7 +221,7 @@ const Node = ({ node }) => {
               )
             })}
           </Box>
-          <Box sx={{ display: "inline-flex", maxWidth: "270px" }}>
+          <Box sx={{ display: "inline-flex", maxWidth: "320px" }}>
             <Collapse collapsedSize={30} in={expandDrives}>
               <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
                 {node.redfish.storage.volumes.map((val, index) => {
