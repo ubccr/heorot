@@ -6,10 +6,10 @@
 
 ### Install Node:
 
-> Version 16 LTS is recommended
+> Version 18 LTS is recommended
 
 ```bash
-$ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+$ curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 $ sudo apt-get install -y nodejs
 ```
 
@@ -63,14 +63,12 @@ $ cp /opt/heorot/client/src/config.example.js /opt/heorot/client/src/config.js
 $ nano /opt/heorot/client/src/config.js
 ```
 
-#### Generate Certs & Keys:
+#### Generate Cert:
 
 ```bash
 $ cd /opt/heorot/api/keys
 # Change localhost to your server's IP & region info
 $ openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
-
-$ ssh-keygen -f bmc.key
 
 # Ensure keys are readable by grendel user
 $ ls -l
@@ -96,13 +94,6 @@ $ sudo systemctl start dev-heorot-client.service
 ## :tada: Heorot should now be running!
 
 You can access the dev Web UI at http://localhost:3000 and the API at https://localhost/_your_route_
-
-### MongoDB Initialization:
-
-> :warning: Ubuntu 22.04 does not have a mongosh install candidate, I advise using [MongoDB Compass](https://www.mongodb.com/products/compass) instead
-
-1. Head to http://localhost:3000/#/Signup and create an Account
-2. Login to MongoDB and set your user's privileges to "admin"
 
 ### Log files:
 
