@@ -1,8 +1,8 @@
 .vscode
 node_modules
 
-server.key
-server.cert
+*.key
+*.cert
 
 config.js
 docker-compose.yml
