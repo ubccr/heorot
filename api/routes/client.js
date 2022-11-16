@@ -85,37 +85,30 @@ app.get("/node/:node", async (req, res) => {
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
   let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
 
-  if (nodeRes.status === "success" && rack_res.status === "success") {
+  if (nodeRes.status === "success" && nodeRes.result.length > 0 && rack_res.status === "success") {
     let nodeList = rack_res.result.map((val) => val.name).sort((a, b) => a.split("-")[2] - b.split("-")[2])
     let prevNode = nodeList.indexOf(node) < nodeList.length - 1 ? nodeList[nodeList.indexOf(node) + 1] : nodeList[0]
     let nextNode = nodeList.indexOf(node) > 0 ? nodeList[nodeList.indexOf(node) - 1] : nodeList[nodeList.length - 1]
     let nodes = nodeRes.result
-    if (nodes.length > 0) {
-      nodes.forEach((element) => {
-        result.push(element)
-      })
-      let bmcPlugin = false
-      if (config.bmc.DELL_USER !== "") bmcPlugin = true
+    nodes.forEach((element) => {
+      result.push(element)
+    })
+    let bmcPlugin = false
+    if (config.bmc.DELL_USER !== "") bmcPlugin = true
 
-      res.json({
-        status: "success",
-        node: node,
-        previous_node: prevNode,
-        next_node: nextNode,
-        result: result,
-        bmc: bmcPlugin,
-      })
-    } else {
-      res.json({
-        status: "error",
-        message: "Node not found",
-      })
-    }
+    res.json({
+      status: "success",
+      node: node,
+      previous_node: prevNode,
+      next_node: nextNode,
+      result: result,
+      bmc: bmcPlugin,
+    })
   } else {
     res.json({
-      status: nodeRes.status,
-      result: nodeRes.result,
-      code: nodeRes.code,
+      status: "error",
+      message: "Node not found",
+      error: { nodeRes, rack_res },
     })
   }
 })

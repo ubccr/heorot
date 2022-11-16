@@ -68,6 +68,7 @@ const Index = () => {
           setLoading(false)
         } else {
           enqueueSnackbar(response.message, { variant: response.status })
+          console.error(response)
         }
       })
   }, [refetch, node])
