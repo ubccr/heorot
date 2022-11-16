@@ -153,6 +153,10 @@ const SwitchGen = ({ data }) => {
                               <TableRow>
                                 {port.map((splitPort, index) => {
                                   let disabled = false
+                                  // This regex assumes the standard node naming convention used by Grendel
+                                  let link =
+                                    splitPort.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?") ??
+                                    splitPort.port.split("/")[2]
                                   if (splitPort.status === "down") disabled = true
                                   if (!(index % 2)) {
                                     if (splitPort.speed === "1G") color = "warning"
@@ -177,9 +181,16 @@ const SwitchGen = ({ data }) => {
                                               disabled={disabled}
                                               variant="contained"
                                               size="small"
-                                              sx={{ minWidth: "35px", width: "35px" }}
+                                              component={Link}
+                                              to={`/Node/${link[0]}`}
+                                              sx={{
+                                                width: "80px",
+                                                textTransform: "none",
+                                                whiteSpace: "nowrap",
+                                                fontSize: "10px",
+                                              }}
                                             >
-                                              {`${splitPort.port.split("/")[2]}`}
+                                              {`${link[0]}`}
                                             </Button>
                                           </span>
                                         </Tooltip>
@@ -191,6 +202,10 @@ const SwitchGen = ({ data }) => {
                               <TableRow>
                                 {port.map((splitPort, index) => {
                                   let disabled = false
+                                  // This regex assumes the standard node naming convention used by Grendel
+                                  let link =
+                                    splitPort.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?") ??
+                                    splitPort.port.split("/")[2]
                                   if (splitPort.status === "down") disabled = true
                                   if (index % 2) {
                                     if (splitPort.speed === "1G") color = "warning"
@@ -215,9 +230,16 @@ const SwitchGen = ({ data }) => {
                                               disabled={disabled}
                                               variant="contained"
                                               size="small"
-                                              sx={{ minWidth: "35px", width: "35px" }}
+                                              component={Link}
+                                              to={`/Node/${link[0]}`}
+                                              sx={{
+                                                width: "80px",
+                                                textTransform: "none",
+                                                whiteSpace: "nowrap",
+                                                fontSize: "10px",
+                                              }}
                                             >
-                                              {`${splitPort.port.split("/")[2]}`}
+                                              {`${link[0]}`}
                                             </Button>
                                           </span>
                                         </Tooltip>
@@ -238,6 +260,7 @@ const SwitchGen = ({ data }) => {
                     let disabled = false
                     if (port.status === "down") disabled = true
                     // let portArr = port.port.split("/")
+                    // This regex assumes the standard node naming convention used by Grendel
                     let link = port.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?")
 
                     return (
@@ -281,6 +304,10 @@ const SwitchGen = ({ data }) => {
                               <TableRow>
                                 {port.map((splitPort, index) => {
                                   let disabled = false
+                                  // This regex assumes the standard node naming convention used by Grendel
+                                  let link =
+                                    splitPort.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?") ??
+                                    splitPort.port.split("/")[2]
                                   if (splitPort.status === "down") disabled = true
                                   if (!(index % 2)) {
                                     if (splitPort.speed === "1G") color = "warning"
@@ -306,9 +333,16 @@ const SwitchGen = ({ data }) => {
                                               disabled={disabled}
                                               variant="contained"
                                               size="small"
-                                              sx={{ minWidth: "35px", width: "35px" }}
+                                              component={Link}
+                                              to={`/Node/${link[0]}`}
+                                              sx={{
+                                                width: "80px",
+                                                textTransform: "none",
+                                                whiteSpace: "nowrap",
+                                                fontSize: "10px",
+                                              }}
                                             >
-                                              {`${splitPort.port.split("/")[2]}`}
+                                              {`${link[0]}`}
                                             </Button>
                                           </span>
                                         </Tooltip>
@@ -320,6 +354,9 @@ const SwitchGen = ({ data }) => {
                               <TableRow>
                                 {port.map((splitPort, index) => {
                                   let disabled = false
+                                  let link =
+                                    splitPort.description.match("[a-z]{3}-[a-z][0-9]{2}-[0-9]{2}(-0[1-2])?") ??
+                                    splitPort.port.split("/")[2]
                                   if (splitPort.status === "down") disabled = true
                                   if (index % 2) {
                                     if (splitPort.speed === "1G") color = "warning"
@@ -345,9 +382,16 @@ const SwitchGen = ({ data }) => {
                                               disabled={disabled}
                                               variant="contained"
                                               size="small"
-                                              sx={{ minWidth: "35px", width: "35px" }}
+                                              component={Link}
+                                              to={`/Node/${link[0]}`}
+                                              sx={{
+                                                width: "80px",
+                                                textTransform: "none",
+                                                whiteSpace: "nowrap",
+                                                fontSize: "10px",
+                                              }}
                                             >
-                                              {`${splitPort.port.split("/")[2]}`}
+                                              {`${link[0]}`}
                                             </Button>
                                           </span>
                                         </Tooltip>
