@@ -71,6 +71,11 @@ const Index = () => {
           console.error(response)
         }
       })
+    return () => {
+      setSimple(false)
+      setApiData()
+      setLoading(true)
+    }
   }, [refetch, node])
 
   const prevNode = () => {
