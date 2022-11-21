@@ -97,7 +97,7 @@ The /opt/heorot/api/keys directory needs the following:
 
 ```bash
 $ cd /opt/heorot/api/keys
-# Example cert genertaion | Change localhost to your server's IP & region info
+# Example cert generation | Change localhost to your server's IP & region info
 $ openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
 
 # Ensure keys are readable by grendel user
