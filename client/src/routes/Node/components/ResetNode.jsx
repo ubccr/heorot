@@ -38,9 +38,9 @@ const ResetBmc = ({ node }) => {
         <DialogTitle>Are you sure you want to powercycle {node}?</DialogTitle>
         <DialogActions>
           <FormControlLabel control={<Checkbox value={pxe} onClick={() => setPxe(!pxe)} />} label="PXE boot" />
-          <Button variant="outlined" color="warning" onClick={() => resetNodeQuery.refetch()}>
+          <Button variant="outlined" color="error" onClick={() => resetNodeQuery.refetch()}>
             {resetNodeQuery.isFetching && <CircularProgress size={14} color="inherit" sx={{ marginRight: "5px" }} />}
-            PowerCycle
+            Power cycle
           </Button>
           <Button variant="outlined" onClick={() => setOpenNode(false)} autoFocus>
             Cancel

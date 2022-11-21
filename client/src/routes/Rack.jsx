@@ -1,6 +1,11 @@
 import {
   Button,
   Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   Grid,
   IconButton,
   LinearProgress,
@@ -10,6 +15,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from "@mui/material"
 import React, { useContext, useState } from "react"
 
@@ -18,6 +24,7 @@ import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import { PluginContext } from "../contexts/PluginContext"
+import RackActions from "./Rack/RackActions"
 import RenderNode from "./Rack/RenderNode"
 import SwitchGen from "./Rack/components/SwitchGen"
 import { UserContext } from "../contexts/UserContext"
@@ -76,6 +83,20 @@ const Rack = () => {
     { staleTime: 120000, cacheTime: 120000 }
   )
 
+  const [actionNodes, setActionNodes] = useState([])
+  const [open, setOpen] = useState(false)
+  const updateActionList = (node) => {
+    if (actionNodes.includes(node)) setActionNodes(actionNodes.filter((val) => val !== node))
+    else setActionNodes([...actionNodes, node])
+  }
+  const selectAll = () => {
+    let node_arr = query.data.nodes
+      .map((u) => u.nodes?.map((node) => node?.grendel.name).filter(Boolean))
+      .filter(Boolean)
+      .flat()
+    setActionNodes([...node_arr])
+  }
+
   return (
     <BgContainer>
       <TableContainer ref={tableRef}>
@@ -99,8 +120,14 @@ const Rack = () => {
                     {rack}
                   </Grid>
                   <Grid item xs={4}>
-                    <Button disabled variant="outlined" size="small">
+                    <Button onClick={() => setOpen(true)} variant="outlined" size="small">
                       Actions
+                    </Button>
+                    <Button onClick={() => selectAll()} variant="outlined" size="small">
+                      Select all
+                    </Button>
+                    <Button onClick={() => setActionNodes([])} variant="outlined" size="small">
+                      Clear
                     </Button>
                   </Grid>
                 </Grid>
@@ -162,7 +189,13 @@ const Rack = () => {
                         </TableCell>
                         <TableCell align={"center"} sx={{ padding: 0 }} rowSpan={node.height}>
                           {node.nodes.map((val, index) => (
-                            <Checkbox size="small" key={index} disabled />
+                            <Tooltip title={val.grendel.name} arrow placement="right" key={index}>
+                              <Checkbox
+                                size="small"
+                                checked={actionNodes.includes(val.grendel.name)}
+                                onChange={() => updateActionList(val.grendel.name)}
+                              />
+                            </Tooltip>
                           ))}
                         </TableCell>
                       </>
@@ -182,6 +215,25 @@ const Rack = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Dialog
+        open={open}
+        onClose={() => {
+          setOpen(false)
+        }}
+        maxWidth="lg"
+        scroll="paper"
+      >
+        <DialogTitle>Node Actions</DialogTitle>
+        <DialogContent>
+          <RackActions nodes={actionNodes.join(",")} />
+        </DialogContent>
+        <Divider />
+        <DialogActions>
+          <Button variant="outlined" onClick={() => setOpen(false)}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </BgContainer>
   )
 }

@@ -145,73 +145,127 @@ app.get("/v1/sel/:node", async (req, res) => {
 })
 
 app.put("/v1/clearSel/:node", async (req, res) => {
-  const node = req.params.node
+  const node = req.params.node.split(",")
 
-  let bmc = await getBMC(node)
-  if (bmc.status === "success") {
-    const uri = `https://${bmc.address}`
-    let auth = await redfish_auth(uri)
-    if (auth.status === "success") {
-      if (auth.oem === "Dell") api_res = await dell_clearSel(uri, auth.token)
-      else if (auth.oem === "Supermicro") api_res = await sm_clearSel(uri, auth.token)
-      else if (auth.oem === "HPE") api_res = await hpe_clearSel(uri, auth.token)
-      else
-        api_res = {
-          status: "error",
-          message: "failed to parse OEM from Redfish call",
-        }
+  let response = await Promise.all(
+    node.map(async (val) => {
+      let bmc = await getBMC(val)
+      if (bmc.status === "success") {
+        const uri = `https://${bmc.address}`
+        let auth = await redfish_auth(uri)
+        if (auth.status === "success") {
+          if (auth.oem === "Dell") api_res = await dell_clearSel(uri, auth.token)
+          else if (auth.oem === "Supermicro") api_res = await sm_clearSel(uri, auth.token)
+          else if (auth.oem === "HPE") api_res = await hpe_clearSel(uri, auth.token)
+          else
+            api_res = {
+              status: "error",
+              message: "failed to parse OEM from Redfish call",
+            }
+          await redfish_logout(auth.location, uri, auth.token)
+          return api_res
+        } else return auth
+      } else return bmc
+    })
+  )
+  let errors = response.filter((val) => val.status === "error")
+  let successes = response.filter((val) => val.status === "success")
+  let status = "success"
+  let message = ""
 
-      await redfish_logout(auth.location, uri, auth.token)
-      res.json(api_res)
-    } else res.json(auth)
-  } else res.json(bmc)
+  if (response.length === 1) res.json(response[0])
+  else {
+    if (successes.length >= 1) message += `Successfully cleared SEL on ${successes.length} node(s). `
+    if (errors.length >= 1) {
+      status = "error"
+      message += `${errors.length} node(s) failed. (see browser console for details)`
+    }
+    res.json({ status: status, message: message, error: errors })
+  }
 })
 
 app.put("/v1/resetBmc/:node", async (req, res) => {
-  const node = req.params.node
+  const node = req.params.node.split(",")
 
-  let bmc = await getBMC(node)
-  if (bmc.status === "success") {
-    const uri = `https://${bmc.address}`
-    let auth = await redfish_auth(uri)
-    if (auth.status === "success") {
-      if (auth.oem === "Dell") api_res = await dell_resetBmc(uri, auth.token)
-      else if (auth.oem === "Supermicro") api_res = await sm_resetBmc(uri, auth.token)
-      else if (auth.oem === "HPE") api_res = await hpe_resetBmc(uri, auth.token)
-      else
-        api_res = {
-          status: "error",
-          message: "failed to parse OEM from Redfish call",
-        }
+  let response = await Promise.all(
+    node.map(async (val) => {
+      let bmc = await getBMC(val)
+      if (bmc.status === "success") {
+        const uri = `https://${bmc.address}`
+        let auth = await redfish_auth(uri)
+        if (auth.status === "success") {
+          if (auth.oem === "Dell") api_res = await dell_resetBmc(uri, auth.token)
+          else if (auth.oem === "Supermicro") api_res = await sm_resetBmc(uri, auth.token)
+          else if (auth.oem === "HPE") api_res = await hpe_resetBmc(uri, auth.token)
+          else
+            api_res = {
+              status: "error",
+              message: "failed to parse OEM from Redfish call",
+            }
 
-      await redfish_logout(auth.location, uri, auth.token)
-      res.json(api_res)
-    } else res.json(auth)
-  } else res.json(bmc)
+          await redfish_logout(auth.location, uri, auth.token)
+          return api_res
+        } else return auth
+      } else return bmc
+    })
+  )
+  let errors = response.filter((val) => val.status === "error")
+  let successes = response.filter((val) => val.status === "success")
+  let status = "success"
+  let message = ""
+
+  if (response.length === 1) res.json(response[0])
+  else {
+    if (successes.length >= 1) message += `Successfully reset the BMC on ${successes.length} node(s). `
+    if (errors.length >= 1) {
+      status = "error"
+      message += `${errors.length} node(s) failed. (see browser console for details)`
+    }
+    res.json({ status: status, message: message, error: errors })
+  }
 })
 
 app.put("/v1/resetNode/:node/:pxe?", async (req, res) => {
-  const node = req.params.node
+  const node = req.params.node.split(",")
   const pxe = req.params.pxe ?? "false"
 
-  let bmc = await getBMC(node)
-  if (bmc.status === "success") {
-    const uri = `https://${bmc.address}`
-    let auth = await redfish_auth(uri)
-    if (auth.status === "success") {
-      if (auth.oem === "Dell") api_res = await dell_resetNode(uri, auth.token, pxe)
-      else if (auth.oem === "Supermicro") api_res = await sm_resetNode(uri, auth.token, pxe)
-      else if (auth.oem === "HPE") api_res = await hpe_resetNode(uri, auth.token, pxe)
-      else
-        api_res = {
-          status: "error",
-          message: "failed to parse OEM from Redfish call",
-        }
+  let response = await Promise.all(
+    node.map(async (val) => {
+      let bmc = await getBMC(val)
+      if (bmc.status === "success") {
+        const uri = `https://${bmc.address}`
+        let auth = await redfish_auth(uri)
+        if (auth.status === "success") {
+          if (auth.oem === "Dell") api_res = await dell_resetNode(uri, auth.token, pxe)
+          else if (auth.oem === "Supermicro") api_res = await sm_resetNode(uri, auth.token, pxe)
+          else if (auth.oem === "HPE") api_res = await hpe_resetNode(uri, auth.token, pxe)
+          else
+            api_res = {
+              status: "error",
+              message: "failed to parse OEM from Redfish call",
+            }
 
-      await redfish_logout(auth.location, uri, auth.token)
-      res.json(api_res)
-    } else res.json(auth)
-  } else res.json(bmc)
+          await redfish_logout(auth.location, uri, auth.token)
+          return api_res
+        } else return auth
+      } else return bmc
+    })
+  )
+
+  let errors = response.filter((val) => val.status === "error")
+  let successes = response.filter((val) => val.status === "success")
+  let status = "success"
+  let message = ""
+
+  if (response.length === 1) res.json(response[0])
+  else {
+    if (successes.length >= 1) message += `Successfully power cycled ${successes.length} node(s). `
+    if (errors.length >= 1) {
+      status = "error"
+      message += `${errors.length} node(s) failed. (see browser console for details)`
+    }
+    res.json({ status: status, message: message, error: errors })
+  }
 })
 
 module.exports = app
