@@ -26,7 +26,7 @@ import { UserContext } from "./contexts/UserContext"
 import Warranty from "./routes/Admin/Warranty"
 import { apiConfig } from "./config"
 // import darkTriangles from "./backgrounds/large-triangles-dark.svg"
-import largeTriangles from "./backgrounds/large-triangles.svg"
+// import largeTriangles from "./backgrounds/large-triangles.svg"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 function App() {
@@ -84,7 +84,8 @@ function App() {
         ? {
             background: {
               main: "rgba(255, 255, 255, 1)",
-              img: `url(${largeTriangles})`,
+              img: "linear-gradient(126.29deg, #00baff 0%, #000066 100%)",
+              // img: `url(${largeTriangles})`,
               // 100 level colors
               table: {
                 single: "#ffe0b2",
