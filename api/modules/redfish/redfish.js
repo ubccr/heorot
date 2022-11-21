@@ -65,9 +65,13 @@ const redfishRequest = async (node) => {
 
   let logout_res = await redfish_logout(auth.location, url, auth.token)
   if (logout_res.status !== 200) {
-    let error = await logout_res.json()
-    let extended = error.error["@Message.ExtendedInfo"] !== undefined ? error.error["@Message.ExtendedInfo"] : ""
-    console.error(`Failed to logout of ${node}'s bmc`, error, extended) // Catch logout errors
+    try {
+      let error = (await logout_res.json()) ?? logout_res
+      let extended = error.error["@Message.ExtendedInfo"] !== undefined ? error.error["@Message.ExtendedInfo"] : ""
+      console.error(`Failed to logout of ${node}'s bmc`, error, extended) // Catch logout errors
+    } catch (e) {
+      console.log("Error at logout_res", e, logout_res)
+    }
   }
   return output
 }
