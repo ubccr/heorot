@@ -84,14 +84,23 @@ const Rack = () => {
   )
 
   const [actionNodes, setActionNodes] = useState([])
+  const [actionDisabled, setActionDisabled] = useState(true)
   const [open, setOpen] = useState(false)
   const updateActionList = (node) => {
     if (actionNodes.includes(node)) setActionNodes(actionNodes.filter((val) => val !== node))
     else setActionNodes([...actionNodes, node])
+    if (!!actionNodes) setActionDisabled(false)
+    else setActionDisabled(true)
   }
   const selectAll = () => {
     let node_arr = query.data.nodes
-      .map((u) => u.nodes?.map((node) => node?.grendel.name).filter(Boolean))
+      .map((u) =>
+        u.nodes
+          ?.map((node) => {
+            if (plugins.node_prefixes.includes(node?.grendel.name.split("-")[0])) return node.grendel.name
+          })
+          .filter(Boolean)
+      )
       .filter(Boolean)
       .flat()
     setActionNodes([...node_arr])
@@ -99,9 +108,9 @@ const Rack = () => {
 
   return (
     <BgContainer>
-      <TableContainer ref={tableRef}>
+      <TableContainer ref={tableRef} sx={{ maxHeight: "calc(100vh - 120px)" }}>
         {query.isFetching && <LinearProgress />}
-        <Table sx={{ tableLayout: "fixed" }} size="small">
+        <Table stickyHeader sx={{ tableLayout: "fixed" }} size="small">
           <TableHead>
             <TableRow>
               <TableCell align={"center"} width={40} sx={{ padding: 0 }}>
@@ -119,14 +128,25 @@ const Rack = () => {
                   <Grid item xs={4}>
                     {rack}
                   </Grid>
-                  <Grid item xs={4}>
-                    <Button onClick={() => setOpen(true)} variant="outlined" size="small">
-                      Actions
-                    </Button>
+                  <Grid item xs={12} md={4}>
+                    <Tooltip title={actionDisabled ? "Please select a Node!" : ""}>
+                      <span>
+                        <Button disabled={actionDisabled} onClick={() => setOpen(true)} variant="outlined" size="small">
+                          Actions
+                        </Button>
+                      </span>
+                    </Tooltip>
                     <Button onClick={() => selectAll()} variant="outlined" size="small">
-                      Select all
+                      Select Nodes
                     </Button>
-                    <Button onClick={() => setActionNodes([])} variant="outlined" size="small">
+                    <Button
+                      onClick={() => {
+                        setActionNodes([])
+                        setActionDisabled(true)
+                      }}
+                      variant="outlined"
+                      size="small"
+                    >
                       Clear
                     </Button>
                   </Grid>
@@ -220,7 +240,7 @@ const Rack = () => {
         onClose={() => {
           setOpen(false)
         }}
-        maxWidth="lg"
+        maxWidth="sm"
         scroll="paper"
       >
         <DialogTitle>Node Actions</DialogTitle>

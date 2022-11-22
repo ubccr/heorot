@@ -6,6 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControlLabel,
   Grid,
   MenuItem,
@@ -119,40 +120,53 @@ const RackActions = ({ nodes }) => {
     <>
       <Box sx={{ padding: "5px" }}>
         <Grid container spacing={2}>
-          <Grid item xs={5}>
+          <Grid item xs={12} sm={4}>
             <TextField
               onChange={(event) => setTags({ ...tags, tags: event.target.value })}
               variant="outlined"
               size="small"
               label="Tags"
               placeholder="z01, gpu, 2u"
+              fullWidth
             />
           </Grid>
-          <Grid item xs={5}>
+          <Grid item xs={6} sm={6} sx={{ display: "flex", justifyContent: "center" }}>
             <RadioGroup defaultValue={"tag"} row onChange={(event) => setTags({ ...tags, action: event.target.value })}>
               <FormControlLabel value="tag" control={<Radio size="small" />} label="Add" />
               <FormControlLabel value="untag" control={<Radio size="small" />} label="Remove" />
             </RadioGroup>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={6} sm={2} sx={{ display: "flex", justifyContent: "center" }}>
             <Button onClick={() => handleSubmit("tags", tags)} variant="outlined">
               Submit
             </Button>
           </Grid>
-          <Grid item xs={10}>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={6} sm={10} sx={{ display: "flex", justifyContent: "center" }}>
             <RadioGroup defaultValue={"provision"} row onChange={(event) => setProvision(event.target.value)}>
               <FormControlLabel value="provision" control={<Radio size="small" />} label="Provision" />
               <FormControlLabel value="unprovision" control={<Radio size="small" />} label="Unprovision" />
             </RadioGroup>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={6} sm={2} sx={{ display: "flex", justifyContent: "center" }}>
             <Button onClick={() => handleSubmit("provision", provision)} variant="outlined">
               Submit
             </Button>
           </Grid>
-          <Grid item xs={10}>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={6} sm={10}>
             {image_query.isFetched && image_query.data.status === "success" && (
-              <Select value={image} onChange={(event) => setImage(event.target.value)} variant="outlined" size="small">
+              <Select
+                value={image}
+                onChange={(event) => setImage(event.target.value)}
+                variant="outlined"
+                size="small"
+                fullWidth
+              >
                 {image_query.data.result.map((val, index) => {
                   return (
                     <MenuItem value={val.name} key={index}>
@@ -163,12 +177,15 @@ const RackActions = ({ nodes }) => {
               </Select>
             )}
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={6} sm={2} sx={{ display: "flex", justifyContent: "center" }}>
             <Button onClick={() => handleSubmit("image", image)} variant="outlined">
               Submit
             </Button>
           </Grid>
-          <Grid item xs={12} sx={{ display: "flex", gap: "5px" }}>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", gap: "5px" }}>
             <Button variant="outlined" onClick={() => handleNodeAction("clearSel")}>
               Clear SELs
             </Button>
