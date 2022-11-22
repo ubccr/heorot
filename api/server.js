@@ -65,6 +65,7 @@ app.get("/plugins", async function (req, res) {
     ome,
     bmc,
     floorplan,
+    node_prefixes: config.rack.prefix.find((val) => val.type === "node")?.prefix ?? ["cpn", "srv"],
   })
 })
 
