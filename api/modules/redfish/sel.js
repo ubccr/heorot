@@ -9,7 +9,7 @@ async function dell_sel(uri, token, version) {
     if (res.status === "success") {
       return {
         status: res.status,
-        count: res.data["Members@odata.count"],
+        count: res.data["Members@odata.count"] ?? 0,
         logs: res.data.Members.map((val) => {
           return {
             created: val.Created,
@@ -28,7 +28,7 @@ async function dell_sel(uri, token, version) {
     if (res.status === "success") {
       return {
         status: res.status,
-        count: res.data["Members@odata.count"],
+        count: res.data["Members@odata.count"] ?? 0,
         logs: res.data.Members.map((val) => {
           return {
             created: val.Created,
@@ -47,7 +47,7 @@ async function dell_sel(uri, token, version) {
       res = await api_request(url, token)
       return {
         status: res.status,
-        count: res.data["Members@odata.count"],
+        count: res.data["Members@odata.count"] ?? 0,
         logs: res.data.Members.map((val) => {
           return {
             created: val.Created,
@@ -68,7 +68,7 @@ async function sm_sel(uri, token) {
   if (res.status === "success") {
     return {
       status: res.status,
-      count: res.data["Members@odata.count"],
+      count: res.data["Members@odata.count"] ?? 0,
       logs: res.data.Members.map((val) => {
         return {
           created: val.Created,
@@ -89,7 +89,7 @@ async function hpe_sel(uri, token) {
   if (res.status === "success") {
     return {
       status: res.status,
-      count: res.data["Members@odata.count"],
+      count: res.data["Members@odata.count"] ?? 0,
       logs: res.data.Items.map((val, index) => {
         if (index < 10) {
           return {
