@@ -17,7 +17,7 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material"
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 
 import BgContainer from "../components/BgContainer"
 import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined"
@@ -89,9 +89,16 @@ const Rack = () => {
   const updateActionList = (node) => {
     if (actionNodes.includes(node)) setActionNodes(actionNodes.filter((val) => val !== node))
     else setActionNodes([...actionNodes, node])
-    if (!!actionNodes) setActionDisabled(false)
-    else setActionDisabled(true)
   }
+  useEffect(() => {
+    if (actionNodes.length > 0) setActionDisabled(false)
+    else setActionDisabled(true)
+
+    return () => {
+      setActionDisabled(true)
+    }
+  }, [actionNodes])
+
   const selectAll = () => {
     let node_arr = query.data.nodes
       .map((u) =>
@@ -139,14 +146,7 @@ const Rack = () => {
                     <Button onClick={() => selectAll()} variant="outlined" size="small">
                       Select Nodes
                     </Button>
-                    <Button
-                      onClick={() => {
-                        setActionNodes([])
-                        setActionDisabled(true)
-                      }}
-                      variant="outlined"
-                      size="small"
-                    >
+                    <Button onClick={() => setActionNodes([])} variant="outlined" size="small">
                       Clear
                     </Button>
                   </Grid>
