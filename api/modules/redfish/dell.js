@@ -44,7 +44,7 @@ const dell_query = async (auth) => {
     query_res_2[2].data.length > 0
       ? query_res_2[2].data
       : pci_devices.filter((val) => ["NVIDIA Corporation"].includes(val.Manufacturer)) // add AMD?
-  let storage = hdd.find((val) => val.Drives.length > 0) ?? []
+  let storage = hdd.find((val) => val.Drives?.length > 0) ?? []
   let ib = pci_devices.filter(
     (val) => ["Mellanox Technologies"].includes(val.Manufacturer) || val.Description.match(/Omni/g)
   ) // find Mellanox IB & Omni path cards
@@ -66,7 +66,7 @@ const dell_query = async (auth) => {
   let query_res_3 = await Promise.all([
     await api_request(enclosure_url, auth),
     await api_request(drive_urls, auth),
-    await api_request(storage?.Volumes["@odata.id"], auth),
+    await api_request(storage?.Volumes["@odata.id"] ?? "", auth),
     await api_request(volume_urls, auth),
     await api_request(network_port_urls, auth),
   ])
