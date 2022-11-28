@@ -4,7 +4,7 @@ config.environment = "prod" // dev | prod - dev allows you to make api requests 
 config.origin = "https://localhost:443" // Only change if you are using a separate Client and API
 config.port = 443 // API port
 
-// Keys - see readme -> Keys for more info
+// HTTPS certs
 config.keys = {
   serverKey: "./keys/server.key",
   serverCert: "./keys/server.cert",
@@ -46,7 +46,7 @@ config.db = {
 
 // Grendel
 config.grendel = {
-  socket: "/var/lib/grendel/grendel-api.socket", // path to Grendel UNIX socket **absolute path** (user nodejs is running as needs permissions to access {add to grendel group})
+  socket: "/var/lib/grendel/grendel-api.socket", // absolute path to Grendel UNIX socket (user nodejs is running as needs permissions to access {add to grendel group})
 }
 
 // OpenManage Enterprise
@@ -60,15 +60,14 @@ config.ome = {
 config.firmware = ["ipxe.pxe", "ipxe-i386.efi", "ipxe-x86_64.efi", "snponly-x86_64.efi", "undionly.kpxe"]
 
 // Login information for switch queries | Should be a user with privileges to run: show mac address-table, show interfaces status, show inventory
-// Switches will need proper tags | see readme.MD -> Grendel Tags
 config.switches = {
   user: "",
   pass: "",
+  privateKeyPath: "", // absolute path to private key | nodejs user (ex: grendel) must have read privileges on key file
 }
 
 // Floorplan page config:
 config.floorplan = {
-  // "Rack" view color mapping
   tag_mapping: [
     { tag: "ubhpc", color: "primary" }, // {tag: "set to grendel tag of slurm partition" color: "MUI color"}
     { tag: "faculty", color: "success" },
@@ -78,13 +77,13 @@ config.floorplan = {
     default_color: "primary",
     secondary_color: "floorplan", // if regex doesn't match: set to this color | Must be MUI color or custom color added to theme in app.js
     model_color: [
-      // switch model coloring array | order matters, last item will take precidence!
+      // switch model coloring array | order matters, last item will take precedence!
       // display: "Legend text in the UI", color: "MUI or custom color", model: "regex to match switch model"
       { display: "No Management Switch", color: "primary", model: /^S/ },
       { display: "Management Switch", color: "error", model: /^PC/ },
     ],
     version_color: [
-      // switch version coloring array | order matters, last item will take precidence!
+      // switch version coloring array | order matters, last item will take precedence!
       // display: "Legend text in the UI", color: "MUI or custom color", version: "regex to match switch versions"
       { display: "OS8", color: "error", version: /^8/ },
       { display: "OS9", color: "warning", version: /^9/ },

@@ -2,6 +2,7 @@ const { NodeSSH } = require("node-ssh")
 const { grendelRequest } = require("../modules/grendel")
 const config = require("../config")
 const xml2js = require("xml2js")
+const fs = require("fs")
 
 const getSwInfoV2 = async (node) => {
   // Grendel
@@ -70,6 +71,7 @@ const getSwInfoV2 = async (node) => {
     username: config.switches.user,
     tryKeyboard: true,
     password: config.switches.pass,
+    privateKeyPath: config.switches.privateKeyPath,
     onKeyboardInteractive(name, instructions, instructionsLang, prompts, finish) {
       if (prompts.length > 0 && prompts[0].prompt.toLowerCase().includes("password")) {
         finish([config.switches.pass])
@@ -88,7 +90,6 @@ const getSwInfoV2 = async (node) => {
         "diffie-hellman-group16-sha512",
         "diffie-hellman-group17-sha512",
         "diffie-hellman-group18-sha512",
-        // older algos for HPE nodes
         "diffie-hellman-group14-sha1",
         "diffie-hellman-group1-sha1",
       ],
@@ -263,6 +264,7 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
           host: fqdn,
           userName: config.switches.user,
           password: config.switches.pass,
+          privateKey: fs.readFileSync(config.switches.privateKeyPath),
           algorithms: {
             kex: [
               "curve25519-sha256",
@@ -276,7 +278,6 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
               "diffie-hellman-group16-sha512",
               "diffie-hellman-group17-sha512",
               "diffie-hellman-group18-sha512",
-              // older algos for HPE nodes
               "diffie-hellman-group14-sha1",
               "diffie-hellman-group1-sha1",
             ],
