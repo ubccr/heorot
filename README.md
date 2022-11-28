@@ -132,7 +132,7 @@ Head to the signup page and create an account to get started
 
 #### There are a few custom Grendel tags that can be added to customize the rack and node view shown in Heorot:
 
-- p22 | "rack name"
+- p22 | /[a-z][0-9]{2}/
   - displays node in rack p22
 - 2u, 3u, 4u | /[0-9]{1,2}u/
   - override for automatic size calcs - renders node as a multi u height chassis
@@ -140,16 +140,15 @@ Head to the signup page and create an account to get started
   - override for automatic size calcs - renders node as a multi node wide chassis
 - noAPI
   - disables redfish API queries on node page
-- switch
-  - allows for switch queries:
-    - Dell_OS8, Dell_OS9, Dell_OS10
-      - set depending on switch OS version
-    - Dell_PC3
-      - specific for Dell Powerconnect 6248 - VxWorks v3.x
-    - Dell_PC5
-      - specific for Dell Powerconnect 7048 - VxWorks v5.x
-    - Arista_EOS
-      - for our core switch | TODO: add non core switch EOS queries for other versions
+- switches:
+  - Dell_OS8, Dell_OS9, Dell_OS10
+    - set depending on switch OS version
+  - Dell_PC3
+    - specific for Dell Powerconnect 6248 - VxWorks v3.x
+  - Dell_PC5
+    - specific for Dell Powerconnect 7048 - VxWorks v5.x
+  - Arista_EOS
+    - for our core switch | TODO: add non core switch EOS queries for other versions
 
 ## :memo: License
 
