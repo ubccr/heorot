@@ -126,7 +126,7 @@ const dell_query = async (auth) => {
     },
     network: ports?.map((val) => {
       return {
-        status: val.Status.Health,
+        status: val.Status?.Health,
         link: val.LinkStatus,
         id: val.Id,
         type: val.ActiveLinkTechnology,
@@ -137,7 +137,7 @@ const dell_query = async (auth) => {
     }),
     pcie: ib.map((val) => {
       return {
-        status: val.Status.Health,
+        status: val.Status?.Health,
         manufacturer: val.Manufacturer,
         name: val.Name,
       }
@@ -162,7 +162,7 @@ const dell_query = async (auth) => {
         .map((val) => {
           if (val.Id.slice(-2) === "-1" || val.Id.slice(-2) === "-0")
             return {
-              status: val.Status.Health,
+              status: val.Status?.Health,
               manufacturer: val.Manufacturer,
               model: val.Model ?? val.Name,
             }
@@ -180,7 +180,7 @@ const dell_query = async (auth) => {
             return {
               name: val.Name,
               description: val.Description,
-              status: val.Status.Health,
+              status: val.Status?.Health,
               volume_type: val.VolumeType,
               raid_type: val.RAIDType ?? "",
               capacity: formatBytes(val.CapacityBytes, 1),
@@ -189,7 +189,7 @@ const dell_query = async (auth) => {
         .filter(Boolean),
       drives: drives.map((val) => {
         return {
-          status: val.Status.Health,
+          status: val.Status?.Health,
           slot: val.PhysicalLocation?.PartLocation.LocationOrdinalValue, // doesn't work on older nodes
           capacity: formatBytes(val.CapacityBytes, 1),
           type: val.MediaType,
