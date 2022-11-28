@@ -120,12 +120,12 @@ const Rack = () => {
         <Table stickyHeader sx={{ tableLayout: "fixed" }} size="small">
           <TableHead>
             <TableRow>
-              <TableCell align={"center"} width={40} sx={{ padding: 0, bgcolor: "inherit" }}>
+              <TableCell align={"center"} width={40} sx={{ padding: 0, bgcolor: "background.main" }}>
                 <IconButton variant="outlined" onClick={() => leftRack()} sx={{ float: "left" }}>
                   <ChevronLeftIcon />
                 </IconButton>
               </TableCell>
-              <TableCell align={"center"} sx={{ bgcolor: "inherit" }}>
+              <TableCell align={"center"} sx={{ bgcolor: "background.main" }}>
                 <Grid container>
                   <Grid item xs={4}>
                     <IconButton onClick={() => refetchQuery()} size="small" sx={{ float: "left" }}>
@@ -152,7 +152,7 @@ const Rack = () => {
                   </Grid>
                 </Grid>
               </TableCell>
-              <TableCell width={40} sx={{ padding: 0, bgcolor: "inherit" }}>
+              <TableCell width={40} sx={{ padding: 0, bgcolor: "background.main" }}>
                 <IconButton variant="outlined" onClick={() => rightRack()} sx={{ float: "right" }}>
                   <ChevronRightIcon />
                 </IconButton>
