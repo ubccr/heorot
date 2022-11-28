@@ -58,7 +58,7 @@ const ManageSwitches = () => {
           </Grid>
           <Grid item xs={12} ref={tableRef}>
             {query.isFetched && query.data.failed.length > 0 && (
-              <TableContainer>
+              <TableContainer sx={{ maxHeight: "calc(100vh - 270px)" }}>
                 <Table size="small">
                   <TableHead>
                     <TableRow>

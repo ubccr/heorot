@@ -75,10 +75,10 @@ const Index = () => {
           boxShadow: 12,
         }}
       >
-        <TableContainer ref={tableRef}>
+        <TableContainer ref={tableRef} sx={{ maxHeight: "calc(100vh - 220px)" }}>
           {query.isLoading && <LinearProgress />}
           {query.isFetched && query.data.status !== "error" && (
-            <Table>
+            <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell>Node:</TableCell>
