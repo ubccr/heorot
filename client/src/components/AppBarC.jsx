@@ -5,8 +5,10 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import AdminMenu from "./AppBar/AdminMenu"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined"
 import IconButton from "@mui/material/IconButton"
 import InfoOutlined from "@mui/icons-material/InfoOutlined"
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined"
 import { Link } from "react-router-dom"
 import MainMenuC from "./AppBar/MainMenuC"
 import { PluginContext } from "../contexts/PluginContext"
@@ -15,6 +17,7 @@ import Status from "./Status"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useSnackbar } from "notistack"
 
 const AppBarC = () => {
@@ -23,6 +26,7 @@ const AppBarC = () => {
   const [user, setUser] = useContext(UserContext)
   const [mode, setMode] = useContext(ThemeContext)
   const [plugins] = useContext(PluginContext)
+  const [modeRef] = useAutoAnimate(null)
 
   const modeToggle = (e) => {
     let newMode = "light"
@@ -112,7 +116,10 @@ const AppBarC = () => {
 
           {user !== null && <SearchC />}
 
-          <Switch color="default" size="small" onChange={modeToggle} />
+          <IconButton ref={modeRef} onClick={() => modeToggle()}>
+            {mode === "light" && <DarkModeOutlinedIcon sx={{ color: "white" }} />}
+            {mode === "dark" && <LightModeOutlinedIcon sx={{ color: "white" }} />}
+          </IconButton>
           {user === null && (
             <Button sx={{ my: 2, color: "white" }}>
               <Link to={"/Login"}>Login</Link>
@@ -120,14 +127,14 @@ const AppBarC = () => {
           )}
           {user !== null && user.privileges === "admin" && (
             <>
-              <IconButton size="large" onClick={() => setStatusOpen(true)}>
+              <IconButton onClick={() => setStatusOpen(true)}>
                 <InfoOutlined sx={{ color: "white" }} />
               </IconButton>
               <Status open={statusOpen} setOpen={setStatusOpen} />
             </>
           )}
           {user !== null && (
-            <IconButton size="large" onClick={handleAccountOpen}>
+            <IconButton onClick={handleAccountOpen}>
               <AccountCircleOutlinedIcon sx={{ color: "white" }} />
             </IconButton>
           )}

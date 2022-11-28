@@ -81,15 +81,31 @@ const Index = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Node:</TableCell>
-                  <TableCell width={"80px"}>Service Tag:</TableCell>
-                  <TableCell width={"80px"}>SEL</TableCell>
-                  <TableCell width={"40px"}>CPU</TableCell>
-                  <TableCell width={"40px"}>MEM</TableCell>
-                  <TableCell width={"40px"}>Fan</TableCell>
-                  <TableCell width={"40px"}>HDD</TableCell>
-                  <TableCell width={"40px"}>Temp</TableCell>
-                  <TableCell width={"40px"}>Batt</TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }}>Node:</TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"80px"}>
+                    Service Tag:
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"80px"}>
+                    SEL
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"40px"}>
+                    CPU
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"40px"}>
+                    MEM
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"40px"}>
+                    Fan
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"40px"}>
+                    HDD
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"40px"}>
+                    Temp
+                  </TableCell>
+                  <TableCell sx={{ bgcolor: "inherit" }} width={"40px"}>
+                    Batt
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

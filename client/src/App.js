@@ -25,7 +25,7 @@ import { ThemeContext } from "./contexts/ThemeContext"
 import { UserContext } from "./contexts/UserContext"
 import Warranty from "./routes/Admin/Warranty"
 import { apiConfig } from "./config"
-// import darkTriangles from "./backgrounds/large-triangles-dark.svg"
+import darkTriangles from "./backgrounds/large-triangles-dark.svg"
 // import largeTriangles from "./backgrounds/large-triangles.svg"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 
@@ -114,7 +114,9 @@ function App() {
               main: "rgba(255, 255, 255, 0.8)",
             },
             background: {
-              main: "rgba(255, 255, 255, 0.08)",
+              main: "#262626",
+              // main: "rgba(255, 255, 255, 0.08)",
+              img: `url(${darkTriangles})`,
               lighter: "#3b3b3b",
               table: {
                 single: "",
