@@ -9,6 +9,7 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  LinearProgress,
   MenuItem,
   Radio,
   RadioGroup,
@@ -184,6 +185,7 @@ const RackActions = ({ nodes }) => {
           </Grid>
           <Grid item xs={12}>
             <Divider />
+            {redfish_query.isFetching && <LinearProgress color="primary" fullWidth />}
           </Grid>
           <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", gap: "5px" }}>
             <Button variant="outlined" onClick={() => handleNodeAction("clearSel")}>
