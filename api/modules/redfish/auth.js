@@ -78,9 +78,10 @@ async function redfish_logout(url, uri, token) {
   let header = {
     method: "DELETE",
     headers: { "X-Auth-Token": token },
+    timeout: 10000,
     agent,
   }
-  return await fetch(logout_url, header)
+  return await fetch_timeout(logout_url, header)
 }
 
 async function fetch_timeout(url, options = {}) {
