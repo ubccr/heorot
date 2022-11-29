@@ -264,7 +264,6 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
           host: fqdn,
           userName: config.switches.user,
           password: config.switches.pass,
-          privateKey: fs.readFileSync(config.switches.privateKeyPath),
           algorithms: {
             kex: [
               "curve25519-sha256",
@@ -298,7 +297,9 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
         idleTimeOut: 25000,
         commands: commands,
       }
-
+      config.switches.privateKeyPath !== undefined
+        ? (host.server.privateKey = fs.readFileSync(config.switches.privateKeyPath))
+        : null
       const SSH2Shell = require("ssh2shell")
       let SSH = new SSH2Shell(host)
 
