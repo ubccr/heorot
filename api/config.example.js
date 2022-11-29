@@ -63,7 +63,7 @@ config.firmware = ["ipxe.pxe", "ipxe-i386.efi", "ipxe-x86_64.efi", "snponly-x86_
 config.switches = {
   user: "",
   pass: "",
-  privateKeyPath: "", // absolute path to private key | nodejs user (ex: grendel) must have read privileges on key file
+  privateKeyPath: undefined, // absolute path to private key | nodejs user (ex: grendel) must have read privileges on key file
 }
 
 // Floorplan page config:
