@@ -73,8 +73,6 @@ const Index = () => {
       })
     return () => {
       setSimple(false)
-      setApiData()
-      setLoading(true)
     }
   }, [refetch, node])
 
