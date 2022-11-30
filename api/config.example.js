@@ -35,7 +35,7 @@ config.bmc = {
 
 // Database - configure for your MongoDB install
 config.db = {
-  host: "localhost",
+  host: "mongodb", //change to localhost for sources install | mongodb ip address
   database: "dcim",
   options: {
     authSource: "admin",
