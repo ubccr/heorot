@@ -99,6 +99,10 @@ const Rack = () => {
     }
   }, [actionNodes])
 
+  useEffect(() => {
+    setActionNodes([])
+  }, [rack])
+
   const selectAll = () => {
     let node_arr = query.data.nodes
       .map((u) =>
