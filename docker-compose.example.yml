@@ -6,11 +6,30 @@ services:
       MONGO_INITDB_DATABASE: dcim
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: changeme
-    ports:
-      - "127.0.0.1:27017:27017"
+    # uncomment if running Heorot as a service
+    #ports:
+    #  - "127.0.0.1:27017:27017"
     volumes:
       - mongodb_data:/data/db
     restart: unless-stopped
+    # comment out the heorot container if running from source
+  heorot:
+    build: ./api
+    ports:
+      - 443:443 # make sure to update config.js accordingly
+    volumes:
+      # path to Heorot config file
+      - ./api/config.js:/usr/src/app/config.js
 
+      # path to grendel socket
+      - /var/lib/grendel/grendel-api.socket:/var/lib/grendel/grendel-api.socket
+
+      # path to Heorot keys directory
+      - type: bind
+        source: ./api/keys
+        target: /usr/src/app/keys
+    links:
+      - mongodb
+    restart: always
 volumes:
   mongodb_data:
