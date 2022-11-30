@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  mongodb_container:
+  mongodb:
     image: mongo:6.0.2
     environment:
       MONGO_INITDB_DATABASE: dcim
