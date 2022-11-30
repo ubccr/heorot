@@ -38,54 +38,43 @@ Checkout the [Screenshots](screenshots.MD) file for an example of the UI.
 
 ## :checkered_flag: Production build
 
-This is an opinionated, reference guide to installing Heorot, please follow security best practices.
+This is an example install using Docker, see the [install](INSTALL.MD) file for a "from the sources" install.
+
+Please follow security best practices. It is recommended to only allow access to Heorot through a private internal only network.
 
 ### :white_check_mark: Requirements
 
 > Installation of requirements will not be covered in this guide
 
 - Git: [git-scm.com](https://git-scm.com)
-- Node: [nodejs.org](https://nodejs.org/en/)
 - Docker: [docs.docker.com](https://docs.docker.com/engine/install/ubuntu/)
 - Grendel: [github.com/ubccr/grendel](https://github.com/ubccr/grendel)
 
 ### Heorot setup:
 
-> This guide will assume Heorot will be run as the grendel user
-
 ```bash
-$ sudo mkdir /opt/heorot
-
-# Ensure directory is accessable to the grendel user
-$ sudo chown ubuntu:grendel -R /opt/heorot
-$ chmod g+s -R /opt/heorot
-
-# replace v1.3.0 with the latest / desired version
-$ git clone --branch v1.3.0 --single-branch https://github.com/ubccr/heorot.git /opt/heorot
+# Example directory
+sudo mkdir /opt/heorot
 ```
 
-### Install node Packages:
+Replace v1.3.2 with the latest / desired version:
 
 ```bash
-$ cd /opt/heorot/api
-$ npm i
+git clone --branch v1.3.2 --single-branch https://github.com/ubccr/heorot.git /opt/heorot
 ```
 
-### Configure and start Mongo container:
+### Copy the configuration files:
 
 ```bash
-$ cp /opt/heorot/docker-compose.example.yml /opt/heorot/docker-compose.yml
-# Change the default password:
-$ nano /opt/heorot/docker-compose.yml
-
-$ docker compose up -d
+cp /opt/heorot/api/config.example.js /opt/heorot/api/config.js && cp /opt/heorot/docker-compose.example.yml /opt/heorot/docker-compose.yml
 ```
 
-### Setup the configuration file:
+### Setup the configuration files:
 
 ```bash
-$ cp /opt/heorot/api/config.example.js /opt/heorot/api/config.js
-$ nano /opt/heorot/api/config.js
+# Please read though the files, there are many comments!
+nano /opt/heorot/docker-compose.yml
+nano /opt/heorot/api/config.js
 ```
 
 ### Generate Certs & Keys:
@@ -94,26 +83,17 @@ The /opt/heorot/api/keys directory needs the following:
 
 1. server.cert
 2. server.key
+3. switches.key (optional switch ssh private key)
 
 ```bash
-$ cd /opt/heorot/api/keys
 # Example cert generation | Change localhost to your server's IP & region info
-$ openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
-
-# Ensure keys are readable by grendel user
-$ ls -l
-$ chmod 640 *
+openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
 ```
 
-### Setup the service file:
+### Start the containers:
 
 ```bash
-# Copy the service files & edit if necessary
-$ sudo cp /opt/heorot/heorot.service /etc/systemd/system/
-$ sudo nano /etc/systemd/system/heorot.service
-
-$ sudo systemctl enable heorot.service
-$ sudo systemctl start heorot.service
+docker compose up -d
 ```
 
 ---
@@ -125,7 +105,7 @@ Head to the signup page and create an account to get started
 ### Log files:
 
 ```bash
- tail /var/log/heorot.log
+docker logs heorot_heorot-1
 ```
 
 ## Grendel Tags:
