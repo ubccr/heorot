@@ -134,10 +134,9 @@ const Index = () => {
 
           {node.substring(0, 3) === "swe" && <Switches node={node} />}
 
+          <Console node={node} BMC={BMC} />
           {!simple && (
             <>
-              <Console node={node} BMC={BMC} />
-
               <Actions node={node} />
 
               <Notes />
