@@ -49,10 +49,10 @@ const Profile = () => {
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} sm={4}>
             Change password:
           </Grid>
-          <Grid item xs={12} md={6} textAlign="end">
+          <Grid item xs={12} sm={8} textAlign="end">
             <TextField
               size="small"
               value={newPassword}
