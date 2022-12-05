@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  mongodb:
+    image: mongo:6.0.2
+    environment:
+      MONGO_INITDB_DATABASE: dcim
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: changeme
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+  heorot_api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile.dev
+    ports:
+      - 443:443 # make sure to update config.js accordingly
+    volumes:
+      - type: bind
+        source: ../api
+        target: /usr/src/app/
+    links:
+      - mongodb
+    restart: always
+  heorot_client:
+    build:
+      context: ../client
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - type: bind
+        source: ../client
+        target: /usr/src/app/
+    links:
+      - heorot_api
+volumes:
+  mongodb_data:
