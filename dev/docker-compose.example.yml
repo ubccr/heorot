@@ -9,20 +9,21 @@ services:
     volumes:
       - mongodb_data:/data/db
     restart: unless-stopped
-  heorot_api:
+  heorot-api:
     build:
       context: ../api
       dockerfile: Dockerfile.dev
     ports:
       - 443:443 # make sure to update config.js accordingly
     volumes:
+      - /var/lib/grendel/grendel-api.socket:/var/lib/grendel/grendel-api.socket
       - type: bind
         source: ../api
         target: /usr/src/app/
     links:
       - mongodb
     restart: always
-  heorot_client:
+  heorot-client:
     build:
       context: ../client
       dockerfile: Dockerfile.dev
@@ -33,6 +34,6 @@ services:
         source: ../client
         target: /usr/src/app/
     links:
-      - heorot_api
+      - heorot-api
 volumes:
   mongodb_data:
