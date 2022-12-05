@@ -1,7 +1,6 @@
 const express = require("express")
 const app = express.Router()
 const { spawn } = require("child_process")
-const fs = require("fs")
 
 let config = require("../config")
 

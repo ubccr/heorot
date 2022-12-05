@@ -37,15 +37,12 @@ function Home() {
               </>
             )}
             {user !== null && user.status === "success" && user.message}
-            {user !== null &&
-              user.status === "success" &&
-              user.privileges === "none" && (
-                <>
-                  <br />
-                  Please contact an administrator and ask for them to activate
-                  your account
-                </>
-              )}
+            {user !== null && user.status === "success" && user.privileges === "none" && (
+              <>
+                <br />
+                Please contact an administrator and ask for them to activate your account
+              </>
+            )}
           </Typography>
         </Box>
       </Container>
