@@ -6,9 +6,6 @@ ARG GID=999
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-RUN npm install
-
 # Add grendel user for socket bind
 RUN groupadd -g $GID $UNAME
 RUN useradd -u $UID -g $GID $UNAME
