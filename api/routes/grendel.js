@@ -88,46 +88,46 @@ app.get("/firmware/list", async (req, res) => {
   })
 })
 
-app.get("/status/:value/:tags?", async (req, res) => {
-  let tags = req.params.tags === undefined ? "" : req.params.tags
-  let args = ["status"]
+// app.get("/status/:value/:tags?", async (req, res) => {
+//   let tags = req.params.tags === undefined ? "" : req.params.tags
+//   let args = ["status"]
 
-  if (req.params.value === "nodes") args.push("nodes", `${tags}`)
-  else if (req.params.value === "long") args.push("nodes", `${tags}`, "--long")
-  else args.push(`${tags}`)
+//   if (req.params.value === "nodes") args.push("nodes", `${tags}`)
+//   else if (req.params.value === "long") args.push("nodes", `${tags}`, "--long")
+//   else args.push(`${tags}`)
 
-  const status = spawn("grendel", args)
-  let stdout = "",
-    stderr = "",
-    error = ""
+//   const status = spawn("grendel", args)
+//   let stdout = "",
+//     stderr = "",
+//     error = ""
 
-  status.stdout.on("data", (data) => {
-    stdout += data
-  })
-  status.stderr.on("data", (data) => {
-    stderr += data
-  })
-  status.on("error", (err) => {
-    error = err
-    res.json({
-      status: "error",
-      message: err,
-    })
-  })
-  status.on("close", (code) => {
-    if (stderr === "" && error === "") {
-      res.json({
-        status: "success",
-        result: stdout,
-      })
-    } else {
-      res.json({
-        status: "error",
-        message: `Issue fetching grendel status: ${stderr}`,
-      })
-    }
-  })
-})
+//   status.stdout.on("data", (data) => {
+//     stdout += data
+//   })
+//   status.stderr.on("data", (data) => {
+//     stderr += data
+//   })
+//   status.on("error", (err) => {
+//     error = err
+//     res.json({
+//       status: "error",
+//       message: err,
+//     })
+//   })
+//   status.on("close", (code) => {
+//     if (stderr === "" && error === "") {
+//       res.json({
+//         status: "success",
+//         result: stdout,
+//       })
+//     } else {
+//       res.json({
+//         status: "error",
+//         message: `Issue fetching grendel status: ${stderr}`,
+//       })
+//     }
+//   })
+// })
 
 app.post("/edit", async (req, res) => {
   const nodeset = req.body.nodeset

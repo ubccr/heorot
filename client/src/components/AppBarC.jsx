@@ -125,14 +125,14 @@ const AppBarC = () => {
               <Link to={"/Login"}>Login</Link>
             </Button>
           )}
-          {user !== null && user.privileges === "admin" && (
+          {/* {user !== null && user.privileges === "admin" && (
             <>
               <IconButton onClick={() => setStatusOpen(true)}>
                 <InfoOutlined sx={{ color: "white" }} />
               </IconButton>
               <Status open={statusOpen} setOpen={setStatusOpen} />
             </>
-          )}
+          )} */}
           {user !== null && (
             <IconButton onClick={handleAccountOpen}>
               <AccountCircleOutlinedIcon sx={{ color: "white" }} />
