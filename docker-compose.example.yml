@@ -14,20 +14,18 @@ services:
     restart: unless-stopped
     # comment out the heorot container if running from source
   heorot:
-    build: ./api
+    build:
+      context: ./api
+      args:
+        # set to user, uid, & gid of user with access to config files & grendel socket
+        UNAME: grendel
+        UID: 999
+        GID: 999
     ports:
       - 443:443 # make sure to update config.js accordingly
     volumes:
-      # path to Heorot config file
-      - ./api/config.js:/usr/src/app/config.js
-
       # path to grendel socket
       - /var/lib/grendel/grendel-api.socket:/var/lib/grendel/grendel-api.socket
-
-      # path to Heorot keys directory
-      - type: bind
-        source: ./api/keys
-        target: /usr/src/app/keys
     links:
       - mongodb
     restart: always

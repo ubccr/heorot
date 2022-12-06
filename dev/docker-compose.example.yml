@@ -13,6 +13,11 @@ services:
     build:
       context: ../api
       dockerfile: Dockerfile.dev
+      args:
+        # set to user, uid, & gid of user with access to config files & grendel socket
+        UNAME: grendel
+        UID: 999
+        GID: 999
     ports:
       - 443:443 # make sure to update config.js accordingly
     volumes:
