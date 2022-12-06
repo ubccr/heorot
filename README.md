@@ -46,7 +46,6 @@ Please follow security best practices. It is recommended to only allow access to
 
 > Installation of requirements will not be covered in this guide
 
-- Git: [git-scm.com](https://git-scm.com)
 - Docker: [docs.docker.com](https://docs.docker.com/engine/install/ubuntu/)
 - Grendel: [github.com/ubccr/grendel](https://github.com/ubccr/grendel)
 

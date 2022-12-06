@@ -1,5 +1,90 @@
 # Dev Environment Setup:
 
+### Requierments:
+
+- [Docker](https://docs.docker.com/engine/install/ubuntu/)
+- [Grendel](https://github.com/ubccr/grendel)
+
+Clone the repo into a folder of your choice then navigate to that directory.
+
+```bash
+cp api/config.example.js api/config.js && cp client/src/config.example.js client/src/config.js && cp dev/docker-compose.example.yml dev/docker-compose.yml
+```
+
+Edit these files with your perferred text editor, be sure to change the DB password and set the api/config.js variables to match your dev environment:
+
+```bash
+api/config.js:
+config.environment = "dev"
+config.origin = "http://localhost:3000"
+
+client/config.js:
+apiUrl: `https://localhost:443`
+```
+
+Install packages:
+
+```bash
+cd api
+npm i
+cd ../client
+npm i
+```
+
+### Generate Certs & Keys:
+
+The api/keys directory needs the following:
+
+1. server.cert
+2. server.key
+3. switches.key (optional switch ssh private key)
+
+```bash
+# Example cert generation | Change localhost to your server's IP & region info
+openssl req -x509 -sha256 -days 356 -nodes -newkey rsa:2048 -subj "/CN=localhost/C=US/L=New York" -keyout server.key -out server.cert
+```
+
+Then you can start up the containers. The api & client directories are bind mounted to the containers so any changes will hot reload the client & api
+
+```bash
+cd /dev
+docker compose up -d --build
+```
+
+https://localhost:443/#/ will take you to the static UI served by Express.
+
+Example: Navigate to https://localhost:443/grendel for the grendel api route.
+
+http://localhost:3000 will take you to the development react UI
+
+---
+
+### Build for production:
+
+> Make sure to change the client/config.js file back to:
+
+```bash
+export const apiConfig = {
+  apiUrl: `https://${window.location.host}`,
+}
+```
+
+Then:
+
+```bash
+cd client
+npm run build
+rm -rd ../api/build
+mv build ../api/build
+```
+
+Now you can test the new prod UI at https://localhost:443/#/
+`bash`
+
+# \*\*\*OLD:
+
+# Dev Environment Setup:
+
 > :warning: This guide is written for Ubuntu 22.04 LTS
 
 ## :white_check_mark: Requirements:
