@@ -3,7 +3,7 @@ services:
   mongodb:
     image: mongo:6.0.2
     environment:
-      MONGO_INITDB_DATABASE: dcim
+      MONGO_INITDB_DATABASE: heorot
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: changeme
     # uncomment if running Heorot as a service
