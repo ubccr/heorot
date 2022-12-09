@@ -1,6 +1,5 @@
 const express = require("express")
 const app = express.Router()
-const { spawn } = require("child_process")
 
 let config = require("../config")
 
@@ -14,7 +13,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "success",
     currentRoute: "/grendel/",
-    availibleRoutes: routes,
+    availableRoutes: routes,
   })
 })
 // --- hosts ---
