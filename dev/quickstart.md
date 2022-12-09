@@ -7,11 +7,13 @@
 
 Clone the repo into a folder of your choice then navigate to that directory.
 
+Make sure your files and directories are owned by uid/gid 1000, otherwise you will get permission errors when they are bind mounted to the container
+
 ```bash
 cp api/config.example.js api/config.js && cp client/src/config.example.js client/src/config.js && cp dev/docker-compose.example.yml dev/docker-compose.yml
 ```
 
-Edit these files with your perferred text editor, be sure to change the DB password and set the api/config.js variables to match your dev environment:
+Edit these files with your preferred text editor, be sure to change the DB password and set the api/config.js variables to match your dev environment:
 
 ```bash
 api/config.js:
