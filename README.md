@@ -56,10 +56,10 @@ Please follow security best practices. It is recommended to only allow access to
 sudo mkdir /opt/heorot
 ```
 
-Replace v1.3.3 with the latest / desired version:
+Replace v1.3.4 with the latest / desired version:
 
 ```bash
-git clone --branch v1.3.3 --single-branch https://github.com/ubccr/heorot.git /opt/heorot
+git clone --branch v1.3.4 --single-branch https://github.com/ubccr/heorot.git /opt/heorot
 ```
 
 ### Copy the configuration files:
