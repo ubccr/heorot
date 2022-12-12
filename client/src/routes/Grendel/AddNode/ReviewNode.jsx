@@ -66,8 +66,16 @@ const ReviewNode = ({ options, ifaces }) => {
                     <TableCell align="right">{val.ip}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>FQDN:</TableCell>
+                    <TableCell>MAC:</TableCell>
                     <TableCell align="right">{val.mac}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>VLAN:</TableCell>
+                    <TableCell align="right">{val.vlan}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>MTU:</TableCell>
+                    <TableCell align="right">{val.mtu}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={2}></TableCell>

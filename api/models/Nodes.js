@@ -14,6 +14,8 @@ const nodesSchema = new Schema(
           ifname: { type: String },
           fqdn: { type: String },
           bmc: { type: Boolean },
+          vlan: { type: String },
+          mtu: { type: Number },
         },
       ],
       provision: { type: Boolean },

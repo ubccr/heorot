@@ -36,6 +36,7 @@ const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
                   </IconButton>
                 </Box>
                 <TextField
+                  size="small"
                   label="FQDN"
                   variant="outlined"
                   onChange={(e) => {
@@ -47,6 +48,7 @@ const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
                   value={val.fqdn}
                 />
                 <TextField
+                  size="small"
                   label="IP Address"
                   variant="outlined"
                   onChange={(e) => {
@@ -58,6 +60,7 @@ const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
                   value={val.ip}
                 />
                 <TextField
+                  size="small"
                   label="MAC Address"
                   variant="outlined"
                   onChange={(e) => {
@@ -67,6 +70,30 @@ const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
                   sx={{ marginBottom: "8px" }}
                   autoComplete="new-password"
                   value={val.mac}
+                />
+                <TextField
+                  size="small"
+                  label="VLAN"
+                  variant="outlined"
+                  onChange={(e) => {
+                    ifaces[index].vlan = e.target.value
+                    setIfaces([...ifaces])
+                  }}
+                  sx={{ marginBottom: "8px" }}
+                  autoComplete="new-password"
+                  value={val.vlan}
+                />
+                <TextField
+                  size="small"
+                  label="MTU"
+                  variant="outlined"
+                  onChange={(e) => {
+                    ifaces[index].mtu = e.target.value
+                    setIfaces([...ifaces])
+                  }}
+                  sx={{ marginBottom: "8px" }}
+                  autoComplete="new-password"
+                  value={val.mtu}
                 />
               </FormGroup>
             </Box>
