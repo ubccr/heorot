@@ -1,23 +1,32 @@
-import { Divider, Grid, Typography } from "@mui/material"
+import { Checkbox, Divider, FormControlLabel, Grid, TextField, Typography } from "@mui/material"
 
 import React from "react"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 
-const Interfaces = ({ data }) => {
+const Interfaces = ({ apiData, setApiData }) => {
+  const [gridRef] = useAutoAnimate(null)
+
   return (
     <Grid container>
-      {data.map((val, index) => {
-        let name = "Interface:"
+      {apiData.interfaces.map((val, index) => {
         let last = false
-        if (data.length === index + 1) last = true
-        if (val.fqdn.substring(0, 3) === "bmc") name = "BMC:"
+        if (apiData.interfaces.length === index + 1) last = true
+        let interfaceData = [
+          { id: "ifname", name: "Name:", data: val.ifname },
+          { id: "fqdn", name: "FQDN:", data: val.fqdn },
+          { id: "ip", name: "IP:", data: val.ip },
+          { id: "mac", name: "MAC:", data: val.mac },
+          { id: "vlan", name: "VLAN:", data: val.vlan },
+          { id: "mtu", name: "MTU:", data: val.mtu },
+          { id: "bmc", name: "BMC", data: val.bmc },
+        ]
         return (
-          <React.Fragment key={val.fqdn}>
+          <React.Fragment key={index}>
             <Grid sm={12} md item>
               <Grid
                 container
                 sx={{
                   padding: "20px",
-                  paddingTop: "5px",
                   borderRadius: "10px",
                   marginTop: "12px",
                   border: 1,
@@ -27,44 +36,40 @@ const Interfaces = ({ data }) => {
                   boxShadow: 12,
                 }}
               >
-                <Grid xs={12} item>
-                  <Typography
-                    variant="h1"
-                    sx={{
-                      fontSize: "24px",
-                      textAlign: "center",
-                      marginBottom: "12px",
-                      fontWeight: "400",
-                    }}
-                  >
-                    {name}
-                  </Typography>
-                </Grid>
-                <Grid xs={2} item>
-                  FQDN:
-                </Grid>
-                <Grid xs={10} item sx={{ textAlign: "end" }}>
-                  {name !== "BMC:" && val.fqdn}
-                  {name === "BMC:" && (
-                    <a target="_blank" rel="noreferrer" href={`https://${val.fqdn}`}>
-                      {val.fqdn}
-                    </a>
-                  )}
-                </Grid>
-                <Divider sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }} />
-                <Grid xs={6} item>
-                  IP:
-                </Grid>
-                <Grid xs={6} item sx={{ textAlign: "end" }}>
-                  {val.ip}
-                </Grid>
-                <Divider sx={{ width: "100%", marginTop: "6px", marginBottom: "6px" }} />
-                <Grid xs={6} item>
-                  MAC:
-                </Grid>
-                <Grid xs={6} item sx={{ textAlign: "end" }}>
-                  {val.mac}
-                </Grid>
+                {interfaceData.map((val, index2) => (
+                  <React.Fragment key={index2}>
+                    <Grid xs={12} item sx={{ margin: "5px" }}>
+                      {typeof val.data !== "boolean" && (
+                        <TextField
+                          variant="outlined"
+                          label={val.name}
+                          value={val.data}
+                          onChange={(e) => {
+                            apiData.interfaces[index][val.id] = e.target.value
+                            setApiData({ ...apiData })
+                          }}
+                          fullWidth
+                          size="small"
+                        />
+                      )}
+                      {typeof val.data === "boolean" && (
+                        <FormControlLabel
+                          label={val.name}
+                          control={
+                            <Checkbox
+                              checked={val.data}
+                              onChange={(e) => {
+                                apiData.interfaces[index][val.id] = e.target.checked
+                                setApiData({ ...apiData })
+                              }}
+                              size="small"
+                            />
+                          }
+                        />
+                      )}
+                    </Grid>
+                  </React.Fragment>
+                ))}
               </Grid>
             </Grid>
             {!last && <Divider orientation="vertical" sx={{ margin: "6px" }} />}
@@ -74,5 +79,4 @@ const Interfaces = ({ data }) => {
     </Grid>
   )
 }
-
 export default Interfaces

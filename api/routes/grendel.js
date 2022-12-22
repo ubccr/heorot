@@ -131,14 +131,18 @@ app.get("/firmware/list", async (req, res) => {
 app.post("/edit", async (req, res) => {
   const nodeset = req.body.nodeset
   const action = req.body.action
+  const actionIndex = req.body.action_index
   const value = req.body.value
 
   let originalJSON = await grendelRequest(`/v1/host/find/${nodeset}`)
 
   if (originalJSON.status !== "error") {
-    let updatedJSON = originalJSON.result.map((val, index) => {
+    let updatedJSON = originalJSON.result.map((val) => {
       if (action === "firmware") val.firmware = value
       else if (action === "image") val.boot_image = value
+      else if (action === "interfaces" && actionIndex === undefined) val.interfaces = value
+      else if (action === "interfaces" && val.interfaces[actionIndex] !== undefined) val.interfaces[actionIndex] = value
+      else if (action === "interfaces" && val.interfaces[actionIndex] === undefined) val.interfaces.push(value)
       return val
     })
 

@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography } from "@mui/material"
+import { Box, Button, IconButton, Typography } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
@@ -24,6 +24,7 @@ const Index = () => {
   const { node } = useParams()
   const [simple, setSimple] = useState(false)
   const [apiData, setApiData] = useState()
+  const [oldInterfaceData, setOldInterfaceData] = useState()
   const [rackData, setRackData] = useState({
     previous_node: "",
     next_node: "",
@@ -35,7 +36,6 @@ const Index = () => {
   const [loading, setLoading] = useState(true)
   const { enqueueSnackbar } = useSnackbar()
   let navigate = useNavigate()
-
   useEffect(() => {
     const types = ["swi", "swe", "pdu"]
     if (types.includes(node.substring(0, 3))) {
@@ -65,6 +65,7 @@ const Index = () => {
           })
 
           setApiData(data)
+          setOldInterfaceData(data.interfaces)
           setLoading(false)
         } else {
           enqueueSnackbar(response.message, { variant: response.status })
@@ -81,6 +82,30 @@ const Index = () => {
   }
   const nextNode = () => {
     navigate(`/Node/${rackData.next_node}`)
+  }
+
+  const addInterface = () => {
+    setApiData({
+      ...apiData,
+      interfaces: [
+        ...apiData.interfaces,
+        {
+          mac: "",
+          ip: "",
+          ifname: "",
+          fqdn: "",
+          bmc: false,
+          vlan: "1",
+          mtu: 1500,
+        },
+      ],
+    })
+  }
+  const clearInterfaceChanges = () => {
+    setApiData({
+      ...apiData,
+      interfaces: oldInterfaceData,
+    })
   }
 
   return (
@@ -125,7 +150,23 @@ const Index = () => {
               <Firmware initialFirmware={apiData.firmware} node={node} />
             </Box>
           </NewGridC>
-          <Interfaces data={apiData.interfaces} />
+
+          <NewGridC heading="Interfaces:">
+            <Box sx={{ marginRight: "10px", display: "flex", justifyContent: "end", gap: "4px" }}>
+              <Button variant="outlined" onClick={() => addInterface()}>
+                Add
+              </Button>
+              <Button variant="outlined" onClick={() => clearInterfaceChanges()}>
+                Clear
+              </Button>
+              <Button variant="outlined" color="warning">
+                Submit
+              </Button>
+            </Box>
+          </NewGridC>
+
+          <Interfaces setApiData={setApiData} apiData={apiData} />
+
           <NewGridC heading="Boot Image:">
             <Box sx={{ textAlign: "end", marginRight: "10px" }}>
               <BootImage bootimage={apiData.boot_image} node={node} />
@@ -134,7 +175,8 @@ const Index = () => {
 
           {node.substring(0, 3) === "swe" && <Switches node={node} />}
 
-          <Console node={node} BMC={BMC} />
+          {node.substring(0, 3) !== "swe" && <Console node={node} BMC={BMC} />}
+
           {!simple && (
             <>
               <Actions node={node} />
