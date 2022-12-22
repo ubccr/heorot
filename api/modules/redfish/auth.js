@@ -16,12 +16,12 @@ async function redfish_auth(uri) {
       Password: config.bmc.DELL_PASS,
     }),
     agent,
-    timeout: 20000,
+    timeout: 25000,
   }
 
   const header = {
     agent,
-    timeout: 20000,
+    timeout: 25000,
   }
   const urls = [`${uri}/redfish/v1/SessionService/Sessions`, `${uri}/redfish/v1`]
   try {
@@ -85,7 +85,7 @@ async function redfish_logout(url, uri, token) {
 }
 
 async function fetch_timeout(url, options = {}) {
-  const { timeout = 8000 } = options
+  const { timeout = 12000 } = options
 
   const controller = new AbortController()
   const id = setTimeout(() => controller.abort(), timeout)
