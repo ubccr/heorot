@@ -1,21 +1,23 @@
-import { useEffect, useRef } from "react"
-import { Terminal } from "xterm"
-import { FitAddon } from "xterm-addon-fit"
-import { io } from "socket.io-client"
 import "xterm/css/xterm.css"
+
+import { useEffect, useRef } from "react"
+
+import { Terminal } from "xterm"
 import { apiConfig } from "../../../config"
+// import { FitAddon } from "xterm-addon-fit"
+import { io } from "socket.io-client"
 
 const TerminalC = ({ node, BMC }) => {
   const term = useRef(null)
 
   useEffect(() => {
     const terminal = new Terminal({ cursorBlink: true })
-    const fitAddon = new FitAddon()
-    terminal.loadAddon(fitAddon)
+    // const fitAddon = new FitAddon()
+    // terminal.loadAddon(fitAddon)
     const socket = io(`wss://${apiConfig.apiUrl.substring(8)}`)
 
     terminal.open(term.current)
-    fitAddon.fit()
+    // fitAddon.fit()
 
     terminal.write("\r\n Attempting to connect to WebSocket...\r\n ")
     let user = JSON.parse(localStorage.getItem("user"))
