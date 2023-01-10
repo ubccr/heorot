@@ -5,6 +5,8 @@ const { grendelRequest } = require("../modules/grendel")
 const { rackGen, floorplan } = require("../modules/client")
 const config = require("../config")
 const Switches = require("../models/Switches")
+const { redfishRequest } = require("../modules/redfish/redfish")
+const Nodes = require("../models/Nodes")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -103,6 +105,44 @@ app.get("/node/:node", async (req, res) => {
       next_node: nextNode,
       result: result,
       bmc: bmcPlugin,
+    })
+  } else {
+    res.json({
+      status: "error",
+      message: "Node not found",
+      error: { nodeRes, rack_res },
+    })
+  }
+})
+app.get("/v1/node/:node", async (req, res) => {
+  const node = req.params.node
+  let rack = node.split("-")[1] ?? ""
+  let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
+  let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
+
+  if (nodeRes.status === "success" && nodeRes.result.length > 0 && rack_res.status === "success") {
+    let nodeList = rack_res.result.map((val) => val.name).sort((a, b) => a.split("-")[2] - b.split("-")[2])
+    let prevNode = nodeList.indexOf(node) < nodeList.length - 1 ? nodeList[nodeList.indexOf(node) + 1] : nodeList[0]
+    let nextNode = nodeList.indexOf(node) > 0 ? nodeList[nodeList.indexOf(node) - 1] : nodeList[nodeList.length - 1]
+    let message = undefined
+    if (nodeRes.result.length > 1) {
+      message = "Warning: More than one node with matching name found."
+      nodeRes.result.forEach((node) => (message += ` id: ${node.id}`))
+    }
+    let bmcPlugin = false
+    if (config.bmc.DELL_USER !== "") bmcPlugin = true
+
+    let dbRequest = await Nodes.findOne({ node: node })
+
+    res.json({
+      status: "success",
+      node: node,
+      previous_node: prevNode,
+      next_node: nextNode,
+      result: nodeRes.result[0],
+      redfish: dbRequest.redfish,
+      message: message,
+      bmc_plugin: bmcPlugin,
     })
   } else {
     res.json({
