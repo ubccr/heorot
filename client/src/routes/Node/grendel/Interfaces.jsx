@@ -45,8 +45,9 @@ const Interfaces = ({ apiData, setApiData }) => {
                           label={val.name}
                           value={val.data}
                           onChange={(e) => {
-                            apiData.interfaces[index][val.id] = e.target.value
-                            setApiData({ ...apiData })
+                            let tmp = apiData
+                            tmp.interfaces[index][val.id] = e.target.value
+                            setApiData({ ...tmp })
                           }}
                           fullWidth
                           size="small"
@@ -59,8 +60,9 @@ const Interfaces = ({ apiData, setApiData }) => {
                             <Checkbox
                               checked={val.data}
                               onChange={(e) => {
-                                apiData.interfaces[index][val.id] = e.target.checked
-                                setApiData({ ...apiData })
+                                let tmp = apiData
+                                tmp.interfaces[index][val.id] = e.target.checked
+                                setApiData({ ...tmp })
                               }}
                               size="small"
                             />
