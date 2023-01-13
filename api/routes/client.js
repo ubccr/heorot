@@ -141,7 +141,7 @@ app.get("/v1/node/:node", async (req, res) => {
       previous_node: prevNode,
       next_node: nextNode,
       result: nodeRes.result[0],
-      redfish: dbRequest.redfish,
+      redfish: dbRequest?.redfish,
       firmware_options: config.firmware,
       boot_image_options: boot_image_res.result,
       message: message,
