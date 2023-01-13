@@ -14,8 +14,7 @@ import Home from "./routes/Home"
 import Login from "./routes/Auth/Login"
 import ManageSwitches from "./routes/Admin/ManageSwitches"
 import ManageUsers from "./routes/Admin/ManageUsers"
-import NewNode from "./routes/Node"
-import Node from "./routes/Node/Index"
+import Node from "./routes/Node"
 import { PluginContext } from "./contexts/PluginContext"
 import PrivateRoute from "./components/PrivateRoute"
 import Profile from "./routes/Profile/Profile"
@@ -201,14 +200,6 @@ function App() {
                           element={
                             <PrivateRoute access="user">
                               <Node />{" "}
-                            </PrivateRoute>
-                          }
-                        />
-                        <Route
-                          path="/NewNode/:node"
-                          element={
-                            <PrivateRoute access="user">
-                              <NewNode />{" "}
                             </PrivateRoute>
                           }
                         />
