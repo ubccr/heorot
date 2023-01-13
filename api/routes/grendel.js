@@ -33,7 +33,7 @@ app.post("/host", async (req, res) => {
   // IP address check:
   if (typeof req.body === "object" && req.body.length > 0) {
     let tmp = req.body.map((val) => {
-      return val.interfaces.every((iface) => iface.ip.match("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"))
+      return val.interfaces?.every((iface) => iface.ip.match("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}"))
     })
     if (tmp.every((val) => val)) res.json(await grendelRequest(`/v1/host`, "POST", req.body))
     else res.json({ status: "error", message: "Interface IP address is invalid or missing" })
