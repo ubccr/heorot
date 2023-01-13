@@ -10,7 +10,6 @@ import Grendel from "./Node/Grendel"
 import Redfish from "./Node/Redfish"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
-import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 import { useState } from "react"
@@ -22,16 +21,15 @@ const Node = () => {
   let navigate = useNavigate()
 
   const [user] = useContext(UserContext)
-  const [tabRef] = useAutoAnimate(null)
 
   const prevNode = () => {
-    navigate(`/NewNode/${query.data.previous_node}`)
+    navigate(`/Node/${query.data.previous_node}`)
   }
   const nextNode = () => {
-    navigate(`/NewNode/${query.data.next_node}`)
+    navigate(`/Node/${query.data.next_node}`)
   }
 
-  const query = useQuery(["node", node], async ({ signal }) => {
+  const query = useQuery([`node-query-${node}`, node], async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
@@ -87,7 +85,7 @@ const Node = () => {
             <Tab label="Redfish" />
           </Tabs>
         </Box>
-        <Box ref={tabRef} sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
+        <Box sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
           {tab === 0 && query.isFetched && <Grendel query={query} />}
           {tab === 1 && query.isFetched && <Console node={node} query={query} />}
           {tab === 2 && query.isFetched && <Redfish query={query} />}
