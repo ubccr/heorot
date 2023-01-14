@@ -35,8 +35,6 @@ app.use("/client", auth, clientRouter)
 
 const redfishRouter = require("./routes/redfish.js")
 app.use("/redfish", auth, redfishRouter)
-const nodesRouter = require("./routes/nodes.js")
-app.use("/nodes", auth, nodesRouter)
 
 const grendelRouter = require("./routes/grendel.js")
 app.use("/grendel", auth, grendelRouter)
