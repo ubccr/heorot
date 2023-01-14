@@ -140,30 +140,31 @@ const Grendel = ({ query }) => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell></TableCell>
-              <TableCell align="right">
-                <Button variant="outlined" size="small" type="submit">
-                  {loading ? <CircularProgress size={22.75} /> : "Submit"}
-                </Button>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => {
-                    interface_append({
-                      mac: "",
-                      ip: "",
-                      ifname: "",
-                      fqdn: "",
-                      bmc: false,
-                      vlan: "",
-                    })
-                  }}
-                >
-                  Add Interface
-                </Button>
-                <Button variant="outlined" size="small" color="warning" onClick={() => resetForm()}>
-                  Reset
-                </Button>
+              <TableCell colSpan={2}>
+                <Box sx={{ display: "flex", gap: "4px", justifyContent: "end" }}>
+                  <Button variant="outlined" size="small" type="submit">
+                    {loading ? <CircularProgress size={22.75} /> : "Submit"}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      interface_append({
+                        mac: "",
+                        ip: "",
+                        ifname: "",
+                        fqdn: "",
+                        bmc: false,
+                        vlan: "",
+                      })
+                    }}
+                  >
+                    Add Interface
+                  </Button>
+                  <Button variant="outlined" size="small" color="warning" onClick={() => resetForm()}>
+                    Reset
+                  </Button>
+                </Box>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -189,12 +190,13 @@ const Grendel = ({ query }) => {
                         key={item.id}
                         sx={{ display: "inline-flex", alignItems: "center", marginLeft: "2px", marginRight: "2px" }}
                         orientation="horizontal"
+                        timeout={500}
                       >
                         <Chip label={tag_fields[index].tag} size="small" onDelete={() => tag_remove(index)} />
                       </Collapse>
                     ))}
                   </TransitionGroup>
-                  <Collapse in={tagExpand} unmountOnExit orientation="horizontal">
+                  <Collapse in={tagExpand} orientation="horizontal" timeout={500}>
                     <Box sx={{ display: "inline-flex" }}>
                       <TextField
                         sx={{ width: "90px" }}
@@ -249,7 +251,7 @@ const Grendel = ({ query }) => {
                 <TableRow>
                   <TableCell>Interface {index + 1}</TableCell>
                   <TableCell align="right">
-                    <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
                       <Box>
                         <Interfaces data={item} index={index} control={control} />
                       </Box>
@@ -290,11 +292,6 @@ const Grendel = ({ query }) => {
                 />
               </TableCell>
             </TableRow>
-
-            <TableRow>
-              <TableCell>ID:</TableCell>
-              <TableCell align="right">{query.data.result.id}</TableCell>
-            </TableRow>
           </TableBody>
         </Table>
       </form>
@@ -304,7 +301,7 @@ const Grendel = ({ query }) => {
 
 const Interfaces = ({ data, index, control }) => {
   const [expand, setExpand] = useState(false)
-  let shortDisplay = data.fqdn !== "" ? data.fqdn : data.ip
+  let shortDisplay = data.fqdn !== "" ? data.fqdn.split(".")[0] : data.ip
   return (
     <>
       <Box sx={{ display: "inline-flex", alignItems: "center" }}>
@@ -316,7 +313,7 @@ const Interfaces = ({ data, index, control }) => {
         </IconButton>
       </Box>
 
-      <Collapse in={expand}>
+      <Collapse in={expand} timeout={500}>
         <Grid2 container spacing={2} sx={{ maxWidth: "400px", marginTop: "2px" }}>
           <Grid2 xs={12}>
             <Controller
