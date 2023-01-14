@@ -5,7 +5,7 @@ const { grendelRequest } = require("../modules/grendel")
 const { rackGen, floorplan } = require("../modules/client")
 const config = require("../config")
 const Switches = require("../models/Switches")
-const { redfishRequest } = require("../modules/redfish/redfish")
+// const { redfishRequest } = require("../modules/redfish/redfish")
 const Nodes = require("../models/Nodes")
 
 app.get("/", (req, res) => {
@@ -142,6 +142,7 @@ app.get("/v1/node/:node", async (req, res) => {
       next_node: nextNode,
       result: nodeRes.result[0],
       redfish: dbRequest?.redfish,
+      notes: dbRequest?.notes ?? "",
       firmware_options: config.firmware,
       boot_image_options: boot_image_res.result,
       message: message,
@@ -154,6 +155,18 @@ app.get("/v1/node/:node", async (req, res) => {
       error: { nodeRes, rack_res },
     })
   }
+})
+
+app.post("/v1/notes", async (req, res) => {
+  /*
+  body: {
+    node: "cpn-h01-01",
+    notes: "New notes",
+  }
+*/
+  let query = await Nodes.updateOne({ node: req.body.node }, { notes: req.body.notes })
+  if (query.modifiedCount > 0) res.json({ status: "success", message: "Successfully updated password!" })
+  else res.json({ status: "error", message: "Error, password unchanged" })
 })
 
 module.exports = app

@@ -7,6 +7,7 @@ import Console from "./Node/Console"
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Grendel from "./Node/Grendel"
+import Notes from "./Node/Notes"
 import Redfish from "./Node/Redfish"
 import Switches from "./Node/Switches"
 import { UserContext } from "../contexts/UserContext"
@@ -84,6 +85,7 @@ const Node = () => {
             <Tab label="Grendel" />
             <Tab label="Console" />
             <Tab label="Redfish" />
+            <Tab label="Notes" />
             {node.split("-")[0] === "swe" && <Tab label="Port Management" />}
           </Tabs>
         </Box>
@@ -91,7 +93,8 @@ const Node = () => {
           {tab === 0 && query.isFetched && <Grendel query={query} />}
           {tab === 1 && query.isFetched && <Console node={node} query={query} />}
           {tab === 2 && query.isFetched && <Redfish query={query} />}
-          {tab === 3 && query.isFetched && <Switches query={query} />}
+          {tab === 3 && query.isFetched && <Notes query={query} />}
+          {tab === 4 && query.isFetched && <Switches query={query} />}
         </Box>
       </BgContainer>
     </>
