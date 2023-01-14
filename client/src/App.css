@@ -13,3 +13,7 @@ button {
   vertical-align: -0.125em;
   margin-bottom: calc(-0.125em / 2);
 }
+.xterm-screen {
+  padding: 5px;
+  padding-right: 17px;
+}

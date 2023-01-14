@@ -80,9 +80,8 @@ io.on("connection", function (socket) {
       if (!err) {
         socket.emit("auth", "authenticated")
         socket.on("node", function (data) {
-          nodeAddr = data
           let SSHConnection = {
-            host: nodeAddr,
+            host: data,
             port: 22,
             username: config.bmc.DELL_USER,
             tryKeyboard: true,
@@ -107,6 +106,13 @@ io.on("connection", function (socket) {
               ],
             },
           }
+
+          if (data.split("-")[0] === "swe") {
+            SSHConnection.username = config.switches.user
+            SSHConnection.password = config.switches.pass
+            SSHConnection.privateKey = fs.readFileSync(config.switches.privateKeyPath)
+          }
+
           var conn = new SSHClient()
           conn
             .on("ready", function () {

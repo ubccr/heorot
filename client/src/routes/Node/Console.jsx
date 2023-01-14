@@ -1,17 +1,18 @@
 // Fit addon seems to break line wrapping on small window sizes - Reverting to fixed width and overflow scroll
-// Also xterm v5+ breaks fonts, seems to be because I assign everything (*) to a google font in the index.html, but I cannot override with :not(.xterm)...
 
 import "xterm/css/xterm.css"
 
-import React, { useEffect, useRef } from "react"
+import React, { useContext, useEffect, useRef } from "react"
 
 import { Box } from "@mui/material"
 import { Terminal } from "xterm"
+import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
 import { io } from "socket.io-client"
 import { useState } from "react"
 
 const Console = ({ node, query }) => {
+  const [user] = useContext(UserContext)
   // get bmc function
   const [bmc, setBmc] = useState(undefined)
   useEffect(() => {
@@ -25,19 +26,14 @@ const Console = ({ node, query }) => {
 
   useEffect(() => {
     if (bmc === undefined) return
-    const terminal = new Terminal({ cursorBlink: true })
+    const terminal = new Terminal({ cursorBlink: true, cols: 100 })
     const socket = io(`wss://${apiConfig.apiUrl.substring(8)}`)
 
     terminal.open(termRef.current)
     terminal.write("\r\n Connecting to WebSocket... \r\n")
 
-    // auth
-    let user = JSON.parse(localStorage.getItem("user"))
-    let token = ""
-    if (user) token = user.accessToken
-
     socket.on("connect", () => {
-      socket.emit("auth", token)
+      socket.emit("auth", user.accessToken ?? "")
       socket.on("auth", (data) => {
         if (data === "authenticated") {
           terminal.write("\r\n Authentication successful \r\n")
@@ -61,7 +57,7 @@ const Console = ({ node, query }) => {
           })
         } else
           terminal.write(
-            "\r\n Authentication to WebSocket failed. Try logging out and back in, or check your config.js \r\n"
+            "\r\n Authentication to WebSocket failed.\r\n Try logging out and back in, or check your config.js \r\n"
           )
       })
     })
@@ -71,7 +67,7 @@ const Console = ({ node, query }) => {
     }
   }, [node, bmc])
 
-  return <Box ref={termRef} sx={{ padding: 0, overflowY: "scroll" }} />
+  return <Box ref={termRef} />
 }
 
 export default Console
