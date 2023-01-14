@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 
 const Redfish = ({ query }) => {
   let data = query.data.redfish
+  if (data === undefined) return <Typography>No Redfish data found!</Typography>
   return (
     <TableContainer>
       <Table>
