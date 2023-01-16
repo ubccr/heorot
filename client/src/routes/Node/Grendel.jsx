@@ -306,7 +306,20 @@ const Interfaces = ({ data, index, control }) => {
     <>
       <Box sx={{ display: "inline-flex", alignItems: "center" }}>
         <Grow in={!expand}>
-          <Typography>{shortDisplay}</Typography>
+          {data.bmc === true ? (
+            <Typography
+              component="a"
+              target="_blank"
+              rel="noreferrer"
+              href={`https://${data.fqdn}`}
+              color="primary"
+              sx={{ textDecoration: "underline" }}
+            >
+              {shortDisplay}
+            </Typography>
+          ) : (
+            <Typography>{shortDisplay}</Typography>
+          )}
         </Grow>
         <IconButton size="small" onClick={() => setExpand(!expand)}>
           {expand ? <ExpandLessIcon /> : <ExpandMoreIcon />}

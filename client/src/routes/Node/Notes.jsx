@@ -35,7 +35,7 @@ const Notes = ({ query }) => {
         <TextField
           multiline
           fullWidth
-          rows={20}
+          rows={15}
           name="notes"
           label={`${query.data.node}'s notes`}
           defaultValue={query.data.notes}
