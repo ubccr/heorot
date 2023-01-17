@@ -69,11 +69,21 @@ const Node = () => {
             boxShadow: 16,
           }}
         >
-          <IconButton variant="outlined" disabled={query.isFetching} onClick={() => prevNode()} sx={{ float: "left" }}>
+          <IconButton
+            variant="outlined"
+            disabled={query.isFetching || !query.data.previous_node}
+            onClick={() => prevNode()}
+            sx={{ float: "left" }}
+          >
             <ExpandLessIcon />
           </IconButton>
           {node}
-          <IconButton variant="outlined" disabled={query.isFetching} onClick={() => nextNode()} sx={{ float: "right" }}>
+          <IconButton
+            variant="outlined"
+            disabled={query.isFetching || !query.data.next_node}
+            onClick={() => nextNode()}
+            sx={{ float: "right" }}
+          >
             <ExpandMoreIcon />
           </IconButton>
           {query.isFetching && <LinearProgress sx={{ marginTop: "5px" }} />}
