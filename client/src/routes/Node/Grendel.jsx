@@ -235,8 +235,8 @@ const Grendel = ({ query }) => {
                           <em>None</em>
                         </MenuItem>
                         {query.data.boot_image_options.map((val, index) => (
-                          <MenuItem key={index} value={val.name}>
-                            {val.name}
+                          <MenuItem key={index} value={val}>
+                            {val}
                           </MenuItem>
                         ))}
                       </Select>

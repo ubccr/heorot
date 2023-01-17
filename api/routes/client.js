@@ -120,6 +120,7 @@ app.get("/v1/node/:node", async (req, res) => {
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
   let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
   let boot_image_res = await grendelRequest(`/v1/bootimage/list`)
+  let boot_image_list = boot_image_res.status === "success" ? boot_image_res.result.map((val) => val.name) : []
 
   if (nodeRes.status === "success" && nodeRes.result.length > 0 && rack_res.status === "success") {
     let nodeList = rack_res.result.map((val) => val.name).sort((a, b) => a.split("-")[2] - b.split("-")[2])
@@ -144,7 +145,7 @@ app.get("/v1/node/:node", async (req, res) => {
       redfish: dbRequest?.redfish,
       notes: dbRequest?.notes ?? "",
       firmware_options: config.firmware,
-      boot_image_options: boot_image_res.result,
+      boot_image_options: boot_image_list,
       message: message,
       bmc_plugin: bmcPlugin,
     })
