@@ -101,6 +101,7 @@ const Grendel = ({ query }) => {
         fqdn: val.fqdn,
         bmc: val.bmc,
         vlan: val.vlan,
+        mtu: val.mtu,
       })
     })
     query.data.result.tags.forEach((val) => {
