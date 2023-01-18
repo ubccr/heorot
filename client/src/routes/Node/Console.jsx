@@ -26,7 +26,7 @@ const Console = ({ node, query }) => {
 
   useEffect(() => {
     if (bmc === undefined) return
-    const terminal = new Terminal({ cursorBlink: true, cols: 100 })
+    const terminal = new Terminal({ cursorBlink: true, cols: 90, rows: 30 })
     const socket = io(`wss://${apiConfig.apiUrl.substring(8)}`)
 
     terminal.open(termRef.current)
@@ -67,7 +67,7 @@ const Console = ({ node, query }) => {
     }
   }, [node, bmc])
 
-  return <Box ref={termRef} />
+  return <Box ref={termRef} sx={{ overflowX: "scroll" }} />
 }
 
 export default Console
