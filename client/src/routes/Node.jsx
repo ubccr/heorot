@@ -1,12 +1,14 @@
-import { Box, IconButton, LinearProgress, Tab, Tabs, Typography } from "@mui/material"
+import { Box, IconButton, LinearProgress, Tab, Tabs, Tooltip, Typography } from "@mui/material"
 import React, { useContext } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 
 import BgContainer from "../components/BgContainer"
+import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined"
 import Console from "./Node/Console"
 import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Grendel from "./Node/Grendel"
+import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined"
 import Notes from "./Node/Notes"
 import Redfish from "./Node/Redfish"
 import Switches from "./Node/Switches"
@@ -23,13 +25,6 @@ const Node = () => {
   let navigate = useNavigate()
 
   const [user] = useContext(UserContext)
-
-  const prevNode = () => {
-    navigate(`/Node/${query.data.previous_node}`)
-  }
-  const nextNode = () => {
-    navigate(`/Node/${query.data.next_node}`)
-  }
 
   const query = useQuery([`node-query-${node}`, node], async ({ signal }) => {
     let payload = {
@@ -69,23 +64,39 @@ const Node = () => {
             boxShadow: 16,
           }}
         >
+          <Tooltip title="Back to rack">
+            <IconButton variant="outlined" onClick={() => navigate(`/Rack/${node.split("-")[1]}`)}>
+              <KeyboardBackspaceOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+
           <IconButton
             variant="outlined"
             disabled={query.isFetching || !query.data.previous_node}
-            onClick={() => prevNode()}
-            sx={{ float: "left" }}
+            onClick={() => navigate(`/Node/${query.data.previous_node}`)}
           >
             <ExpandLessIcon />
           </IconButton>
+
           {node}
+
           <IconButton
             variant="outlined"
             disabled={query.isFetching || !query.data.next_node}
-            onClick={() => nextNode()}
-            sx={{ float: "right" }}
+            onClick={() => navigate(`/Node/${query.data.next_node}`)}
           >
             <ExpandMoreIcon />
           </IconButton>
+
+          <Tooltip title="Refresh data">
+            <IconButton
+              variant="outlined"
+              // set refresh in query to true
+              onClick={() => query.refetch()}
+            >
+              <CachedOutlinedIcon />
+            </IconButton>
+          </Tooltip>
           {query.isFetching && <LinearProgress sx={{ marginTop: "5px" }} />}
         </Typography>
       </Box>
