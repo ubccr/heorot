@@ -11,7 +11,6 @@ const ResetBmc = ({ node }) => {
   const [pxe, setPxe] = useState(false)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
-
   const resetNodeQuery = useQuery(
     ["resetNode", node, pxe],
     async ({ signal }) => {
@@ -22,7 +21,9 @@ const ResetBmc = ({ node }) => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/resetNode/${node}/${pxe}`, payload)).json()
+      let refresh = pxe ? "true" : "false"
+      console.log(refresh)
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/resetNode/${node}/${refresh}`, payload)).json()
       enqueueSnackbar(res.message, { variant: res.status })
       setOpenNode(false)
       return res
