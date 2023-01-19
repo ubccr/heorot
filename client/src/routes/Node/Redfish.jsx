@@ -4,9 +4,11 @@ import {
   Card,
   CardActions,
   CardContent,
-  Collapse,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
   Divider,
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -15,15 +17,21 @@ import {
   TableRow,
   Typography,
 } from "@mui/material"
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { green, grey, orange } from "@mui/material/colors"
 
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
+import { UserContext } from "../../contexts/UserContext"
+import { apiConfig } from "../../config"
+import { useQuery } from "react-query"
+import { useSnackbar } from "notistack"
 
-const Redfish = ({ query }) => {
+const Redfish = ({ query, setRefresh }) => {
   let data = query.data.redfish
+
+  const [openSEL, setOpenSEL] = useState(false)
+  const [user] = useContext(UserContext)
+  const { enqueueSnackbar } = useSnackbar()
 
   const [diskChassisArr, setDiskChassisArr] = useState([])
   useEffect(() => {
@@ -47,6 +55,25 @@ const Redfish = ({ query }) => {
     }
   }, [query])
 
+  const clearSEL_query = useQuery(
+    ["clearSel-node", query],
+    async ({ signal }) => {
+      setRefresh("true")
+      let payload = {
+        method: "PUT",
+        headers: {
+          "x-access-token": user.accessToken,
+        },
+        signal,
+      }
+      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/clearSEL/${query.data.node}`, payload)).json()
+      enqueueSnackbar(res.message, { variant: res.status })
+      query.refetch()
+      return res
+    },
+    { enabled: false }
+  )
+
   if (data === undefined)
     return (
       <Typography variant="h1" fontSize={20}>
@@ -66,7 +93,6 @@ const Redfish = ({ query }) => {
         <Grid2 container spacing={1}>
           <Grid2 xs={12} sm={6} lg={3}>
             <Card variant="outlined" sx={{ height: "190px" }}>
-              {/* <CardMedia sx={{ height: "160px" }} image={dell_r740} /> */}
               <CardContent>
                 <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                   Model: {data.model}
@@ -77,7 +103,6 @@ const Redfish = ({ query }) => {
                 <Typography variant="h2" fontSize={16}>
                   Service Tag: {data.service_tag}
                 </Typography>
-                {/* <Divider /> */}
                 <Typography variant="h1" fontSize={14}>
                   BIOS Version: {data.bios_version}
                 </Typography>
@@ -153,15 +178,50 @@ const Redfish = ({ query }) => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button variant="outlined" size="small">
+                <Button variant="outlined" size="small" onClick={() => setOpenSEL(!openSEL)}>
                   Show
                 </Button>
-                <Button variant="outlined" size="small">
-                  Clear
+                <Button variant="outlined" size="small" onClick={() => clearSEL_query.refetch()}>
+                  {clearSEL_query.isFetching ? <CircularProgress size={24} /> : "Clear"}
                 </Button>
               </CardActions>
             </Card>
           </Grid2>
+
+          <Dialog open={openSEL} onClose={() => setOpenSEL(false)} maxWidth="xl">
+            <DialogContent>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell colSpan={3} align="center">
+                        System Event Logs
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="center">Time:</TableCell>
+                      <TableCell align="center">Severity:</TableCell>
+                      <TableCell align="center">Message:</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {data.sel.logs.map((val, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{new Date(val.created).toLocaleString()}</TableCell>
+                        <TableCell>{val.severity}</TableCell>
+                        <TableCell>{val.message}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenSEL(false)} variant="outlined">
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           <Grid2 xs={12}>
             <Divider />
@@ -171,7 +231,6 @@ const Redfish = ({ query }) => {
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px" }}>
                 <CardContent>
-                  {/* <CardMedia sx={{ height: "160px", marginBottom: "8px" }} image={intel_logo} /> */}
                   <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                     CPUs
                   </Typography>
@@ -188,7 +247,6 @@ const Redfish = ({ query }) => {
                           Threads: {val.threads}
                         </Typography>
                       )}
-                      {/* {val.turbo === "Enabled" && ( */}
                       <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
                         Frequency: {val.frequency} MHz
                       </Typography>
@@ -206,7 +264,6 @@ const Redfish = ({ query }) => {
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px" }}>
                 <CardContent>
-                  {/* <CardMedia sx={{ height: "160px", marginBottom: "8px" }} image={nvidia_logo} /> */}
                   <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                     GPUs
                   </Typography>
@@ -228,7 +285,6 @@ const Redfish = ({ query }) => {
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px" }}>
                 <CardContent>
-                  {/* <CardMedia sx={{ height: "160px", marginBottom: "8px" }} image={nvidia_logo} /> */}
                   <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                     PCIe Devices
                   </Typography>
@@ -333,26 +389,4 @@ const Redfish = ({ query }) => {
     </>
   )
 }
-
-// const CollapseTable = (props) => {
-//   const [expand, setExpand] = useState(false)
-//   return (
-//     <>
-//       <Box sx={{ display: "inline-flex", alignItems: "center" }}>
-//         {expand === false && <Typography>{props.display}</Typography>}
-//         <IconButton size="small" onClick={() => setExpand(!expand)}>
-//           {expand === false && <ExpandMoreIcon />}
-//           {expand === true && <ExpandLessIcon />}
-//         </IconButton>
-//       </Box>
-
-//       <Collapse in={expand}>
-//         <Table size="small">
-//           <TableBody>{props.children}</TableBody>
-//         </Table>
-//       </Collapse>
-//     </>
-//   )
-// }
-
 export default Redfish

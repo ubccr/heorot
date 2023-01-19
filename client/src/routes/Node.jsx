@@ -25,19 +25,21 @@ const Node = () => {
   let navigate = useNavigate()
 
   const [user] = useContext(UserContext)
+  const [refresh, setRefresh] = useState("false")
 
-  const query = useQuery([`node-query-${node}`, node], async ({ signal }) => {
+  const query = useQuery([`node-query-${node}`, node, refresh], async ({ signal }) => {
     let payload = {
       headers: {
         "x-access-token": user.accessToken,
       },
       signal,
     }
-    const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/node/${node}`, payload)).json()
+    const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/node/${node}/${refresh}`, payload)).json()
     if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
     else if (res.status === "error" && res.hasOwnProperty("silent")) console.error(`${res.message}`)
     else if (res.message !== undefined) enqueueSnackbar(res.message, { variant: "warning" })
 
+    setRefresh("false")
     return res
   })
   return (
@@ -92,7 +94,11 @@ const Node = () => {
             <IconButton
               variant="outlined"
               // set refresh in query to true
-              onClick={() => query.refetch()}
+              onClick={async () => {
+                setRefresh("true")
+                await new Promise((resolve) => setTimeout(resolve, 50)) // timeout to fix async useState
+                query.refetch()
+              }}
             >
               <CachedOutlinedIcon />
             </IconButton>
@@ -113,7 +119,7 @@ const Node = () => {
         <Box sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
           {tab === 0 && query.isFetched && <Grendel query={query} />}
           {tab === 1 && query.isFetched && <Console node={node} query={query} />}
-          {tab === 2 && query.isFetched && <Redfish query={query} />}
+          {tab === 2 && query.isFetched && <Redfish query={query} setRefresh={setRefresh} />}
           {tab === 3 && query.isFetched && <Notes query={query} />}
           {tab === 4 && query.isFetched && <Switches query={query} />}
         </Box>

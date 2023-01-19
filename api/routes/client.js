@@ -7,6 +7,7 @@ const config = require("../config")
 const Switches = require("../models/Switches")
 // const { redfishRequest } = require("../modules/redfish/redfish")
 const Nodes = require("../models/Nodes")
+const { fetch_node } = require("../modules/nodes")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -114,8 +115,10 @@ app.get("/node/:node", async (req, res) => {
     })
   }
 })
-app.get("/v1/node/:node", async (req, res) => {
+app.get("/v1/node/:node/:refresh?", async (req, res) => {
   const node = req.params.node
+  const refresh = req.params.refresh ?? "false"
+
   let rack = node.split("-")[1] ?? ""
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
   let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
@@ -133,6 +136,8 @@ app.get("/v1/node/:node", async (req, res) => {
     }
     let bmcPlugin = false
     if (config.bmc.DELL_USER !== "") bmcPlugin = true
+
+    if (refresh === "true") await fetch_node(node, refresh)
 
     let dbRequest = await Nodes.findOne({ node: node })
 
