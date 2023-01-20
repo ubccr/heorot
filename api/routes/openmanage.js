@@ -8,9 +8,7 @@ let config = require("../config")
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
-let omeEncoded = Buffer.from(config.ome.user + ":" + config.ome.pass).toString(
-  "base64"
-)
+let omeEncoded = Buffer.from(config.ome.user + ":" + config.ome.pass).toString("base64")
 let omeAuth = "Basic " + omeEncoded
 let omeHeader = {
   headers: {
@@ -75,11 +73,7 @@ app.get("/nodes", async (req, res) => {
 })
 
 app.get("/health/:id", async (req, res) => {
-  const url =
-    config.ome.url +
-    "/api/DeviceService/Devices(" +
-    req.params.id +
-    ")/SubSystemHealth"
+  const url = config.ome.url + "/api/DeviceService/Devices(" + req.params.id + ")/SubSystemHealth"
 
   try {
     let api_res = await apiRequest(url, omeHeader)
@@ -126,7 +120,6 @@ async function apiRequest(url, http_header) {
       result: json_res.value,
     }
   } catch (error) {
-    console.error(error)
     return {
       status: "error",
       message: "API Request error",

@@ -5,7 +5,7 @@ import BgContainer from "../../components/BgContainer"
 import DeleteNodes from "./EditNodes/DeleteNodes"
 import EditJson from "./EditNodes/EditJson"
 import EditNodes from "./EditNodes/EditNodes"
-import ImportNodes from "./ImportNodes"
+// import ImportNodes from "./ImportNodes"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useState } from "react"
 
@@ -55,7 +55,7 @@ const Index = () => {
           >
             <Tab label="Add Node" />
             <Tab label="Edit Nodes" />
-            <Tab label="Bulk Import" />
+            {/* <Tab label="Bulk Import" /> */}
           </Tabs>
         </Box>
         <Divider sx={{ marginBottom: "15px" }} />
@@ -69,7 +69,7 @@ const Index = () => {
               <EditJson />
             </>
           )}
-          {value === 2 && <ImportNodes />}
+          {/* {value === 2 && <ImportNodes />} */}
         </Box>
       </BgContainer>
     </>

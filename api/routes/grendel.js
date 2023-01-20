@@ -80,80 +80,12 @@ app.delete("/image/delete/:nodeset", async (req, res) => {
   res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`, "DELETE"))
 })
 
+// --- misc ---
 app.get("/firmware/list", async (req, res) => {
   res.json({
     status: "success",
     result: config.firmware,
   })
-})
-
-// app.get("/status/:value/:tags?", async (req, res) => {
-//   let tags = req.params.tags === undefined ? "" : req.params.tags
-//   let args = ["status"]
-
-//   if (req.params.value === "nodes") args.push("nodes", `${tags}`)
-//   else if (req.params.value === "long") args.push("nodes", `${tags}`, "--long")
-//   else args.push(`${tags}`)
-
-//   const status = spawn("grendel", args)
-//   let stdout = "",
-//     stderr = "",
-//     error = ""
-
-//   status.stdout.on("data", (data) => {
-//     stdout += data
-//   })
-//   status.stderr.on("data", (data) => {
-//     stderr += data
-//   })
-//   status.on("error", (err) => {
-//     error = err
-//     res.json({
-//       status: "error",
-//       message: err,
-//     })
-//   })
-//   status.on("close", (code) => {
-//     if (stderr === "" && error === "") {
-//       res.json({
-//         status: "success",
-//         result: stdout,
-//       })
-//     } else {
-//       res.json({
-//         status: "error",
-//         message: `Issue fetching grendel status: ${stderr}`,
-//       })
-//     }
-//   })
-// })
-
-app.post("/edit", async (req, res) => {
-  const nodeset = req.body.nodeset
-  const action = req.body.action
-  const actionIndex = req.body.action_index
-  const value = req.body.value
-
-  let originalJSON = await grendelRequest(`/v1/host/find/${nodeset}`)
-
-  if (originalJSON.status !== "error") {
-    let updatedJSON = originalJSON.result.map((val) => {
-      if (action === "firmware") val.firmware = value
-      else if (action === "image") val.boot_image = value
-      else if (action === "interfaces" && actionIndex === undefined) val.interfaces = value
-      else if (action === "interfaces" && val.interfaces[actionIndex] !== undefined) val.interfaces[actionIndex] = value
-      else if (action === "interfaces" && val.interfaces[actionIndex] === undefined) val.interfaces.push(value)
-      return val
-    })
-
-    let updateNode = await grendelRequest(`/v1/host`, "POST", updatedJSON)
-    res.json(updateNode)
-  } else {
-    res.json({
-      status: "error",
-      message: originalJSON.result.message,
-    })
-  }
 })
 
 module.exports = app

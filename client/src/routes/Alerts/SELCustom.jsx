@@ -15,7 +15,7 @@ const SELCustom = ({ data, node, type, icon }) => {
   const { enqueueSnackbar } = useSnackbar()
 
   const query_sel = useQuery(
-    ["sel", node],
+    [`sel-${node}`, node],
     async ({ signal }) => {
       let payload = {
         headers: {
@@ -23,7 +23,8 @@ const SELCustom = ({ data, node, type, icon }) => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/node/${node}/true`, payload)).json()
+      // const res = await (await fetch(`${apiConfig.apiUrl}/redfish/v1/sel/${node}`, payload)).json()
       if (res.status === "error") {
         enqueueSnackbar(res.message, { variant: "error" })
         setOpenSEL(false)
@@ -58,7 +59,7 @@ const SELCustom = ({ data, node, type, icon }) => {
         <DialogContent>
           {query_sel.isLoading && <LinearProgress />}
           {!query_sel.isLoading && query_sel.status === "success" && query_sel.data.status === "success" && (
-            <SELTable data={query_sel.data.logs} />
+            <SELTable data={query_sel.data.redfish.sel.logs} />
           )}
           <Box
             sx={{
