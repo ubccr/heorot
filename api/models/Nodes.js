@@ -29,7 +29,7 @@ const nodesSchema = new Schema(
 
       model: { type: String },
       manufacturer: { type: String },
-      service_tag: { type: String },
+      service_tag: { type: String, unique: true },
       bios_version: { type: String },
       boot_order: { type: String },
       hostname: { type: String },
@@ -142,6 +142,21 @@ const nodesSchema = new Schema(
       },
     },
     notes: { type: String },
+    warranty: {
+      shipDate: { type: String },
+      productLineDescription: { type: String },
+      entitlements: [
+        {
+          itemNumber: { type: String },
+          startDate: { type: String, required: true },
+          endDate: { type: String, required: true },
+          entitlementType: { type: String },
+          serviceLevelCode: { type: String },
+          serviceLevelDescription: { type: String },
+          serviceLevelGroup: { type: Number },
+        },
+      ],
+    },
   },
   { timestamps: true }
 )
