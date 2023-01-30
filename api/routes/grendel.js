@@ -30,6 +30,33 @@ app.get("/host/tags/:tags", async (req, res) => {
 })
 
 app.post("/host", async (req, res) => {
+  /*
+  body: [
+    {
+        "name": "ut dolor nostrud",
+        "id": "deserunt Excepteur proident",
+        "provision": true,
+        "firmware": "magna sit fugiat",
+        "boot_image": "irure consectetur ipsum tempor",
+        "interfaces": [
+            {
+                "mac": "in ipsum dolore ex",
+                "name": "sunt dolore minim",
+                "ip": "aliqua dolor aliquip",
+                "fqdn": "consectetur",
+                "bmc": false
+            },
+            {
+                "mac": "magna ipsum ",
+                "name": "exercitation",
+                "ip": "sint",
+                "fqdn": "non eu dolore occaecat",
+                "bmc": false
+            }
+        ]
+    },
+  ]
+  */
   // IP address check:
   if (typeof req.body === "object" && req.body.length > 0) {
     let tmp = req.body.map((val) => {
@@ -73,6 +100,22 @@ app.get("/image/find/:nodeset", async (req, res) => {
   res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`))
 })
 app.post("/image", async (req, res) => {
+  /*
+  body: [
+    {
+        "name": "non cillum veniam",
+        "id": "ex dolore",
+        "kernel": "ex in laboris voluptate ut",
+        "initrd": [
+            "est fugiat pariatur voluptate",
+            "in"
+        ],
+        "liveimg": "ullamco in laboris ea",
+        "cmdline": "ut Excepteur",
+        "verify": false
+    },
+  ]
+  */
   res.json(await grendelRequest(`/v1/bootimage`, "POST", req.body))
 })
 app.delete("/image/delete/:nodeset", async (req, res) => {
