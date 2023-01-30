@@ -12,7 +12,7 @@ const { fetch_node } = require("../modules/nodes")
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/client" + element.route.path)
   })
   res.json({
     status: "success",
@@ -89,7 +89,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
   let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
   let boot_image_res = await grendelRequest(`/v1/bootimage/list`)
-  let boot_image_list = boot_image_res.status === "success" ? boot_image_res.result.map((val) => val.name) : []
+  let boot_image_list = boot_image_res.status === "success" ? boot_image_res.result : []
 
   if (nodeRes.status === "success" && nodeRes.result.length > 0 && rack_res.status === "success") {
     let nodeList = rack_res.result.map((val) => val.name).sort((a, b) => a.split("-")[2] - b.split("-")[2])

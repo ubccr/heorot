@@ -11,7 +11,7 @@ const { dell_resetNode, sm_resetNode, hpe_resetNode } = require("../modules/redf
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/redfish" + element.route.path)
   })
   res.json({
     status: "success",

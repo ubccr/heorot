@@ -10,7 +10,7 @@ const auth = require("../modules/auth")
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/auth" + element.route.path)
   })
   res.json({
     status: "success",

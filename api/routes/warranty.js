@@ -1,6 +1,5 @@
 const express = require("express")
 const app = express.Router()
-const fetch = require("node-fetch")
 const Nodes = require("../models/Nodes")
 const Warranty = require("../models/Warranty")
 
@@ -12,7 +11,7 @@ const { warrantyApiReq } = require("../modules/Warranty")
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/warranty" + element.route.path)
   })
   res.json({
     status: "success",

@@ -22,7 +22,7 @@ let omeHeader = {
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/openmanage" + element.route.path)
   })
   res.json({
     status: "success",
