@@ -51,14 +51,22 @@ const Grendel = ({ query }) => {
   const [tagExpand, setTagExpand] = useState(false)
   const [newTag, setNewTag] = useState("")
 
+  //  boot image
+  const [imageExpand, setImageExpand] = useState(false)
+
   // form
-  const { control, reset, handleSubmit } = useForm({
+  const { control, reset, getValues, setValue, watch, handleSubmit } = useForm({
     defaultValues: {
       provision: query.data.result.provision,
       firmware: query.data.result.firmware,
       boot_image: query.data.result.boot_image,
       id: query.data.result.id,
       name: query.data.result.name,
+      boot_image_edit: JSON.stringify(
+        query.data.boot_image_options.find((val) => val.name === query.data.result.boot_image),
+        null,
+        4
+      ),
     },
   })
 
@@ -83,6 +91,19 @@ const Grendel = ({ query }) => {
     resetForm()
   }, [query])
 
+  useEffect(() => {
+    let boot_image = getValues("boot_image")
+    let newImageJson =
+      boot_image === ""
+        ? ""
+        : JSON.stringify(
+            query.data.boot_image_options.find((val) => val.name === getValues("boot_image")),
+            null,
+            4
+          )
+    setValue("boot_image_edit", newImageJson)
+  }, [watch("boot_image")])
+
   const resetForm = () => {
     reset({
       provision: query.data.result.provision,
@@ -90,6 +111,11 @@ const Grendel = ({ query }) => {
       boot_image: query.data.result.boot_image,
       id: query.data.result.id,
       name: query.data.result.name,
+      boot_image_edit: JSON.stringify(
+        query.data.boot_image_options.find((val) => val.name === query.data.result.boot_image),
+        null,
+        4
+      ),
     })
     interface_remove()
     tag_remove()
@@ -113,11 +139,13 @@ const Grendel = ({ query }) => {
 
   // query
   const [loading, setLoading] = useState(false)
+  const [imageLoading, setImageLoading] = useState(false)
 
   const onSubmit = async (data) => {
     setLoading(true)
     let tmp_tags = data.tags.map((val) => val.tag)
     let final_data = [{ ...data, tags: tmp_tags }]
+    delete final_data.boot_image_edit
 
     let payload = {
       method: "POST",
@@ -132,6 +160,28 @@ const Grendel = ({ query }) => {
     if (res.status === "success")
       enqueueSnackbar(`Successfully updated ${res.result.hosts} host(s)`, { variant: res.status })
     else enqueueSnackbar(res.message, { variant: res.status })
+    query.refetch()
+  }
+
+  const onImageSubmit = async () => {
+    let boot_image_json = JSON.parse(getValues("boot_image_edit"))
+    setImageLoading(true)
+    let payload = {
+      method: "POST",
+      headers: {
+        "x-access-token": user.accessToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([boot_image_json]),
+    }
+    let res = await (await fetch(`${apiConfig.apiUrl}/grendel/image`, payload)).json()
+    setImageLoading(false)
+    if (res.status === "success")
+      enqueueSnackbar(`Successfully updated ${res.result.images} image(s)`, { variant: res.status })
+    else {
+      console.error(res)
+      enqueueSnackbar(res.message, { variant: res.status })
+    }
     query.refetch()
   }
 
@@ -218,52 +268,58 @@ const Grendel = ({ query }) => {
               </TableCell>
             </TableRow>
 
-            <TableRow>
+            <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
               <TableCell>Boot Image:</TableCell>
               <TableCell align="right">
-                <Controller
-                  name="boot_image"
-                  control={control}
-                  render={({ field }) => (
-                    <FormControl>
-                      <Select
-                        {...field}
-                        variant="outlined"
-                        size="small"
-                        MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
-                      >
-                        <MenuItem value="">
-                          <em>None</em>
-                        </MenuItem>
-                        {query.data.boot_image_options.map((val, index) => (
-                          <MenuItem key={index} value={val}>
-                            {val}
+                <Box sx={{ display: "inline-flex", gap: "4px", alignItems: "center" }}>
+                  <Controller
+                    name="boot_image"
+                    control={control}
+                    render={({ field }) => (
+                      <FormControl>
+                        <Select
+                          {...field}
+                          variant="outlined"
+                          size="small"
+                          MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
+                        >
+                          <MenuItem value="">
+                            <em>None</em>
                           </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
-                />
+                          {query.data.boot_image_options.map((val, index) => (
+                            <MenuItem key={index} value={val.name}>
+                              {val.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                  <Collapse in={imageExpand} orientation="horizontal" timeout={500}>
+                    <Box sx={{ display: "inline-flex" }}>
+                      <Button variant="outlined" onClick={() => onImageSubmit()}>
+                        {imageLoading ? <CircularProgress size={22.75} /> : "Submit"}
+                      </Button>
+                    </Box>
+                  </Collapse>
+                  <IconButton size="small" onClick={() => setImageExpand(!imageExpand)}>
+                    {imageExpand ? <ChevronRightOutlinedIcon /> : <ChevronLeftOutlinedIcon />}
+                  </IconButton>
+                </Box>
               </TableCell>
             </TableRow>
 
-            {interface_fields.map((item, index) => (
-              <Fade in={true} key={item.id}>
-                <TableRow>
-                  <TableCell>Interface {index + 1}</TableCell>
-                  <TableCell align="right">
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-                      <Box>
-                        <Interfaces data={item} index={index} control={control} />
-                      </Box>
-                      <IconButton size="small" sx={{ maxHeight: "34px" }} onClick={() => interface_remove(index)}>
-                        <CloseOutlined />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              </Fade>
-            ))}
+            <TableRow>
+              <TableCell colSpan={2} style={{ paddingBottom: 0, paddingTop: 0 }}>
+                <Collapse in={imageExpand} unmountOnExit timeout={500}>
+                  <Controller
+                    name="boot_image_edit"
+                    control={control}
+                    render={({ field }) => <TextField multiline rows={16} fullWidth {...field} label="Boot Image" />}
+                  />
+                </Collapse>
+              </TableCell>
+            </TableRow>
 
             <TableRow>
               <TableCell>Firmware:</TableCell>
@@ -293,173 +349,89 @@ const Grendel = ({ query }) => {
                 />
               </TableCell>
             </TableRow>
+
+            <TableRow>
+              <TableCell colSpan={2} sx={{ overflow: "hidden", paddingTop: "10px", paddingBottom: "10px" }}>
+                <Grid2 container spacing={2} sx={{ display: "flex", justifyContent: "end" }}>
+                  {interface_fields.map((item, index) => (
+                    <Grid2 key={item.id} xs={12} sm={12} md={6} lg={3}>
+                      <Grid2
+                        container
+                        spacing={1}
+                        sx={{
+                          border: 1,
+                          borderColor: "border.main",
+                          borderRadius: "5px",
+                          padding: "16px",
+                          paddingTop: "10px",
+                        }}
+                      >
+                        <Grid2 xs={6} sx={{ display: "flex", justifyContent: "start", alignItems: "center" }}>
+                          <Controller
+                            name={`interfaces.${index}.bmc`}
+                            control={control}
+                            render={({ field }) => (
+                              <FormControlLabel label="BMC" control={<Checkbox {...field} checked={field.value} />} />
+                            )}
+                          />
+                        </Grid2>
+                        <Grid2 xs={6} sx={{ display: "flex", justifyContent: "end", alignItems: "center" }}>
+                          <IconButton size="small" sx={{ maxHeight: "34px" }} onClick={() => interface_remove(index)}>
+                            <CloseOutlined />
+                          </IconButton>
+                        </Grid2>
+                        <Grid2 xs={12}>
+                          <Controller
+                            name={`interfaces.${index}.fqdn`}
+                            control={control}
+                            render={({ field }) => <TextField label="FQDN" size="small" {...field} fullWidth />}
+                          />
+                        </Grid2>
+                        <Grid2 xs={12}>
+                          <Controller
+                            name={`interfaces.${index}.mac`}
+                            control={control}
+                            render={({ field }) => <TextField label="MAC" size="small" {...field} fullWidth />}
+                          />
+                        </Grid2>
+                        <Grid2 xs={12} sm={6}>
+                          <Controller
+                            name={`interfaces.${index}.ifname`}
+                            control={control}
+                            render={({ field }) => <TextField label="Name" size="small" {...field} fullWidth />}
+                          />
+                        </Grid2>
+                        <Grid2 xs={12} sm={6}>
+                          <Controller
+                            name={`interfaces.${index}.ip`}
+                            control={control}
+                            render={({ field }) => <TextField label="IP" size="small" {...field} fullWidth />}
+                          />
+                        </Grid2>
+                        <Grid2 xs={12} sm={6}>
+                          <Controller
+                            name={`interfaces.${index}.vlan`}
+                            control={control}
+                            render={({ field }) => <TextField label="VLAN" size="small" {...field} fullWidth />}
+                          />
+                        </Grid2>
+                        <Grid2 xs={12} sm={6}>
+                          <Controller
+                            name={`interfaces.${index}.mtu`}
+                            control={control}
+                            render={({ field }) => <TextField label="MTU" size="small" {...field} fullWidth />}
+                          />
+                        </Grid2>
+                      </Grid2>
+                    </Grid2>
+                  ))}
+                </Grid2>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </form>
     </TableContainer>
-  )
-}
-
-const Interfaces = ({ data, index, control }) => {
-  const [expand, setExpand] = useState(false)
-  let shortDisplay = data.fqdn !== "" ? data.fqdn.split(".")[0] : data.ip
-  return (
-    <>
-      <Box sx={{ display: "inline-flex", alignItems: "center" }}>
-        <Grow in={!expand}>
-          {data.bmc === true ? (
-            <Typography
-              component="a"
-              target="_blank"
-              rel="noreferrer"
-              href={`https://${data.fqdn}`}
-              color="primary"
-              sx={{ textDecoration: "underline" }}
-            >
-              {shortDisplay}
-            </Typography>
-          ) : (
-            <Typography>{shortDisplay}</Typography>
-          )}
-        </Grow>
-        <IconButton size="small" onClick={() => setExpand(!expand)}>
-          {expand ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </IconButton>
-      </Box>
-
-      <Collapse in={expand} timeout={500}>
-        <Grid2 container spacing={2} sx={{ maxWidth: "400px", marginTop: "2px" }}>
-          <Grid2 xs={12}>
-            <Controller
-              name={`interfaces.${index}.fqdn`}
-              control={control}
-              render={({ field }) => <TextField label="FQDN" size="small" {...field} fullWidth />}
-            />
-          </Grid2>
-          <Grid2 xs={12} sm={6}>
-            <Controller
-              name={`interfaces.${index}.ifname`}
-              control={control}
-              render={({ field }) => <TextField label="Name" size="small" {...field} fullWidth />}
-            />
-          </Grid2>
-          <Grid2 xs={12} sm={6}>
-            <Controller
-              name={`interfaces.${index}.ip`}
-              control={control}
-              render={({ field }) => <TextField label="IP" size="small" {...field} fullWidth />}
-            />
-          </Grid2>
-          <Grid2 xs={12} sm={6}>
-            <Controller
-              name={`interfaces.${index}.mac`}
-              control={control}
-              render={({ field }) => <TextField label="MAC" size="small" {...field} fullWidth />}
-            />
-          </Grid2>
-          <Grid2 xs={12} sm={6}>
-            <Controller
-              name={`interfaces.${index}.vlan`}
-              control={control}
-              render={({ field }) => <TextField label="VLAN" size="small" {...field} fullWidth />}
-            />
-          </Grid2>
-          <Grid2 xs={12} sm={6}>
-            <Controller
-              name={`interfaces.${index}.mtu`}
-              control={control}
-              render={({ field }) => <TextField label="MTU" size="small" {...field} fullWidth />}
-            />
-          </Grid2>
-          <Grid2 xs={12} sm={6} sx={{ display: "flex", justifyContent: "center" }}>
-            <Controller
-              name={`interfaces.${index}.bmc`}
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel label="BMC" control={<Checkbox {...field} checked={field.value} />} />
-              )}
-            />
-          </Grid2>
-        </Grid2>
-        {/* <Box sx={{ display: "flex", justifyContent: "right" }}>
-          <Table size="small" sx={{ maxWidth: "600px" }}>
-            <TableBody>
-              <TableRow>
-                <TableCell>Name:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.ifname`}
-                    control={control}
-                    render={({ field }) => <TextField size="small" {...field} fullWidth />}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>FQDN:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.fqdn`}
-                    control={control}
-                    render={({ field }) => <TextField size="small" {...field} fullWidth />}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>IP:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.ip`}
-                    control={control}
-                    render={({ field }) => <TextField size="small" {...field} fullWidth />}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>MAC:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.mac`}
-                    control={control}
-                    render={({ field }) => <TextField size="small" {...field} fullWidth />}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>VLAN:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.vlan`}
-                    control={control}
-                    render={({ field }) => <TextField size="small" {...field} fullWidth />}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>MTU:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.mtu`}
-                    control={control}
-                    render={({ field }) => <TextField size="small" {...field} fullWidth />}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>BMC:</TableCell>
-                <TableCell>
-                  <Controller
-                    name={`interfaces.${index}.bmc`}
-                    control={control}
-                    defaultValue={false}
-                    render={({ field }) => <Checkbox {...field} checked={field.value} />}
-                  />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Box> */}
-      </Collapse>
-    </>
   )
 }
 
