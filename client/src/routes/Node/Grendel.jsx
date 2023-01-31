@@ -63,7 +63,7 @@ const Grendel = ({ query }) => {
       id: query.data.result.id,
       name: query.data.result.name,
       boot_image_edit: JSON.stringify(
-        query.data.boot_image_options.find((val) => val.name === query.data.result.boot_image),
+        [query.data.boot_image_options.find((val) => val.name === query.data.result.boot_image)],
         null,
         4
       ),
@@ -96,11 +96,7 @@ const Grendel = ({ query }) => {
     let newImageJson =
       boot_image === ""
         ? ""
-        : JSON.stringify(
-            query.data.boot_image_options.find((val) => val.name === getValues("boot_image")),
-            null,
-            4
-          )
+        : JSON.stringify([query.data.boot_image_options.find((val) => val.name === getValues("boot_image"))], null, 4)
     setValue("boot_image_edit", newImageJson)
   }, [watch("boot_image")])
 
@@ -112,7 +108,7 @@ const Grendel = ({ query }) => {
       id: query.data.result.id,
       name: query.data.result.name,
       boot_image_edit: JSON.stringify(
-        query.data.boot_image_options.find((val) => val.name === query.data.result.boot_image),
+        [query.data.boot_image_options.find((val) => val.name === query.data.result.boot_image)],
         null,
         4
       ),
@@ -164,7 +160,6 @@ const Grendel = ({ query }) => {
   }
 
   const onImageSubmit = async () => {
-    let boot_image_json = JSON.parse(getValues("boot_image_edit"))
     setImageLoading(true)
     let payload = {
       method: "POST",
@@ -172,17 +167,17 @@ const Grendel = ({ query }) => {
         "x-access-token": user.accessToken,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify([boot_image_json]),
+      body: getValues("boot_image_edit"),
     }
     let res = await (await fetch(`${apiConfig.apiUrl}/grendel/image`, payload)).json()
     setImageLoading(false)
-    if (res.status === "success")
+    if (res.status === "success") {
       enqueueSnackbar(`Successfully updated ${res.result.images} image(s)`, { variant: res.status })
-    else {
+      query.refetch()
+    } else {
       console.error(res)
       enqueueSnackbar(res.message, { variant: res.status })
     }
-    query.refetch()
   }
 
   return (
