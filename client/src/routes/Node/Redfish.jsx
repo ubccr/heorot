@@ -165,7 +165,10 @@ const Redfish = ({ query, setRefresh }) => {
           </Grid2>
 
           <Grid2 xs={12} sm={6} lg={3}>
-            <Card variant="outlined" sx={{ height: "190px" }}>
+            <Card
+              variant="outlined"
+              sx={{ height: "190px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
+            >
               <CardContent>
                 <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                   System Event Log
@@ -177,7 +180,7 @@ const Redfish = ({ query, setRefresh }) => {
                   Latest Log: {data.sel.logs[0]?.message}
                 </Typography>
               </CardContent>
-              <CardActions>
+              <CardActions sx={{ justifyContent: "center" }}>
                 <Button variant="outlined" size="small" onClick={() => setOpenSEL(!openSEL)}>
                   Show
                 </Button>
