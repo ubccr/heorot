@@ -114,6 +114,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
       next_node: nextNode,
       result: nodeRes.result[0],
       redfish: dbRequest?.redfish,
+      warranty: dbRequest?.warranty,
       notes: dbRequest?.notes ?? "",
       firmware_options: config.firmware,
       boot_image_options: boot_image_list,

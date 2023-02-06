@@ -361,6 +361,36 @@ const Redfish = ({ query, setRefresh }) => {
             </Card>
           </Grid2>
 
+          {query.data.warranty !== undefined && (
+            <Grid2 xs={12} sm={6} lg={3}>
+              <Card variant="outlined" sx={{ height: "270px" }}>
+                <CardContent>
+                  <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
+                    Warranty
+                  </Typography>
+                  {query.data.warranty.entitlements.map((val, index) => (
+                    <React.Fragment key={index}>
+                      <Typography variant="h2" fontSize={14}>
+                        Start: {new Date(val.startDate).toLocaleString()}
+                      </Typography>
+                      <Typography variant="h2" fontSize={14}>
+                        End: {new Date(val.endDate).toLocaleString()}
+                      </Typography>
+                      <Typography variant="h2" fontSize={14}>
+                        Type: {val.entitlementType}
+                      </Typography>
+                      <Typography variant="h2" fontSize={14}>
+                        Code: {val.serviceLevelCode}
+                      </Typography>
+                      {query.data.warranty.entitlements.length > 1 &&
+                        index < query.data.warranty.entitlements.length && <Divider sx={{ marginBottom: "5px" }} />}
+                    </React.Fragment>
+                  ))}
+                </CardContent>
+              </Card>
+            </Grid2>
+          )}
+
           <Grid2 xs={12} sx={{ marginTop: "5px", marginBottom: "5px" }}>
             <Divider />
           </Grid2>
