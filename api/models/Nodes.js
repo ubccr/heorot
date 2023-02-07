@@ -118,6 +118,7 @@ const nodesSchema = new Schema(
             type: { type: String },
             name: { type: String },
             model: { type: String },
+            form_factor: { type: String },
             manufacturer: { type: String },
             description: { type: String },
             serial_number: { type: String },
