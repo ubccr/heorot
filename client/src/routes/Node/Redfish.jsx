@@ -371,15 +371,15 @@ const Redfish = ({ query, setRefresh }) => {
                   {query.data.warranty.entitlements.map((val, index) => (
                     <React.Fragment key={index}>
                       <Typography variant="h2" fontSize={14}>
-                        Start: {new Date(val.startDate).toLocaleString()}
-                      </Typography>
-                      <Typography variant="h2" fontSize={14}>
-                        End: {new Date(val.endDate).toLocaleString()}
-                      </Typography>
-                      <Typography variant="h2" fontSize={14}>
                         Type: {val.entitlementType}
                       </Typography>
-                      <Typography variant="h2" fontSize={14}>
+                      <Typography variant="h2" fontSize={12}>
+                        Start: {new Date(val.startDate).toLocaleString()}
+                      </Typography>
+                      <Typography variant="h2" fontSize={12}>
+                        End: {new Date(val.endDate).toLocaleString()}
+                      </Typography>
+                      <Typography variant="h2" fontSize={12}>
                         Code: {val.serviceLevelCode}
                       </Typography>
                       {query.data.warranty.entitlements.length > 1 &&
