@@ -87,8 +87,9 @@ const ConfigureInterfaces = ({ ifaces, setIfaces }) => {
                   size="small"
                   label="MTU"
                   variant="outlined"
+                  type="number"
                   onChange={(e) => {
-                    ifaces[index].mtu = e.target.value
+                    ifaces[index].mtu = parseInt(e.target.value)
                     setIfaces([...ifaces])
                   }}
                   sx={{ marginBottom: "8px" }}
