@@ -1,28 +1,23 @@
-import { Button, Menu, MenuItem, Switch, Toolbar, Typography } from "@mui/material"
-import { useContext, useState } from "react"
+import { Button, Toolbar, Typography } from "@mui/material"
 
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
+import AccountMenu from "./AppBar/AccountMenu"
 import AdminMenu from "./AppBar/AdminMenu"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined"
 import IconButton from "@mui/material/IconButton"
-import InfoOutlined from "@mui/icons-material/InfoOutlined"
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined"
 import { Link } from "react-router-dom"
 import MainMenuC from "./AppBar/MainMenuC"
 import { PluginContext } from "../contexts/PluginContext"
 import SearchC from "./AppBar/SearchC"
-import Status from "./Status"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import { useSnackbar } from "notistack"
+import { useContext } from "react"
 
 const AppBarC = () => {
-  const { enqueueSnackbar } = useSnackbar()
-
   const [user, setUser] = useContext(UserContext)
   const [mode, setMode] = useContext(ThemeContext)
   const [plugins] = useContext(PluginContext)
@@ -51,24 +46,6 @@ const AppBarC = () => {
       fetch(`${apiConfig.apiUrl}/auth/setTheme`, payload)
     }
   }
-
-  const [anchorEl, setAnchorEl] = useState(null)
-  const [statusOpen, setStatusOpen] = useState(false)
-  const isMenuOpen = Boolean(anchorEl)
-  const handleAccountOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleMenuClose = () => {
-    setAnchorEl(null)
-  }
-  const handleSignout = () => {
-    setAnchorEl(null)
-    setUser(null)
-    setMode("light")
-    localStorage.clear("user")
-    enqueueSnackbar("Successfully logged out", { variant: "success" })
-  }
-  const menuId = "primary-search-account-menu"
 
   return (
     <Box>
@@ -125,41 +102,9 @@ const AppBarC = () => {
               <Link to={"/Login"}>Login</Link>
             </Button>
           )}
-          {/* {user !== null && user.privileges === "admin" && (
-            <>
-              <IconButton onClick={() => setStatusOpen(true)}>
-                <InfoOutlined sx={{ color: "white" }} />
-              </IconButton>
-              <Status open={statusOpen} setOpen={setStatusOpen} />
-            </>
-          )} */}
-          {user !== null && (
-            <IconButton onClick={handleAccountOpen}>
-              <AccountCircleOutlinedIcon sx={{ color: "white" }} />
-            </IconButton>
-          )}
+          {user !== null && <AccountMenu />}
         </Toolbar>
       </AppBar>
-      <Menu
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        id={menuId}
-        keepMounted
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleMenuClose} component={Link} to={"/Profile"}>
-          Profile
-        </MenuItem>
-        <MenuItem onClick={handleSignout}>Sign out</MenuItem>
-      </Menu>
     </Box>
   )
 }
