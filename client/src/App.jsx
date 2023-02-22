@@ -19,6 +19,7 @@ import { PluginContext } from "./contexts/PluginContext"
 import PrivateRoute from "./components/PrivateRoute"
 import Profile from "./routes/Profile/Profile"
 import Rack from "./routes/Rack"
+import Settings from "./routes/Settings"
 import Signup from "./routes/Auth/Signup"
 import { SnackbarProvider } from "notistack"
 import { ThemeContext } from "./contexts/ThemeContext"
@@ -232,6 +233,14 @@ function App() {
                           element={
                             <PrivateRoute access="none">
                               <Profile />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Settings"
+                          element={
+                            <PrivateRoute access="admin">
+                              <Settings />{" "}
                             </PrivateRoute>
                           }
                         />
