@@ -3,13 +3,16 @@ import React, { useContext, useState } from "react"
 
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useSnackbar } from "notistack"
 
 const Notes = ({ query }) => {
   const { enqueueSnackbar } = useSnackbar()
+  const [pageRef] = useAutoAnimate(null)
 
   const [user] = useContext(UserContext)
   const [loading, setLoading] = useState(false)
+  const [overwrite, setOverwrite] = useState("")
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -20,19 +23,26 @@ const Notes = ({ query }) => {
         "x-access-token": user.accessToken,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ node: query.data.node, notes: e.currentTarget.notes.value }),
+      body: JSON.stringify({
+        node: query.data.node,
+        old_notes: query.data.notes,
+        new_notes: e.currentTarget.notes.value,
+        overwrite: overwrite !== "" ? true : false,
+      }),
     }
     let res = await (await fetch(`${apiConfig.apiUrl}/client/v1/notes`, payload)).json()
     setLoading(false)
-    if (res.status === "success") enqueueSnackbar(`Successfully updated notes`, { variant: res.status })
-    else enqueueSnackbar(res.message, { variant: res.status })
+    enqueueSnackbar(res.message, { variant: res.status })
+    if (res?.code === "EOVERWRITE") setOverwrite(res.overwrite)
+    if (res?.code !== "EOVERWRITE") setOverwrite("")
     query.refetch()
   }
 
   return (
     <Box sx={{ display: "flex-row", width: "100%" }}>
-      <form onSubmit={(e) => handleSubmit(e)}>
+      <form onSubmit={(e) => handleSubmit(e)} ref={pageRef}>
         <TextField
+          sx={{ marginBottom: "10px" }}
           multiline
           fullWidth
           rows={15}
@@ -41,7 +51,19 @@ const Notes = ({ query }) => {
           defaultValue={query.data.notes}
           placeholder="Start typing..."
         />
-        <Button fullWidth variant="outlined" type="submit" sx={{ marginTop: "10px" }}>
+        {overwrite && (
+          <TextField
+            sx={{ marginBottom: "10px" }}
+            multiline
+            fullWidth
+            rows={5}
+            name="old_notes"
+            label={`Notes that will be overwritten`}
+            color="error"
+            value={overwrite}
+          />
+        )}
+        <Button fullWidth variant="outlined" type="submit">
           {loading ? <CircularProgress size={22.75} /> : "Submit"}
         </Button>
       </form>

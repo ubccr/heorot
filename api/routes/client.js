@@ -8,6 +8,7 @@ const Switches = require("../models/Switches")
 // const { redfishRequest } = require("../modules/redfish/redfish")
 const Nodes = require("../models/Nodes")
 const { fetch_node } = require("../modules/nodes")
+const Settings = require("../models/Settings")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -133,13 +134,41 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
 app.post("/v1/notes", async (req, res) => {
   /*
   body: {
-    node: "cpn-h01-01",
-    notes: "New notes",
+    new_notes: { updated notes },
+    old_notes: { old notes },
+    overwrite?: true | false
   }
 */
-  let query = await Nodes.updateOne({ node: req.body.node }, { notes: req.body.notes })
-  if (query.modifiedCount > 0) res.json({ status: "success", message: "Successfully updated password!" })
-  else res.json({ status: "error", message: "Error, password unchanged" })
+  let query_verify = await Nodes.findOne({ node: req.body.node })
+
+  if (req.body.overwrite !== true && query_verify.notes !== undefined && query_verify.notes !== req.body.old_notes) {
+    res.json({
+      status: "error",
+      message: "Error, notes have been modified by another user! Submit again to overwrite changes.",
+      code: "EOVERWRITE",
+      overwrite: query_verify.notes,
+    })
+    return
+  }
+
+  let query = await Nodes.updateOne({ node: req.body.node }, { notes: req.body.new_notes })
+  if (query.modifiedCount > 0) res.json({ status: "success", message: "Successfully updated notes!" })
+  else res.json({ status: "error", message: "Error, notes unchanged" })
 })
+
+app.get("/v1/settings", async (req, res) => {
+  let query = await Settings.find({}, { _id: 0, __v: 0 })
+  res.json(query)
+})
+// app.post("/v1/settings", async (req, res) => {
+/*
+  body: {
+    new: { updated Settings model },
+    previous: { old Settings model },
+  }
+*/
+// let query_verify = await Settings.find({}, { _id: 0, __v: 0 })
+// let query_update = await Settings.findOneAndUpdate({}, req.body)
+// })
 
 module.exports = app
