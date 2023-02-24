@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 const crypto = require("crypto")
-require("mongoose-regexp")(mongoose)
+// require("mongoose-String")(mongoose)
 
 const settingsSchema = new Schema(
   {
@@ -9,21 +9,21 @@ const settingsSchema = new Schema(
       username: { type: String, default: "" },
       password: { type: String, default: "" },
       firmware_versions: {
-        type: [{ model: { type: RegExp }, bios: { type: String }, bmc: { type: String } }],
+        type: [{ name: { type: String }, model: { type: String }, bios: { type: String }, bmc: { type: String } }],
         default: [
-          { model: /(R|C)[0-9]5[0-9]{1,2}/g, bios: "1.8.2", bmc: "6.10.30.00" }, // dell 15th gen
-          { model: /(R|C)[0-9]5[0-9]5/g, bios: "2.9.3", bmc: "6.10.30.00" }, // dell 15th gen - AMD
-          { model: /(R|C)[0-9]4[0-9]{1,2}/g, bios: "2.17.1", bmc: "6.10.30.00" }, // dell 14th gen
-          { model: /R[2-3]40/g, bios: "2.12.2", bmc: "6.10.30.00" }, // dell 14th gen (2 and 3 series)
-          { model: /(R|C)[0-9]3[0-9]{1,2}/g, bios: "2.15.0", bmc: "2.83.83.83" }, // dell 13th gen
-          { model: /(R|C)[0-9]2[0-9]{1,2}/g, bios: "2.9.0", bmc: "2.65.65.65" }, // dell 12th gen
+          { name: "Dell 15th Gen", model: "/(R|C)[0-9]5[0-9]{1,2}/g", bios: "1.8.2", bmc: "6.10.30.00" }, // dell 15th gen
+          { name: "Dell 15th Gen - AMD", model: "/(R|C)[0-9]5[0-9]5/g", bios: "2.9.3", bmc: "6.10.30.00" }, // dell 15th gen - AMD
+          { name: "Dell 14th Gen", model: "/(R|C)[0-9]4[0-9]{1,2}/g", bios: "2.17.1", bmc: "6.10.30.00" }, // dell 14th gen
+          { name: "Dell 14th Gen - R240 & R340", model: "/R[2-3]40/g", bios: "2.12.2", bmc: "6.10.30.00" }, // dell 14th gen (2 and 3 series)
+          { name: "Dell 13th Gen", model: "/(R|C)[0-9]3[0-9]{1,2}/g", bios: "2.15.0", bmc: "2.83.83.83" }, // dell 13th gen
+          { name: "Dell 12th Gen", model: "/(R|C)[0-9]2[0-9]{1,2}/g", bios: "2.9.0", bmc: "2.65.65.65" }, // dell 12th gen
         ],
       },
     },
     switches: {
       username: { type: String, default: "" },
       password: { type: String, default: "" },
-      privateKeyPath: { type: String, default: "" },
+      private_key_path: { type: String, default: "" },
     },
     openmanage: {
       username: { type: String, default: "" },
@@ -54,18 +54,18 @@ const settingsSchema = new Schema(
       default_color: { type: String, default: "primary" },
       secondary_color: { type: String, default: "floorplan" },
       model_color: {
-        type: [{ display: { type: String }, color: { type: String }, model: { type: RegExp } }],
+        type: [{ display: { type: String }, color: { type: String }, model: { type: String } }],
         default: [
-          { display: "No Management Switch", color: "primary", model: /^S/ },
-          { display: "Management Switch", color: "error", model: /^PC/ },
+          { display: "No Management Switch", color: "primary", model: "/^S/" },
+          { display: "Management Switch", color: "error", model: "/^PC/" },
         ],
       },
       version_color: {
-        type: [{ display: { type: String }, color: { type: String }, version: { type: RegExp } }],
+        type: [{ display: { type: String }, color: { type: String }, version: { type: String } }],
         default: [
-          { display: "OS8", color: "error", version: /^8/ },
-          { display: "OS9", color: "warning", version: /^9/ },
-          { display: "OS10", color: "primary", version: /^10/ },
+          { display: "OS8", color: "error", version: "/^8/" },
+          { display: "OS9", color: "warning", version: "/^9/" },
+          { display: "OS10", color: "primary", version: "/^10/" },
         ],
       },
       floorX: { type: [String], default: [..."defghijklmnopqrstuvw"] },
