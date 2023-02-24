@@ -24,10 +24,10 @@ config.bmc = {
   DELL_PASS: "", // set to your nodes idrac/redfish password
   firmware_versions: [
     // latest bios and bmc version mapping to node type | will need to be changed when newer firmwares release
-    { model: /(R|C)[0-9]5[0-9]{1,2}/g, bios: "1.7.5", bmc: "5.10.50.15" }, // dell 15th gen
-    { model: /(R|C)[0-9]5[0-9]5/g, bios: "2.8.4", bmc: "5.10.50.00" }, // dell 15th gen - AMD
-    { model: /(R|C)[0-9]4[0-9]{1,2}/g, bios: "2.15.1", bmc: "5.10.50.15" }, // dell 14th gen
-    { model: /R[2-3]40/g, bios: "2.10.1", bmc: "5.10.50.00" }, // dell 14th gen (2 and 3 series)
+    { model: /(R|C)[0-9]5[0-9]{1,2}/g, bios: "1.8.2", bmc: "6.10.00.00" }, // dell 15th gen
+    { model: /(R|C)[0-9]5[0-9]5/g, bios: "2.9.3", bmc: "6.10.00.00" }, // dell 15th gen - AMD
+    { model: /(R|C)[0-9]4[0-9]{1,2}/g, bios: "2.16.1", bmc: "6.10.00.00" }, // dell 14th gen
+    { model: /R[2-3]40/g, bios: "2.12.2", bmc: "6.10.00.00" }, // dell 14th gen (2 and 3 series)
     { model: /(R|C)[0-9]3[0-9]{1,2}/g, bios: "2.15.0", bmc: "2.83.83.83" }, // dell 13th gen
     { model: /(R|C)[0-9]2[0-9]{1,2}/g, bios: "2.9.0", bmc: "2.65.65.65" }, // dell 12th gen
   ],
@@ -35,7 +35,7 @@ config.bmc = {
 
 // Database - configure for your MongoDB install
 config.db = {
-  host: "mongodb", //change to localhost for sources install | mongodb ip address
+  host: "mongodb", // change to localhost for sources install | mongodb ip address
   database: "heorot",
   options: {
     authSource: "admin",
@@ -46,7 +46,7 @@ config.db = {
 
 // Grendel
 config.grendel = {
-  socket: "/var/lib/grendel/grendel-api.socket", // absolute path to Grendel UNIX socket (user nodejs is running as needs permissions to access {add to grendel group})
+  socket: "/var/lib/grendel/grendel-api.socket", // absolute path to Grendel UNIX socket (user nodejs is running as needs permissions to access aka add to grendel group)
 }
 
 // OpenManage Enterprise
@@ -91,7 +91,7 @@ config.floorplan = {
     ],
   },
 
-  // loyout modification | allows you to add or remove rows / columns
+  // layout modification | allows you to add or remove rows / columns
   floorX: [..."defghijklmnopqrstuvw"],
   floorY: [
     "28",
