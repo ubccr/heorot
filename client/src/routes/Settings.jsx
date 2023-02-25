@@ -46,7 +46,6 @@ const Settings = () => {
           },
         })
       ).json()
-      console.log(data)
       return data[0]
     },
   })
@@ -59,6 +58,124 @@ const Settings = () => {
     control,
     name: "bmc.firmware_versions",
   })
+
+  const {
+    fields: tag_mapping_fields,
+    append: tag_mapping_append,
+    remove: tag_mapping_remove,
+  } = useFieldArray({
+    control,
+    name: "floorplan.tag_mapping",
+  })
+  const {
+    fields: model_color_fields,
+    append: model_color_append,
+    remove: model_color_remove,
+  } = useFieldArray({
+    control,
+    name: "floorplan.model_color",
+  })
+  const {
+    fields: version_color_fields,
+    append: version_color_append,
+    remove: version_color_remove,
+  } = useFieldArray({
+    control,
+    name: "floorplan.version_color",
+  })
+  const {
+    fields: rack_prefix_fields,
+    append: rack_prefix_append,
+    remove: rack_prefix_remove,
+  } = useFieldArray({
+    control,
+    name: "rack.prefix",
+  })
+  const {
+    fields: node_size_fields,
+    append: node_size_append,
+    remove: node_size_remove,
+  } = useFieldArray({
+    control,
+    name: "rack.node_size",
+  })
+
+  const settings_form = [
+    {
+      category: "BMC",
+      fields: [
+        { name: "Username", value: "bmc.username", options: {} },
+        { name: "Password", value: "bmc.password", options: { type: "password" } },
+      ],
+    },
+    {
+      category: "Switches",
+      fields: [
+        { name: "Username", value: "switches.username", options: {} },
+        { name: "Password", value: "switches.password", options: { type: "password" } },
+        { name: "Private Key Path", value: "switches.private_key_path", options: {} },
+      ],
+    },
+    {
+      category: "OpenManage",
+      fields: [
+        { name: "Username", value: "openmange.username", options: {} },
+        { name: "Password", value: "openmange.password", options: { type: "password" } },
+        { name: "Address", value: "openmange.address", options: {} },
+      ],
+    },
+    {
+      category: "Multiple Floorplan Tag Mapping",
+      fields: [
+        { name: "Tag", value: "floorplan.tag_multiple.tag", options: {} },
+        { name: "Color", value: "floorplan.tag_multiple.color", options: {} },
+      ],
+    },
+    {
+      category: "Floorplan Tag Colors",
+      fields: [
+        { name: "Default", value: "floorplan.default_color", options: {} },
+        { name: "Secondary", value: "floorplan.secondary_color", options: {} },
+      ],
+    },
+    {
+      category: "Rack Config",
+      fields: [
+        { name: "Max U", value: "rack.max", options: { type: "number" } },
+        { name: "Min U", value: "rack.min", options: { type: "number" } },
+      ],
+    },
+    {
+      category: "Firmware Versions",
+      fields: firmware_fields,
+      prefix: "bmc.firmware_versions",
+    },
+    {
+      category: "Floorplan Tag Mapping",
+      fields: tag_mapping_fields,
+      prefix: "floorplan.tag_mapping",
+    },
+    {
+      category: "Switch Model Colors",
+      fields: model_color_fields,
+      prefix: "floorplan.model_color",
+    },
+    {
+      category: "Switch Version Color",
+      fields: version_color_fields,
+      prefix: "floorplan.version_color",
+    },
+    {
+      category: "Node Prefixes",
+      fields: rack_prefix_fields,
+      prefix: "rack.prefix",
+    },
+    {
+      category: "Node Sizes",
+      fields: node_size_fields,
+      prefix: "rack.node_size",
+    },
+  ]
 
   const onSubmit = async (data) => {}
   return (
@@ -87,101 +204,45 @@ const Settings = () => {
       </Grid2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid2 container spacing={2}>
-          <Grid2 xs={6}>BMC</Grid2>
-          <Grid2 xs={6}>
-            <Controller
-              name="bmc.username"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="username" />}
-            />
-            <Controller
-              name="bmc.password"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="password" type="password" />}
-            />
-          </Grid2>
-          <Grid2 xs={6}>Switches</Grid2>
-          <Grid2 xs={6}>
-            <Controller
-              name="switches.username"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="username" />}
-            />
-            <Controller
-              name="switches.password"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="password" type="password" />}
-            />
-            <Controller
-              name="switches.private_key_path"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="Private key path" />}
-            />
-          </Grid2>
-          <Grid2 xs={6}>Open Manage Enterprise</Grid2>
-          <Grid2 xs={6}>
-            <Controller
-              name="openmanage.username"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="username" />}
-            />
-            <Controller
-              name="openmanage.password"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="password" type="password" />}
-            />
-            <Controller
-              name="openmanage.address"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="OME address" />}
-            />
-          </Grid2>
-          <Grid2 xs={6}>Dell Warranty API</Grid2>
-          <Grid2 xs={6}>
-            <Controller
-              name="dell_warranty_api.id"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="ID" type="password" />}
-            />
-            <Controller
-              name="dell_warranty_api.secret"
-              control={control}
-              defaultValue=""
-              render={({ field }) => <TextField size="small" {...field} label="Secret" type="password" />}
-            />
-          </Grid2>
-          {firmware_fields.map((item, index) => (
-            <Grid2 xs={12} key={item.id}>
-              <Controller
-                name={`bmc.firmware_versions.${index}.name`}
-                control={control}
-                render={({ field }) => <TextField size="small" {...field} label="Name" />}
-              />
-              <Controller
-                name={`bmc.firmware_versions.${index}.model`}
-                control={control}
-                render={({ field }) => <TextField size="small" {...field} label="Model" />}
-              />
-              <Controller
-                name={`bmc.firmware_versions.${index}.bios`}
-                control={control}
-                render={({ field }) => <TextField size="small" {...field} label="BIOS version" />}
-              />
-              <Controller
-                name={`bmc.firmware_versions.${index}.bmc`}
-                control={control}
-                render={({ field }) => <TextField size="small" {...field} label="BMC version" />}
-              />
-            </Grid2>
+          {settings_form.map((item, index) => (
+            <React.Fragment key={index}>
+              <Grid2 xs={item.prefix ? 12 : 6}>{item.category}</Grid2>
+              <Grid2 xs={item.prefix ? 12 : 6}>
+                {item.fields.map((settings_field, index) => {
+                  if (item.prefix !== undefined) {
+                    // settings in Array
+                    return (
+                      <Grid2 container spacing={2} key={index}>
+                        {Object.keys(settings_field)
+                          .filter((val) => val !== "id")
+                          .map((val) => (
+                            <Grid2 xs={3} key={item.id + "-" + val}>
+                              <Controller
+                                name={`${item.prefix}.${index}.${val}`}
+                                control={control}
+                                render={({ field }) => <TextField size="small" {...field} label={val} fullWidth />}
+                              />
+                            </Grid2>
+                          ))}
+                      </Grid2>
+                    )
+                  } else {
+                    // settings in Object
+                    return (
+                      <Controller
+                        name={settings_field.value}
+                        key={index}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <TextField size="small" {...field} label={settings_field.name} {...settings_field.options} />
+                        )}
+                      />
+                    )
+                  }
+                })}
+              </Grid2>
+            </React.Fragment>
           ))}
         </Grid2>
       </form>
