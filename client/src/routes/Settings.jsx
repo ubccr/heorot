@@ -1,6 +1,7 @@
-import { Button, IconButton, TextField, Typography } from "@mui/material"
+import { Box, Button, Divider, IconButton, TextField, Tooltip, Typography } from "@mui/material"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
 import React, { useContext } from "react"
+import { useMutation, useQuery } from "react-query"
 
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined"
 import BgContainer from "../components/BgContainer"
@@ -9,7 +10,6 @@ import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
 import { PluginContext } from "../contexts/PluginContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
-import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const Settings = () => {
@@ -105,6 +105,7 @@ const Settings = () => {
   const settings_form = [
     {
       category: "BMC",
+      tooltip: "Authentication credentials for node Redfish login",
       fields: [
         { name: "Username", value: "bmc.username", options: {} },
         { name: "Password", value: "bmc.password", options: { type: "password" } },
@@ -112,6 +113,7 @@ const Settings = () => {
     },
     {
       category: "Switches",
+      tooltip: "Authentication credentials for switch SSH login. Private keys can also be used, path must be absolute",
       fields: [
         { name: "Username", value: "switches.username", options: {} },
         { name: "Password", value: "switches.password", options: { type: "password" } },
@@ -120,14 +122,24 @@ const Settings = () => {
     },
     {
       category: "OpenManage",
+      tooltip: "OpenManage Enterprise appliance credentials and host address",
       fields: [
-        { name: "Username", value: "openmange.username", options: {} },
-        { name: "Password", value: "openmange.password", options: { type: "password" } },
-        { name: "Address", value: "openmange.address", options: {} },
+        { name: "Username", value: "openmanage.username", options: {} },
+        { name: "Password", value: "openmanage.password", options: { type: "password" } },
+        { name: "Address", value: "openmanage.address", options: {} },
+      ],
+    },
+    {
+      category: "Warranty API",
+      tooltip: "Dell developer warranty API credentials",
+      fields: [
+        { name: "ID", value: "dell_warranty_api.id", options: { type: "password" } },
+        { name: "Secret", value: "dell_warranty_api.secret", options: { type: "password" } },
       ],
     },
     {
       category: "Multiple Floorplan Tag Mapping",
+      tooltip: "Floorplan color for if a rack has multiple matching tags",
       fields: [
         { name: "Tag", value: "floorplan.tag_multiple.tag", options: {} },
         { name: "Color", value: "floorplan.tag_multiple.color", options: {} },
@@ -135,6 +147,7 @@ const Settings = () => {
     },
     {
       category: "Floorplan Tag Colors",
+      tooltip: "Default floorplan tag colors",
       fields: [
         { name: "Default", value: "floorplan.default_color", options: {} },
         { name: "Secondary", value: "floorplan.secondary_color", options: {} },
@@ -142,13 +155,17 @@ const Settings = () => {
     },
     {
       category: "Rack Config",
+      tooltip: "Size of table rendered in Rack page",
       fields: [
         { name: "Max U", value: "rack.max", options: { type: "number" } },
         { name: "Min U", value: "rack.min", options: { type: "number" } },
       ],
     },
+  ]
+  const settings_form_arr = [
     {
       category: "Firmware Versions",
+      tooltip: "Regex match and firmware versions for nodes rendered in Rack. Set to the latest versions",
       fields: firmware_fields,
       prefix: "bmc.firmware_versions",
       add_fields: firmware_append,
@@ -157,6 +174,7 @@ const Settings = () => {
     },
     {
       category: "Floorplan Tag Mapping",
+      tooltip: 'Match Grendel tags to colors when the "Color" option is selected in Floorplan',
       fields: tag_mapping_fields,
       prefix: "floorplan.tag_mapping",
       add_fields: tag_mapping_append,
@@ -165,6 +183,7 @@ const Settings = () => {
     },
     {
       category: "Switch Model Colors",
+      tooltip: "Regex match and color configuration for switches displayed in Floorplan",
       fields: model_color_fields,
       prefix: "floorplan.model_color",
       add_fields: model_color_append,
@@ -173,6 +192,7 @@ const Settings = () => {
     },
     {
       category: "Switch Version Color",
+      tooltip: "Changes the colors displayed in Floorplan when the display: Switch Version is selected",
       fields: version_color_fields,
       prefix: "floorplan.version_color",
       add_fields: version_color_append,
@@ -181,6 +201,7 @@ const Settings = () => {
     },
     {
       category: "Node Prefixes",
+      tooltip: "Sets the node prefix used for different node types",
       fields: rack_prefix_fields,
       prefix: "rack.prefix",
       add_fields: rack_prefix_append,
@@ -189,6 +210,7 @@ const Settings = () => {
     },
     {
       category: "Node Sizes",
+      tooltip: "Sets how nodes are rendered in the Rack view when their API is reachable",
       fields: node_size_fields,
       prefix: "rack.node_size",
       add_fields: node_size_append,
@@ -197,13 +219,36 @@ const Settings = () => {
     },
   ]
 
-  const onSubmit = async (data) => {}
+  const mutation = useMutation({
+    mutationFn: (data) => {
+      let payload = {
+        method: "POST",
+        headers: {
+          "x-access-token": user.accessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+      return fetch(`${apiConfig.apiUrl}/client/v1/settings`, payload)
+    },
+    onError: async (error, variables, context) => {
+      let error_json = await error.json()
+      enqueueSnackbar(error_json.message, { variant: "error" })
+      console.error(error_json.error)
+    },
+    onSuccess: async (data, variables, context) => {
+      let data_json = await data.json()
+      enqueueSnackbar(data_json.message, { variant: "success" })
+    },
+  })
+  const onSubmit = async (data) => {
+    mutation.mutate(data)
+  }
   return (
     <BgContainer>
-      <div>Settings</div>
-      <Grid2 container spacing={2}>
+      <Grid2 container spacing={2} sx={{ marginTop: "20px" }}>
         <Grid2 xs={6} sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography>Heorot version: {plugins.version}</Typography>
+          <Typography fontSize={18}>Heorot version: {plugins.version}</Typography>
         </Grid2>
         <Grid2 xs={6} sx={{ display: "flex", justifyContent: "center" }}>
           <Button variant="outlined" size="small" onClick={() => query_updates.refetch()}>
@@ -222,57 +267,78 @@ const Settings = () => {
           </>
         )}
       </Grid2>
+      <Divider sx={{ marginTop: "20px", marginBottom: "20px" }} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid2 container spacing={2}>
+          <Grid2
+            xs={12}
+            sx={{ display: "flex", margin: "20px", justifyContent: "space-between", alignItems: "center" }}
+          >
+            <Typography variant="h2" fontSize={22}>
+              Application Settings:
+            </Typography>
+            <Box sx={{ display: "flex", gap: "5px" }}>
+              <Button variant="outlined" size="small" type="submit">
+                Submit
+              </Button>
+              <Button variant="outlined" size="small" color="warning" onClick={() => reset()}>
+                Reset
+              </Button>
+            </Box>
+          </Grid2>
           {settings_form.map((item, index) => (
             <React.Fragment key={index}>
-              <Grid2 xs={item.prefix ? 12 : 6}>
-                {item.category}
-                {item.prefix && (
-                  <IconButton onClick={() => item.add_fields(item.contains)}>
-                    <AddOutlinedIcon />
-                  </IconButton>
-                )}
+              <Grid2 xs={6}>
+                <Tooltip title={item.tooltip} placement="bottom">
+                  <Typography>{item.category}</Typography>
+                </Tooltip>
               </Grid2>
-              <Grid2 xs={item.prefix ? 12 : 6}>
-                {item.fields.map((settings_field, index) => {
-                  if (item.prefix !== undefined) {
-                    // settings in Array
-                    return (
-                      <Grid2 container spacing={2} key={settings_field.id}>
-                        {Object.keys(settings_field)
-                          .filter((val) => val !== "id")
-                          .map((val) => (
-                            <Grid2 xs={2} key={item.id + "-" + val}>
-                              <Controller
-                                name={`${item.prefix}.${index}.${val}`}
-                                control={control}
-                                render={({ field }) => <TextField size="small" {...field} label={val} fullWidth />}
-                              />
-                            </Grid2>
-                          ))}
-                        <Grid2 xs={2}>
-                          <IconButton onClick={() => item.remove_fields(index)}>
-                            <CloseOutlinedIcon />
-                          </IconButton>
+              <Grid2 xs={6}>
+                {item.fields.map((settings_field, index) => (
+                  <Controller
+                    name={settings_field.value}
+                    key={index}
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <TextField size="small" {...field} label={settings_field.name} {...settings_field.options} />
+                    )}
+                  />
+                ))}
+              </Grid2>
+            </React.Fragment>
+          ))}
+          {settings_form_arr.map((item, index) => (
+            <React.Fragment key={index}>
+              <Grid2 xs={12}>
+                <Tooltip title={item.tooltip} placement="bottom">
+                  <Typography>{item.category}</Typography>
+                </Tooltip>
+                <IconButton onClick={() => item.add_fields(item.contains)}>
+                  <AddOutlinedIcon />
+                </IconButton>
+              </Grid2>
+              <Grid2 xs={12}>
+                {item.fields.map((settings_field, index) => (
+                  <Grid2 container spacing={2} key={settings_field.id}>
+                    {Object.keys(settings_field)
+                      .filter((val) => val !== "id")
+                      .map((val) => (
+                        <Grid2 key={item.id + "-" + val}>
+                          <Controller
+                            name={`${item.prefix}.${index}.${val}`}
+                            control={control}
+                            render={({ field }) => <TextField size="small" {...field} label={val} fullWidth />}
+                          />
                         </Grid2>
-                      </Grid2>
-                    )
-                  } else {
-                    // settings in Object
-                    return (
-                      <Controller
-                        name={settings_field.value}
-                        key={index}
-                        control={control}
-                        defaultValue=""
-                        render={({ field }) => (
-                          <TextField size="small" {...field} label={settings_field.name} {...settings_field.options} />
-                        )}
-                      />
-                    )
-                  }
-                })}
+                      ))}
+                    <Grid2>
+                      <IconButton onClick={() => item.remove_fields(index)}>
+                        <CloseOutlinedIcon />
+                      </IconButton>
+                    </Grid2>
+                  </Grid2>
+                ))}
               </Grid2>
             </React.Fragment>
           ))}
