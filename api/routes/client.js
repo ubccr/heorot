@@ -9,6 +9,7 @@ const Switches = require("../models/Switches")
 const Nodes = require("../models/Nodes")
 const { fetch_node } = require("../modules/nodes")
 const Settings = require("../models/Settings")
+const bcrypt = require("bcryptjs")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -157,18 +158,40 @@ app.post("/v1/notes", async (req, res) => {
 })
 
 app.get("/v1/settings", async (req, res) => {
-  let query = await Settings.find({}, { _id: 0, __v: 0 })
+  let query = await Settings.find(
+    {},
+    {
+      _id: 0,
+      __v: 0,
+      "bmc.password": 0,
+      "switches.password": 0,
+      "openmanage.password": 0,
+      "dell_warranty_api.secret": 0,
+    }
+  )
   res.json(query)
 })
-// app.post("/v1/settings", async (req, res) => {
-/*
+app.post("/v1/settings", async (req, res) => {
+  /*
   body: {
-    new: { updated Settings model },
-    previous: { old Settings model },
+    { updated Settings model },
   }
 */
-// let query_verify = await Settings.find({}, { _id: 0, __v: 0 })
-// let query_update = await Settings.findOneAndUpdate({}, req.body)
-// })
+  req.body.bmc.password = req.body.bmc.password !== "" ? bcrypt.hashSync(req.body.bmc.password, 10) : undefined
+  req.body.switches.password =
+    req.body.switches.password !== "" ? bcrypt.hashSync(req.body.switches.password, 10) : undefined
+  req.body.openmanage.password =
+    req.body.openmanage.password !== "" ? bcrypt.hashSync(req.body.openmanage.password, 10) : undefined
+  req.body.dell_warranty_api.id =
+    req.body.dell_warranty_api.id !== "" ? bcrypt.hashSync(req.body.dell_warranty_api.id, 10) : undefined
+  req.body.dell_warranty_api.secret =
+    req.body.dell_warranty_api.secret !== "" ? bcrypt.hashSync(req.body.dell_warranty_api.secret, 10) : undefined
+
+  console.log(req.body)
+  let db_res = await Settings.updateOne({}, req.body)
+  if (db_res.acknowledged === true && db_res.matchedCount === 1)
+    res.json({ status: "success", message: `Successfully saved settings` })
+  else res.status(400).json({ status: "error", message: "Error saving to DB", error: db_res })
+})
 
 module.exports = app
