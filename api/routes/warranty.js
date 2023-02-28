@@ -118,7 +118,6 @@ app.get("/get/:node", async (req, res) => {
       })
     } else {
       if (node !== null) {
-        console.log(node)
         let result = {}
         node.entitlements.forEach((val, index) => {
           if (val.serviceLevelCode === "ND" || val.serviceLevelCode === "P+") {

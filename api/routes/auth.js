@@ -59,7 +59,7 @@ app.post("/signin", async (req, res) => {
   // TODO: Handle query errors
   if (query !== null) {
     if (bcrypt.compareSync(password, query.password)) {
-      let token = jwt.sign({ id: query.id }, config.auth.API_JWT_SECRET, {
+      let token = jwt.sign({ id: query.id }, config.settings.jwt_secret, {
         expiresIn: 28800, // 8 hours
       })
       res.send({

@@ -6,18 +6,18 @@ let config = require("../config")
 const agent = new https.Agent({
   rejectUnauthorized: false,
 })
-const encoded = Buffer.from(config.bmc.DELL_USER + ":" + config.bmc.DELL_PASS).toString("base64")
-const auth = "Basic " + encoded
-const header = {
-  headers: {
-    method: "GET",
-    Authorization: auth,
-    credentials: "include",
-  },
-  agent,
-}
 
 async function biosApi(node) {
+  const encoded = Buffer.from(config.settings.bmc.username + ":" + config.settings.bmc.password).toString("base64")
+  const auth = "Basic " + encoded
+  const header = {
+    headers: {
+      method: "GET",
+      Authorization: auth,
+      credentials: "include",
+    },
+    agent,
+  }
   const api_url = "https://" + node + "/redfish/v1/Systems/System.Embedded.1/Bios"
 
   try {
@@ -45,7 +45,8 @@ async function biosApi(node) {
     return {
       status: "error",
       message: "BIOS API error",
-      error: error.message,
+      node: api_url,
+      error: error,
     }
   }
 }

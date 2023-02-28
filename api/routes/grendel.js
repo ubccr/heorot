@@ -127,7 +127,7 @@ app.delete("/image/delete/:nodeset", async (req, res) => {
 app.get("/firmware/list", async (req, res) => {
   res.json({
     status: "success",
-    result: config.firmware,
+    result: config.settings.boot_firmware,
   })
 })
 
