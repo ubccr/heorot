@@ -27,7 +27,7 @@ services:
         target: /usr/src/app/
     links:
       - mongodb
-    restart: always
+    restart: unless-stopped
   heorot-client:
     build:
       context: ../client
@@ -40,5 +40,6 @@ services:
         target: /usr/src/app/
     links:
       - heorot-api
+    restart: unless-stopped
 volumes:
   mongodb_data:
