@@ -195,6 +195,7 @@ const dell_query = async (auth) => {
           type: val.MediaType,
           name: val.Name,
           model: val.Model,
+          form_factor: val.Oem?.Dell?.DellPhysicalDisk?.DriveFormFactor ?? "",
           manufacturer: val.Manufacturer,
           description: val.Description,
           serial_number: val.SerialNumber,

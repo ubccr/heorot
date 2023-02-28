@@ -1,7 +1,7 @@
 const { api_request } = require("./redfish")
 
 async function dell_resetNode(uri, token, pxe) {
-  if (pxe) {
+  if (pxe === "true") {
     const pxe_url = uri + "/redfish/v1/Systems/System.Embedded.1"
     const pxe_body = JSON.stringify({ Boot: { BootSourceOverrideTarget: "Pxe" } })
     let pxe_res = await api_request(pxe_url, token, "PATCH", false, pxe_body)
@@ -14,7 +14,7 @@ async function dell_resetNode(uri, token, pxe) {
   }
 
   const reset_url = uri + "/redfish/v1/Systems/System.Embedded.1/Actions/ComputerSystem.Reset"
-  const reset_body = JSON.stringify({ ResetType: "PowerCycle" })
+  const reset_body = JSON.stringify({ ResetType: "ForceRestart" })
   let reset_res = await api_request(reset_url, token, "POST", false, reset_body)
   if (reset_res.data.status === 204) {
     return {

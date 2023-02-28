@@ -14,11 +14,12 @@ import Home from "./routes/Home"
 import Login from "./routes/Auth/Login"
 import ManageSwitches from "./routes/Admin/ManageSwitches"
 import ManageUsers from "./routes/Admin/ManageUsers"
-import Node from "./routes/Node/Index"
+import Node from "./routes/Node"
 import { PluginContext } from "./contexts/PluginContext"
 import PrivateRoute from "./components/PrivateRoute"
 import Profile from "./routes/Profile/Profile"
 import Rack from "./routes/Rack"
+import Settings from "./routes/Settings"
 import Signup from "./routes/Auth/Signup"
 import { SnackbarProvider } from "notistack"
 import { ThemeContext } from "./contexts/ThemeContext"
@@ -232,6 +233,14 @@ function App() {
                           element={
                             <PrivateRoute access="none">
                               <Profile />{" "}
+                            </PrivateRoute>
+                          }
+                        />
+                        <Route
+                          path="/Settings"
+                          element={
+                            <PrivateRoute access="admin">
+                              <Settings />{" "}
                             </PrivateRoute>
                           }
                         />

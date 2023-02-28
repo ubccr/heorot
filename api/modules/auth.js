@@ -10,7 +10,7 @@ function auth(req, res, next) {
     if (!token) {
       return res.status(403).send({ status: "error", message: "No auth token provided" })
     }
-    jwt.verify(token, config.auth.API_JWT_SECRET, async (err, decoded) => {
+    jwt.verify(token, config.settings.jwt_secret, async (err, decoded) => {
       if (err) {
         return res.status(401).send({
           status: "error",

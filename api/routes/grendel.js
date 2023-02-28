@@ -8,7 +8,7 @@ const { grendelRequest } = require("../modules/grendel")
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/grendel" + element.route.path)
   })
   res.json({
     status: "success",
@@ -30,10 +30,37 @@ app.get("/host/tags/:tags", async (req, res) => {
 })
 
 app.post("/host", async (req, res) => {
+  /*
+  body: [
+    {
+        "name": "ut dolor nostrud",
+        "id": "deserunt Excepteur proident",
+        "provision": true,
+        "firmware": "magna sit fugiat",
+        "boot_image": "irure consectetur ipsum tempor",
+        "interfaces": [
+            {
+                "mac": "in ipsum dolore ex",
+                "name": "sunt dolore minim",
+                "ip": "aliqua dolor aliquip",
+                "fqdn": "consectetur",
+                "bmc": false
+            },
+            {
+                "mac": "magna ipsum ",
+                "name": "exercitation",
+                "ip": "sint",
+                "fqdn": "non eu dolore occaecat",
+                "bmc": false
+            }
+        ]
+    },
+  ]
+  */
   // IP address check:
   if (typeof req.body === "object" && req.body.length > 0) {
     let tmp = req.body.map((val) => {
-      return val.interfaces.every((iface) => iface.ip.match("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"))
+      return val.interfaces?.every((iface) => iface.ip.match("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}/[0-9]{1,2}"))
     })
     if (tmp.every((val) => val)) res.json(await grendelRequest(`/v1/host`, "POST", req.body))
     else res.json({ status: "error", message: "Interface IP address is invalid or missing" })
@@ -73,6 +100,22 @@ app.get("/image/find/:nodeset", async (req, res) => {
   res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`))
 })
 app.post("/image", async (req, res) => {
+  /*
+  body: [
+    {
+        "name": "non cillum veniam",
+        "id": "ex dolore",
+        "kernel": "ex in laboris voluptate ut",
+        "initrd": [
+            "est fugiat pariatur voluptate",
+            "in"
+        ],
+        "liveimg": "ullamco in laboris ea",
+        "cmdline": "ut Excepteur",
+        "verify": false
+    },
+  ]
+  */
   res.json(await grendelRequest(`/v1/bootimage`, "POST", req.body))
 })
 app.delete("/image/delete/:nodeset", async (req, res) => {
@@ -80,76 +123,12 @@ app.delete("/image/delete/:nodeset", async (req, res) => {
   res.json(await grendelRequest(`/v1/bootimage/find/${nodeset}`, "DELETE"))
 })
 
+// --- misc ---
 app.get("/firmware/list", async (req, res) => {
   res.json({
     status: "success",
-    result: config.firmware,
+    result: config.settings.boot_firmware,
   })
-})
-
-// app.get("/status/:value/:tags?", async (req, res) => {
-//   let tags = req.params.tags === undefined ? "" : req.params.tags
-//   let args = ["status"]
-
-//   if (req.params.value === "nodes") args.push("nodes", `${tags}`)
-//   else if (req.params.value === "long") args.push("nodes", `${tags}`, "--long")
-//   else args.push(`${tags}`)
-
-//   const status = spawn("grendel", args)
-//   let stdout = "",
-//     stderr = "",
-//     error = ""
-
-//   status.stdout.on("data", (data) => {
-//     stdout += data
-//   })
-//   status.stderr.on("data", (data) => {
-//     stderr += data
-//   })
-//   status.on("error", (err) => {
-//     error = err
-//     res.json({
-//       status: "error",
-//       message: err,
-//     })
-//   })
-//   status.on("close", (code) => {
-//     if (stderr === "" && error === "") {
-//       res.json({
-//         status: "success",
-//         result: stdout,
-//       })
-//     } else {
-//       res.json({
-//         status: "error",
-//         message: `Issue fetching grendel status: ${stderr}`,
-//       })
-//     }
-//   })
-// })
-
-app.post("/edit", async (req, res) => {
-  const nodeset = req.body.nodeset
-  const action = req.body.action
-  const value = req.body.value
-
-  let originalJSON = await grendelRequest(`/v1/host/find/${nodeset}`)
-
-  if (originalJSON.status !== "error") {
-    let updatedJSON = originalJSON.result.map((val, index) => {
-      if (action === "firmware") val.firmware = value
-      else if (action === "image") val.boot_image = value
-      return val
-    })
-
-    let updateNode = await grendelRequest(`/v1/host`, "POST", updatedJSON)
-    res.json(updateNode)
-  } else {
-    res.json({
-      status: "error",
-      message: originalJSON.result.message,
-    })
-  }
 })
 
 module.exports = app

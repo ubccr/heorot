@@ -10,7 +10,7 @@ const { grendelRequest } = require("../modules/grendel")
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/switches" + element.route.path)
   })
   res.json({
     status: "success",
@@ -86,18 +86,18 @@ app.get("/v1/refetchAll", async (req, res) => {
   } else res.json(grendelRes)
 })
 
-app.get("/v1/allSwitches", async (req, res) => {
-  let switchesQuery = await Cache.find({ node: /^swe/ })
-  if (switchesQuery !== null) {
-    let tmp = switchesQuery
-      .map((val) => {
-        if (val.cache.status !== "error")
-          return { node: val.node, status: val.cache.status, info: val.cache.info, result: val.cache.result[0] }
-      })
-      .filter(Boolean)
+// app.get("/v1/allSwitches", async (req, res) => {
+//   let switchesQuery = await Cache.find({ node: /^swe/ })
+//   if (switchesQuery !== null) {
+//     let tmp = switchesQuery
+//       .map((val) => {
+//         if (val.cache.status !== "error")
+//           return { node: val.node, status: val.cache.status, info: val.cache.info, result: val.cache.result[0] }
+//       })
+//       .filter(Boolean)
 
-    res.json({ status: "success", result: tmp })
-  } else res.json({ status: "error", message: "Failed to load cached switches from the DB", silent: true })
-})
+//     res.json({ status: "success", result: tmp })
+//   } else res.json({ status: "error", message: "Failed to load cached switches from the DB", silent: true })
+// })
 
 module.exports = app

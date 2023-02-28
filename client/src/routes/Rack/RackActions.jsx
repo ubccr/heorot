@@ -69,7 +69,7 @@ const RackActions = ({ nodes }) => {
     ["rackActionsRedfishQuery", nodes, nodeAction, pxe],
     async ({ signal }) => {
       let url = `${apiConfig.apiUrl}/redfish/v1/${nodeAction}/${nodes}`
-      if (nodeAction === "resetNode") url += `/${pxe}`
+      if (nodeAction === "resetNode") url += `/${pxe ? "true" : "false"}`
       let payload = {
         method: "PUT",
         headers: {
@@ -167,6 +167,7 @@ const RackActions = ({ nodes }) => {
                 variant="outlined"
                 size="small"
                 fullWidth
+                MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
               >
                 {image_query.data.result.map((val, index) => {
                   return (
@@ -185,7 +186,7 @@ const RackActions = ({ nodes }) => {
           </Grid>
           <Grid item xs={12}>
             <Divider />
-            {redfish_query.isFetching && <LinearProgress color="primary" fullWidth />}
+            {redfish_query.isFetching && <LinearProgress color="primary" />}
           </Grid>
           <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", gap: "5px" }}>
             <Button variant="outlined" onClick={() => handleNodeAction("clearSel")}>
@@ -205,7 +206,7 @@ const RackActions = ({ nodes }) => {
         <DialogContent>{nodes}</DialogContent>
         <DialogActions>
           <FormControlLabel
-            control={<Checkbox value={pxe} onClick={(event) => setPxe(!event.target.value)} />}
+            control={<Checkbox value={pxe} onClick={(event) => setPxe(!pxe)} />}
             label="PXE boot"
             sx={{ marginLeft: "5px" }}
           />

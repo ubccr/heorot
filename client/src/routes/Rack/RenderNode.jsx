@@ -95,7 +95,7 @@ const Node = ({ node }) => {
 
                   if (val.speed === 100000) {
                     bColor = "info"
-                    speed = "100GbE"
+                    speed = "100 GbE"
                   } else if (val.speed === 40000) {
                     bColor = "error"
                     speed = "40 GbE"

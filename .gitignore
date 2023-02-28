@@ -2,6 +2,7 @@
 node_modules
 
 *.key
+*.pub
 *.cert
 
 config.js

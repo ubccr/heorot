@@ -3,8 +3,8 @@ const { fetch_node } = require("./nodes.js")
 
 const rackGen = async (grendel, rackArr, refetch) => {
   // find all nodes with matching rack name and send redfish requests
-  let node_prefix = config.rack.prefix.find((val) => val.type === "node")?.prefix ?? []
-  if (node_prefix.length === 0) console.error("Could not map array: 'config.rack.prefix' to a type of node")
+  let node_prefix = config.settings.rack.prefix.find((val) => val.type === "node")?.prefix ?? []
+  if (node_prefix.length === 0) console.error("Could not map array: 'config.settings.rack.prefix' to a type of node")
 
   let nodes_arr = grendel.result.filter((val) => node_prefix.includes(val.name.split("-")[0]))
   let redfish_arr = await Promise.all(nodes_arr.map((val) => fetch_node(val.name, refetch)))
@@ -12,8 +12,8 @@ const rackGen = async (grendel, rackArr, refetch) => {
   // loop through arr generated in routes/client.js
   return rackArr.map((val) => {
     // get all nodes matching the same u that are not pdus
-    let pdu_prefix = config.rack.prefix.find((val) => val.type === "pdu")?.prefix ?? []
-    if (node_prefix.length === 0) console.error("Could not map array: 'config.rack.prefix' to a type of pdu")
+    let pdu_prefix = config.settings.rack.prefix.find((val) => val.type === "pdu")?.prefix ?? []
+    if (node_prefix.length === 0) console.error("Could not map array: 'config.settings.rack.prefix' to a type of pdu")
 
     let node = grendel.result.filter(
       (n) => parseInt(n.name.split("-")[2]) === val.u && !pdu_prefix.includes(n.name.split("-")[0])
@@ -26,7 +26,7 @@ const rackGen = async (grendel, rackArr, refetch) => {
         let nodeset = n.name.split("-")
 
         // set type from config file
-        config.rack.prefix.forEach((p) => {
+        config.settings.rack.prefix.forEach((p) => {
           val.type = p.prefix.includes(nodeset[0]) ? p.type : val.type
         })
         // get redfish query based on node name
@@ -35,7 +35,7 @@ const rackGen = async (grendel, rackArr, refetch) => {
         // get latest firmware versions
         let latest_bios = ""
         let latest_bmc = ""
-        config.bmc.firmware_versions.forEach((val) => {
+        config.settings.bmc.firmware_versions.forEach((val) => {
           if (redfish_output?.redfish.model?.match(val.model)) {
             latest_bios = val.bios
             latest_bmc = val.bmc
@@ -59,7 +59,7 @@ const rackGen = async (grendel, rackArr, refetch) => {
       // try to calculate height and width from model name
       if (node_output[0].redfish !== undefined) {
         let node_model = node_output[0].redfish.model ?? ""
-        config.rack.node_size.forEach((size) => {
+        config.settings.rack.node_size.forEach((size) => {
           size.models.forEach((models) => {
             if (node_model.match(models)) {
               height = size.height
@@ -89,8 +89,8 @@ const rackGen = async (grendel, rackArr, refetch) => {
 }
 
 function floorplan(grendel_query, switch_query) {
-  const floorX = config.floorplan.floorX
-  const floorY = config.floorplan.floorY
+  const floorX = config.settings.floorplan.floorX
+  const floorY = config.settings.floorplan.floorY
   let nodes = new Map()
   let switches = new Map()
 
@@ -123,14 +123,14 @@ function floorplan(grendel_query, switch_query) {
         slurm: compareTags(rackArr),
         node_count: nodeCounts.node_count,
         u_count: nodeCounts.u_count,
-        nodes_color: config.floorplan.color_mapping.default_color,
-        default_color: config.floorplan.color_mapping.default_color,
+        nodes_color: config.settings.floorplan.default_color,
+        default_color: config.settings.floorplan.default_color,
         switchInfo,
       })
     })
   })
 
-  return { status: "success", config: config.floorplan, result: floorplan }
+  return { status: "success", config: config.settings.floorplan, result: floorplan }
 }
 
 // Local functions:
@@ -161,7 +161,7 @@ const nodeCount = (arr) => {
 const compareTags = (arr) => {
   let output = {
     partition: "",
-    color: config.floorplan.color_mapping.secondary_color,
+    color: config.settings.floorplan.secondary_color,
   }
   let tags = new Set()
   if (arr !== undefined && arr.length > 0) {
@@ -169,13 +169,13 @@ const compareTags = (arr) => {
       if (val.tags !== null) val.tags.forEach((tag) => tags.add(tag))
     })
 
-    config.floorplan.tag_mapping.forEach((val) => {
+    config.settings.floorplan.tag_mapping.forEach((val) => {
       if (tags.has(val.tag) && output.partition === "") {
         output.partition = val.tag
         output.color = val.color
       } else if (tags.has(val.tag) && output.partition !== "") {
-        output.partition = config.floorplan.tag_multiple.tag
-        output.color = config.floorplan.tag_multiple.color
+        output.partition = config.settings.floorplan.tag_multiple.tag
+        output.color = config.settings.floorplan.tag_multiple.color
       }
     })
   }
@@ -186,11 +186,11 @@ const compareTags = (arr) => {
 const swDisplay = (switches) => {
   let output = {
     sw_models: [],
-    sw_models_color: config.floorplan.color_mapping.default_color,
+    sw_models_color: config.settings.floorplan.default_color,
     sw_versions: [],
-    sw_versions_color: config.floorplan.color_mapping.default_color,
+    sw_versions_color: config.settings.floorplan.default_color,
     sw_ratios: [],
-    sw_ratios_color: config.floorplan.color_mapping.default_color,
+    sw_ratios_color: config.settings.floorplan.default_color,
   }
   let tmpModels = []
   let tmpVersions = []
@@ -203,15 +203,15 @@ const swDisplay = (switches) => {
       tmpRatios.push(val.info.active_oversubscription)
     })
     // model color mapping | based on if a switch model is present in the rack
-    let tmpModelColor = config.floorplan.color_mapping.secondary_color
-    config.floorplan.color_mapping.model_color.forEach((val) => {
+    let tmpModelColor = config.settings.floorplan.secondary_color
+    config.settings.floorplan.model_color.forEach((val) => {
       if (tmpModels.find((x) => x.match(val.model))) tmpModelColor = val.color
     })
     output.sw_models_color = tmpModelColor
 
     // Version color mapping
-    let tmpVersionColor = config.floorplan.color_mapping.secondary_color
-    config.floorplan.color_mapping.version_color.forEach((val) => {
+    let tmpVersionColor = config.settings.floorplan.secondary_color
+    config.settings.floorplan.version_color.forEach((val) => {
       if (tmpVersions.find((x) => x.match(val.version))) tmpVersionColor = val.color
     })
     output.sw_versions_color = tmpVersionColor

@@ -1,0 +1,28 @@
+# Example file for the REST client VSCode plugin, useful for debugging or writing redfish API requests
+POST https://{bmc ip / hostname}/redfish/v1/SessionService/Sessions HTTP/1.1
+Content-Type: application/json
+
+{
+    "UserName": "",
+    "Password": ""
+}
+
+### Use returned X-Auth-Token for future queries or use base64 encoded Authorization header
+GET https://{bmc ip / hostname}/redfish/v1/ HTTP/1.1
+X-Auth-Token: blah
+# or: Authorization: Basic username:password
+
+
+### Example fix for Bad Request error
+PATCH https://{bmc ip}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes HTTP/1.1
+Content-Type: application/json
+Authorization: Basic username:password
+
+{
+    "Attributes": {
+        "NIC.1.DNSDomainFromDHCP": "Disabled",
+        "NIC.1.DNSDomainNameFromDHCP": "Disabled",
+        "NIC.1.DNSDomainName": "enter domain name here",
+        "NIC.1.DNSRacName": "bmc-z01-01"
+    }
+}

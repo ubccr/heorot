@@ -205,6 +205,8 @@ const ImportNodes = () => {
               ifname: "",
               fqdn: fqdn,
               bmc: bmc,
+              vlan: "",
+              mtu: 1500,
             }
           })
           if (ifaces.length === 0) {
@@ -214,6 +216,8 @@ const ImportNodes = () => {
               ifname: "",
               fqdn: `${map[0][0]}.${form.domain}`,
               bmc: false,
+              vlan: "",
+              mtu: 1500,
             })
           }
 

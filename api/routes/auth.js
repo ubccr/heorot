@@ -10,7 +10,7 @@ const auth = require("../modules/auth")
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/auth" + element.route.path)
   })
   res.json({
     status: "success",
@@ -59,7 +59,7 @@ app.post("/signin", async (req, res) => {
   // TODO: Handle query errors
   if (query !== null) {
     if (bcrypt.compareSync(password, query.password)) {
-      let token = jwt.sign({ id: query.id }, config.auth.API_JWT_SECRET, {
+      let token = jwt.sign({ id: query.id }, config.settings.jwt_secret, {
         expiresIn: 28800, // 8 hours
       })
       res.send({

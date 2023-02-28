@@ -27,7 +27,7 @@ const AddNode = () => {
   const [step, setStep] = useState(0)
   const [ifaces, setIfaces] = useState([])
   const [options, setOptions] = useState(initialOptions)
-  const newIface = { name: "", fqdn: "", ip: "", mac: "", bmc: false }
+  const newIface = { name: "", fqdn: "", ip: "", mac: "", bmc: false, vlan: "1", mtu: 1500 }
 
   const addNodeQuery = useQuery(
     "addNode",

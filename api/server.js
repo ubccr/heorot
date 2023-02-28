@@ -35,8 +35,6 @@ app.use("/client", auth, clientRouter)
 
 const redfishRouter = require("./routes/redfish.js")
 app.use("/redfish", auth, redfishRouter)
-const nodesRouter = require("./routes/nodes.js")
-app.use("/nodes", auth, nodesRouter)
 
 const grendelRouter = require("./routes/grendel.js")
 app.use("/grendel", auth, grendelRouter)
@@ -54,10 +52,10 @@ app.get("/plugins", async function (req, res) {
   let warranty,
     ome,
     bmc = false
-  if (config.auth.WARRANTY_API_ID !== "") warranty = true
-  if (config.ome.url !== "") ome = true
-  if (config.bmc.DELL_USER !== "") bmc = true
-  let floorplan = config.floorplan
+  if (config.settings.dell_warranty_api.id !== "") warranty = true
+  if (config.settings.openmanage.address !== "") ome = true
+  if (config.settings.bmc.username !== "") bmc = true
+  let floorplan = config.settings.floorplan
 
   res.json({
     status: "success",
@@ -65,7 +63,8 @@ app.get("/plugins", async function (req, res) {
     ome,
     bmc,
     floorplan,
-    node_prefixes: config.rack.prefix.find((val) => val.type === "node")?.prefix ?? ["cpn", "srv"],
+    node_prefixes: config.settings.rack.prefix.find((val) => val.type === "node")?.prefix ?? ["cpn", "srv"],
+    version: process.env.npm_package_version,
   })
 })
 
@@ -76,17 +75,16 @@ const io = require("socket.io")(Server, {
 const SSHClient = require("ssh2").Client
 io.on("connection", function (socket) {
   socket.on("auth", function (token) {
-    jwt.verify(token, config.auth.API_JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, config.settings.jwt_secret, (err, decoded) => {
       if (!err) {
         socket.emit("auth", "authenticated")
         socket.on("node", function (data) {
-          nodeAddr = data
           let SSHConnection = {
-            host: nodeAddr,
+            host: data,
             port: 22,
-            username: config.bmc.DELL_USER,
+            username: config.settings.bmc.username,
             tryKeyboard: true,
-            password: config.bmc.DELL_PASS,
+            password: config.settings.bmc.password,
             // privateKey: fs.readFileSync("./keys/bmc.key"),
             algorithms: {
               kex: [
@@ -107,6 +105,13 @@ io.on("connection", function (socket) {
               ],
             },
           }
+
+          if (data.split("-")[0] === "swe") {
+            SSHConnection.username = config.settings.switches.username
+            SSHConnection.password = config.settings.switches.password
+            SSHConnection.privateKey = fs.readFileSync(config.settings.switches.private_key_path)
+          }
+
           var conn = new SSHClient()
           conn
             .on("ready", function () {
@@ -132,7 +137,7 @@ io.on("connection", function (socket) {
               })
             })
             .on("keyboard-interactive", function (name, instr, lang, prompts, cb) {
-              if (prompts[0].prompt === "Password: ") cb([config.bmc.DELL_PASS])
+              if (prompts[0].prompt === "Password: ") cb([config.settings.bmc.password])
             })
             .on("close", function () {
               socket.emit("data", "\r\n Disconnected from SSH Session \r\n")

@@ -5,11 +5,16 @@ const { grendelRequest } = require("../modules/grendel")
 const { rackGen, floorplan } = require("../modules/client")
 const config = require("../config")
 const Switches = require("../models/Switches")
+const Nodes = require("../models/Nodes")
+const { fetch_node } = require("../modules/nodes")
+const Settings = require("../models/Settings")
+const { encrypt, decrypt } = require("../modules/encryption")
+const { syncDBSettings } = require("../modules/db")
 
 app.get("/", (req, res) => {
   let routes = []
   app.stack.forEach((element) => {
-    routes.push(element.route.path)
+    routes.push("/client" + element.route.path)
   })
   res.json({
     status: "success",
@@ -43,7 +48,7 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
   // let grendel_res = grendel_res_all.result.filter((node) => node.name.split("-")[1] === rack)
 
   let rackArr = []
-  for (let x = config.rack.min; x <= config.rack.max; x++) {
+  for (let x = config.settings.rack.min; x <= config.settings.rack.max; x++) {
     rackArr[x] = {
       u: x,
       type: "",
@@ -78,31 +83,45 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
   })
 })
 
-app.get("/node/:node", async (req, res) => {
+app.get("/v1/node/:node/:refresh?", async (req, res) => {
   const node = req.params.node
-  let result = []
+  const refresh = req.params.refresh ?? "false"
+
   let rack = node.split("-")[1] ?? ""
   let nodeRes = await grendelRequest(`/v1/host/find/${node}`)
   let rack_res = await grendelRequest(`/v1/host/tags/${rack}`)
+  let boot_image_res = await grendelRequest(`/v1/bootimage/list`)
+  let boot_image_list = boot_image_res.status === "success" ? boot_image_res.result : []
 
   if (nodeRes.status === "success" && nodeRes.result.length > 0 && rack_res.status === "success") {
     let nodeList = rack_res.result.map((val) => val.name).sort((a, b) => a.split("-")[2] - b.split("-")[2])
     let prevNode = nodeList.indexOf(node) < nodeList.length - 1 ? nodeList[nodeList.indexOf(node) + 1] : nodeList[0]
     let nextNode = nodeList.indexOf(node) > 0 ? nodeList[nodeList.indexOf(node) - 1] : nodeList[nodeList.length - 1]
-    let nodes = nodeRes.result
-    nodes.forEach((element) => {
-      result.push(element)
-    })
+    let message = undefined
+    if (nodeRes.result.length > 1) {
+      message = "Warning: More than one node with matching name found."
+      nodeRes.result.forEach((node) => (message += ` id: ${node.id}`))
+    }
     let bmcPlugin = false
-    if (config.bmc.DELL_USER !== "") bmcPlugin = true
+    if (config.settings.bmc.username !== "") bmcPlugin = true
+
+    if (refresh === "true") await fetch_node(node, refresh)
+
+    let dbRequest = await Nodes.findOne({ node: node })
 
     res.json({
       status: "success",
       node: node,
       previous_node: prevNode,
       next_node: nextNode,
-      result: result,
-      bmc: bmcPlugin,
+      result: nodeRes.result[0],
+      redfish: dbRequest?.redfish,
+      warranty: dbRequest?.warranty,
+      notes: dbRequest?.notes ?? "",
+      firmware_options: config.settings.boot_firmware,
+      boot_image_options: boot_image_list,
+      message: message,
+      bmc_plugin: bmcPlugin,
     })
   } else {
     res.json({
@@ -111,6 +130,79 @@ app.get("/node/:node", async (req, res) => {
       error: { nodeRes, rack_res },
     })
   }
+})
+
+app.post("/v1/notes", async (req, res) => {
+  /*
+  body: {
+    new_notes: { updated notes },
+    old_notes: { old notes },
+    overwrite?: true | false
+  }
+*/
+  let query_verify = await Nodes.findOne({ node: req.body.node })
+
+  if (req.body.overwrite !== true && query_verify.notes !== undefined && query_verify.notes !== req.body.old_notes) {
+    res.json({
+      status: "error",
+      message: "Error, notes have been modified by another user! Submit again to overwrite changes.",
+      code: "EOVERWRITE",
+      overwrite: query_verify.notes,
+    })
+    return
+  }
+
+  let query = await Nodes.updateOne({ node: req.body.node }, { notes: req.body.new_notes })
+  if (query.modifiedCount > 0) res.json({ status: "success", message: "Successfully updated notes!" })
+  else res.json({ status: "error", message: "Error, notes unchanged" })
+})
+
+app.get("/v1/settings", async (req, res) => {
+  let query = await Settings.find(
+    {},
+    {
+      _id: 0,
+      __v: 0,
+      jwt_secret: 0,
+      "bmc.password": 0,
+      "switches.password": 0,
+      "openmanage.password": 0,
+      "dell_warranty_api.id": 0,
+      "dell_warranty_api.secret": 0,
+    }
+  )
+  res.json(query)
+})
+
+app.post("/v1/settings", async (req, res) => {
+  /*
+  body: {
+    { updated Settings model },
+  }
+*/
+  let query = await Settings.find({}, { _id: 0, __v: 0, jwt_secret: 0 })
+  let old_settings = query[0]
+
+  req.body.bmc.password =
+    req.body.bmc.password !== "" ? await encrypt(req.body.bmc.password) : old_settings.bmc.password
+  req.body.switches.password =
+    req.body.switches.password !== "" ? await encrypt(req.body.switches.password) : old_settings.switches.password
+  req.body.openmanage.password =
+    req.body.openmanage.password !== "" ? await encrypt(req.body.openmanage.password) : old_settings.openmanage.password
+  req.body.dell_warranty_api.id =
+    req.body.dell_warranty_api.id !== ""
+      ? await encrypt(req.body.dell_warranty_api.id)
+      : old_settings.dell_warranty_api.id
+  req.body.dell_warranty_api.secret =
+    req.body.dell_warranty_api.secret !== ""
+      ? await encrypt(req.body.dell_warranty_api.secret)
+      : old_settings.dell_warranty_api.secret
+
+  let db_res = await Settings.updateOne({}, { $set: req.body })
+  if (db_res.acknowledged === true && db_res.matchedCount === 1) {
+    res.json({ status: "success", message: `Successfully saved settings` })
+    syncDBSettings()
+  } else res.status(400).json({ status: "error", message: "Error saving to DB", error: db_res })
 })
 
 module.exports = app

@@ -16,7 +16,8 @@ const getSwInfoV2 = async (node) => {
   }
   let grendel = grendelRes.result[0]
   if (grendel.interfaces.length === 0) return { status: "error", message: `${node} has no interfaces to query` }
-  const fqdn = grendel.interfaces[0].fqdn !== "" ? grendel.interfaces[0].fqdn : grendel.interfaces[0].ip
+  let bmcInterface = grendel.interfaces.find((val) => val.bmc === true) ?? grendel.interfaces[0]
+  const fqdn = bmcInterface.fqdn !== "" ? bmcInterface.fqdn : bmcInterface.ip
 
   // Switch version logic
   let parseType = ""
@@ -68,13 +69,13 @@ const getSwInfoV2 = async (node) => {
   let conn = new NodeSSH()
   let SSHConfig = {
     host: fqdn,
-    username: config.switches.user,
+    username: config.settings.switches.username,
     tryKeyboard: true,
-    password: config.switches.pass,
-    privateKeyPath: config.switches.privateKeyPath,
+    password: config.settings.switches.password,
+    privateKeyPath: config.settings.switches.private_key_path,
     onKeyboardInteractive(name, instructions, instructionsLang, prompts, finish) {
       if (prompts.length > 0 && prompts[0].prompt.toLowerCase().includes("password")) {
-        finish([config.switches.pass])
+        finish([config.settings.switches.password])
       }
     },
     algorithms: {
@@ -262,8 +263,8 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
       let host = {
         server: {
           host: fqdn,
-          userName: config.switches.user,
-          password: config.switches.pass,
+          userName: config.settings.switches.username,
+          password: config.settings.switches.password,
           algorithms: {
             kex: [
               "curve25519-sha256",
@@ -297,8 +298,8 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
         idleTimeOut: 25000,
         commands: commands,
       }
-      config.switches.privateKeyPath !== undefined
-        ? (host.server.privateKey = fs.readFileSync(config.switches.privateKeyPath))
+      config.settings.switches.private_key_path !== ""
+        ? (host.server.privateKey = fs.readFileSync(config.settings.switches.private_key_path))
         : null
       const SSH2Shell = require("ssh2shell")
       let SSH = new SSH2Shell(host)
