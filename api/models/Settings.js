@@ -34,7 +34,7 @@ const settingsSchema = new Schema(
       id: { type: String, default: "" },
       secret: { type: String, default: "" },
     },
-    jwt_secret: { type: String, default: crypto.randomBytes(20).toString("hex") },
+    jwt_secret: { type: String, default: crypto.randomBytes(16).toString("hex") },
     boot_firmware: {
       type: [String],
       default: ["ipxe.pxe", "ipxe-i386.efi", "ipxe-x86_64.efi", "snponly-x86_64.efi", "undionly.kpxe"],
