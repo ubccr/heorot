@@ -4,6 +4,8 @@ import AuthForm from "./AuthForm"
 import { signup } from "../../modules/Auth"
 import { useSnackbar } from "notistack"
 
+// TODO: improper useEffect
+
 const Signup = () => {
   const { enqueueSnackbar } = useSnackbar()
   const form = {

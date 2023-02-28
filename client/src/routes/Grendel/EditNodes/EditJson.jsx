@@ -6,6 +6,8 @@ import { UserContext } from "../../../contexts/UserContext"
 import { apiConfig } from "../../../config"
 import { useSnackbar } from "notistack"
 
+// TODO: change useEffect to query & add mutation
+
 const EditJson = () => {
   const [editNode, setEditNode] = useState("")
   const [nodeJson, setNodeJson] = useState("")

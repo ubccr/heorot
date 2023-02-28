@@ -7,6 +7,8 @@ import { signin } from "../../modules/Auth"
 import { useNavigate } from "react-router-dom"
 import { useSnackbar } from "notistack"
 
+// TODO: improper useEffect
+
 const Login = () => {
   const form = {
     name: "Login",

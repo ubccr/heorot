@@ -1,5 +1,7 @@
 import { apiConfig } from "../config"
 
+// TODO: ensure localstorage security
+
 export async function signin(username, password) {
   const url = `${apiConfig.apiUrl}/auth/signin`
   const payload = {
@@ -16,8 +18,7 @@ export async function signin(username, password) {
     let response = await fetch(url, payload)
     let data = await response.json()
 
-    if (data.accessToken !== undefined)
-      localStorage.setItem("user", JSON.stringify(data))
+    if (data.accessToken !== undefined) localStorage.setItem("user", JSON.stringify(data))
     return data
   } catch (error) {
     return { status: "error", message: "API call failed", error }

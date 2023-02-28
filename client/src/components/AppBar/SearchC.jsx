@@ -6,6 +6,10 @@ import { apiConfig } from "../../config"
 import { useNavigate } from "react-router-dom"
 import { useSnackbar } from "notistack"
 
+// TODO: improper useEffect
+// TODO: refactor with react query
+// ? add support for service tag lookup
+
 const SearchC = ({ action, setOutput }) => {
   const [open, setOpen] = useState(false)
   const [options, setOptions] = useState([])

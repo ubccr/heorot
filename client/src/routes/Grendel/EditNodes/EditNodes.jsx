@@ -17,6 +17,8 @@ import { apiConfig } from "../../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: complete rewrite for new networking layout
+
 const EditNodes = () => {
   const [formValues, setFormValues] = useState({
     action: "",

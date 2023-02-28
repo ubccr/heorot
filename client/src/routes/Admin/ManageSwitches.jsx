@@ -19,6 +19,8 @@ import { useContext } from "react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: reduce into settings page and/or automatic queries
+
 const ManageSwitches = () => {
   const [tableRef] = useAutoAnimate()
   const [user] = useContext(UserContext)

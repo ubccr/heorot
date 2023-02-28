@@ -18,6 +18,9 @@ import { useContext } from "react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: refactor entire alerts page
+// TODO: ditch OME and query nodes automatically?
+
 const Index = () => {
   const [tableRef] = useAutoAnimate(null)
   const [user] = useContext(UserContext)

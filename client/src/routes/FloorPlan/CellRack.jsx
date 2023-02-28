@@ -4,6 +4,8 @@ import React, { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useState } from "react"
 
+// TODO: improper useEffect usage
+
 const CellRack = ({ rack, outputType, color }) => {
   const [output_t, setOutput_t] = useState("")
   const [output_b, setOutput_b] = useState("")

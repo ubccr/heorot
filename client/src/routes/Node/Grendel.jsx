@@ -41,6 +41,7 @@ import { useState } from "react"
 // TODO: Form validation & error handling
 // TODO: Form submission
 // TODO: Fix tags animation pop on component load
+// TODO: Verify useEffect usage
 
 const Grendel = ({ query }) => {
   // query

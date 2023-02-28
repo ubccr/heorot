@@ -28,6 +28,9 @@ import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: think about different display options
+// TODO: deprecate management switch display?
+
 const Floorplan = () => {
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()

@@ -6,6 +6,8 @@ import { apiConfig } from "../../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: change query to mutation
+
 const DeleteNodes = () => {
   const [user] = useContext(UserContext)
   const [nodeset, setNodeset] = useState("")

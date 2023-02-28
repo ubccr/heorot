@@ -26,6 +26,10 @@ import { apiConfig } from "../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: fix useEffect
+// TODO: change query to mutation
+// TODO: improve warranty card
+
 const Redfish = ({ query, setRefresh }) => {
   let data = query.data.redfish
 

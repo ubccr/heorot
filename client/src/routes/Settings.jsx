@@ -13,6 +13,13 @@ import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
 import { useSnackbar } from "notistack"
 
+// TODO: Cleanup file
+// TODO: Improve layout
+// TODO: Better tooltips & add placeholders
+// TODO: Improve update checking logic
+// ? include "train" support for prereleases?
+// ? Can the useFieldArrays be simplified?
+
 const Settings = () => {
   const { enqueueSnackbar } = useSnackbar()
   const [plugins] = useContext(PluginContext)

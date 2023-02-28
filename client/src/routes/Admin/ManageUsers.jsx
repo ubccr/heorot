@@ -23,6 +23,8 @@ import { apiConfig } from "../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: refactor with react query & mutation
+
 const ManageUsers = () => {
   const [checked, setChecked] = useState([])
   const [action, setAction] = useState("")

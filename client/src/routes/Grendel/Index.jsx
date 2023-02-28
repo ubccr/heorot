@@ -9,6 +9,8 @@ import EditNodes from "./EditNodes/EditNodes"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useState } from "react"
 
+// TODO: remove aka move all functions into Rack page?
+
 const Index = () => {
   const [tabRef] = useAutoAnimate(null)
   const [value, setValue] = useState(0)

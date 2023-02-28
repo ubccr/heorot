@@ -8,6 +8,8 @@ import { apiConfig } from "../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: refactor
+
 const Warranty = () => {
   const [tags, setTags] = useState("")
   const { enqueueSnackbar } = useSnackbar()

@@ -18,6 +18,12 @@ import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 import { useState } from "react"
 
+// TODO: add switch port management
+// TODO: change tab indexing so switches don't render "Redfish"
+// TODO: unsaved changes warning?
+// TODO: fix padding for chips on overflow
+// TODO: Storage table layout for 3.5in drives
+
 const Node = () => {
   const [tab, setTab] = useState(0)
   const { node } = useParams()

@@ -11,6 +11,8 @@ import { apiConfig } from "../../config"
 import { io } from "socket.io-client"
 import { useState } from "react"
 
+// TODO: fix useEffects
+
 const Console = ({ node, query }) => {
   const [user] = useContext(UserContext)
   // get bmc function

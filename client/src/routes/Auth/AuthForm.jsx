@@ -1,13 +1,10 @@
-import {
-  Button,
-  Container,
-  Divider,
-  TextField,
-  Typography,
-} from "@mui/material"
-import { useState } from "react"
+import { Button, Container, Divider, TextField, Typography } from "@mui/material"
 
 import { Link } from "react-router-dom"
+import { useState } from "react"
+
+// TODO: change to an Auth package?
+// TODO: change to react hook form
 
 const AuthForm = ({ form, setSubmit }) => {
   const [formValues, setFormValues] = useState({})
@@ -46,22 +43,15 @@ const AuthForm = ({ form, setSubmit }) => {
     const { username, password, password2 } = formValues
     const formErrors = {}
 
-    if (!username || username === "")
-      formErrors.username = "Username cannot be blank"
-    else if (username.length > 30)
-      formErrors.username = "Username is over 30 characters"
-    else if (username.length < 3)
-      formErrors.username = "Username must be longer than 3 characters"
+    if (!username || username === "") formErrors.username = "Username cannot be blank"
+    else if (username.length > 30) formErrors.username = "Username is over 30 characters"
+    else if (username.length < 3) formErrors.username = "Username must be longer than 3 characters"
 
-    if (!password || password === "")
-      formErrors.password = "Password cannot be blank"
-    else if (password.length < 8)
-      formErrors.password = "Password must be longer than 8 characters"
+    if (!password || password === "") formErrors.password = "Password cannot be blank"
+    else if (password.length < 8) formErrors.password = "Password must be longer than 8 characters"
 
-    if (!password2 || password2 === "")
-      formErrors.password2 = "Please fill out field"
-    else if (password2 !== password)
-      formErrors.password2 = "Passwords do not match"
+    if (!password2 || password2 === "") formErrors.password2 = "Please fill out field"
+    else if (password2 !== password) formErrors.password2 = "Passwords do not match"
 
     return formErrors
   }
@@ -77,9 +67,7 @@ const AuthForm = ({ form, setSubmit }) => {
         boxShadow: 12,
       }}
     >
-      <Typography sx={{ fontSize: 36, fontWeight: "light", letterSpacing: 1 }}>
-        {form.name}
-      </Typography>
+      <Typography sx={{ fontSize: 36, fontWeight: "light", letterSpacing: 1 }}>{form.name}</Typography>
       <Divider />
       <form onSubmit={handleSubmit}>
         <TextField

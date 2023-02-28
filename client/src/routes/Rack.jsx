@@ -35,6 +35,10 @@ import { useParams } from "react-router-dom"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: add support for SM and HPE nodes, at least render grendel chips
+// TODO: add more actions: Fix "Bad Request" error, configure PSU redundancy?
+// TODO: maas rendering?
+
 const Rack = () => {
   const { rack } = useParams()
   const { enqueueSnackbar } = useSnackbar()

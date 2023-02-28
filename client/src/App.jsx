@@ -27,8 +27,11 @@ import { UserContext } from "./contexts/UserContext"
 import Warranty from "./routes/Admin/Warranty"
 import { apiConfig } from "./config"
 import darkTriangles from "./backgrounds/large-triangles-dark.svg"
-// import largeTriangles from "./backgrounds/large-triangles.svg"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
+
+// TODO: Move UseEffect to react query?
+// TODO: Move Themes to separate file
+// TODO: Provider cleanup
 
 function App() {
   const [appRef] = useAutoAnimate({ duration: 150 })

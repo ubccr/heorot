@@ -8,6 +8,9 @@ import { apiConfig } from "../../config"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
+// TODO: Change query to mutation
+// TODO: Cleanup layout & add more options?
+
 const Profile = () => {
   const [user] = useContext(UserContext)
   const [newPassword, setNewPassword] = useState("")
