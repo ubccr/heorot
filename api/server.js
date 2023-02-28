@@ -47,7 +47,7 @@ app.use("/warranty", auth, warrantyRouter)
 
 const switchesRouter = require("./routes/switches.js")
 app.use("/switches", auth, switchesRouter)
-
+console.log(process.env.npm_package_version)
 app.get("/plugins", async function (req, res) {
   let warranty,
     ome,
@@ -64,7 +64,7 @@ app.get("/plugins", async function (req, res) {
     bmc,
     floorplan,
     node_prefixes: config.settings.rack.prefix.find((val) => val.type === "node")?.prefix ?? ["cpn", "srv"],
-    version: process.env.npm_package_version,
+    version: process.env.npm_package_version ?? "1.4.0",
   })
 })
 
