@@ -5,11 +5,11 @@ const { grendelRequest } = require("../modules/grendel")
 const { rackGen, floorplan } = require("../modules/client")
 const config = require("../config")
 const Switches = require("../models/Switches")
-// const { redfishRequest } = require("../modules/redfish/redfish")
 const Nodes = require("../models/Nodes")
 const { fetch_node } = require("../modules/nodes")
 const Settings = require("../models/Settings")
-const bcrypt = require("bcryptjs")
+const { encrypt, decrypt } = require("../modules/encryption")
+const { syncDBSettings } = require("../modules/db")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -48,7 +48,7 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
   // let grendel_res = grendel_res_all.result.filter((node) => node.name.split("-")[1] === rack)
 
   let rackArr = []
-  for (let x = config.rack.min; x <= config.rack.max; x++) {
+  for (let x = config.settings.rack.min; x <= config.settings.rack.max; x++) {
     rackArr[x] = {
       u: x,
       type: "",
@@ -103,7 +103,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
       nodeRes.result.forEach((node) => (message += ` id: ${node.id}`))
     }
     let bmcPlugin = false
-    if (config.bmc.DELL_USER !== "") bmcPlugin = true
+    if (config.settings.bmc.username !== "") bmcPlugin = true
 
     if (refresh === "true") await fetch_node(node, refresh)
 
@@ -118,7 +118,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
       redfish: dbRequest?.redfish,
       warranty: dbRequest?.warranty,
       notes: dbRequest?.notes ?? "",
-      firmware_options: config.firmware,
+      firmware_options: config.settings.boot_firmware,
       boot_image_options: boot_image_list,
       message: message,
       bmc_plugin: bmcPlugin,
@@ -163,35 +163,46 @@ app.get("/v1/settings", async (req, res) => {
     {
       _id: 0,
       __v: 0,
+      jwt_secret: 0,
       "bmc.password": 0,
       "switches.password": 0,
       "openmanage.password": 0,
+      "dell_warranty_api.id": 0,
       "dell_warranty_api.secret": 0,
     }
   )
   res.json(query)
 })
+
 app.post("/v1/settings", async (req, res) => {
   /*
   body: {
     { updated Settings model },
   }
 */
-  req.body.bmc.password = req.body.bmc.password !== "" ? bcrypt.hashSync(req.body.bmc.password, 10) : undefined
-  req.body.switches.password =
-    req.body.switches.password !== "" ? bcrypt.hashSync(req.body.switches.password, 10) : undefined
-  req.body.openmanage.password =
-    req.body.openmanage.password !== "" ? bcrypt.hashSync(req.body.openmanage.password, 10) : undefined
-  req.body.dell_warranty_api.id =
-    req.body.dell_warranty_api.id !== "" ? bcrypt.hashSync(req.body.dell_warranty_api.id, 10) : undefined
-  req.body.dell_warranty_api.secret =
-    req.body.dell_warranty_api.secret !== "" ? bcrypt.hashSync(req.body.dell_warranty_api.secret, 10) : undefined
+  let query = await Settings.find({}, { _id: 0, __v: 0, jwt_secret: 0 })
+  let old_settings = query[0]
 
-  console.log(req.body)
-  let db_res = await Settings.updateOne({}, req.body)
-  if (db_res.acknowledged === true && db_res.matchedCount === 1)
+  req.body.bmc.password =
+    req.body.bmc.password !== "" ? await encrypt(req.body.bmc.password) : old_settings.bmc.password
+  req.body.switches.password =
+    req.body.switches.password !== "" ? await encrypt(req.body.switches.password) : old_settings.switches.password
+  req.body.openmanage.password =
+    req.body.openmanage.password !== "" ? await encrypt(req.body.openmanage.password) : old_settings.openmanage.password
+  req.body.dell_warranty_api.id =
+    req.body.dell_warranty_api.id !== ""
+      ? await encrypt(req.body.dell_warranty_api.id)
+      : old_settings.dell_warranty_api.id
+  req.body.dell_warranty_api.secret =
+    req.body.dell_warranty_api.secret !== ""
+      ? await encrypt(req.body.dell_warranty_api.secret)
+      : old_settings.dell_warranty_api.secret
+
+  let db_res = await Settings.updateOne({}, { $set: req.body })
+  if (db_res.acknowledged === true && db_res.matchedCount === 1) {
     res.json({ status: "success", message: `Successfully saved settings` })
-  else res.status(400).json({ status: "error", message: "Error saving to DB", error: db_res })
+    syncDBSettings()
+  } else res.status(400).json({ status: "error", message: "Error saving to DB", error: db_res })
 })
 
 module.exports = app
