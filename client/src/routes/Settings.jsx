@@ -7,6 +7,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined"
 import BgContainer from "../components/BgContainer"
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { PluginContext } from "../contexts/PluginContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
@@ -289,8 +290,11 @@ const Settings = () => {
           {settings_form.map((item, index) => (
             <React.Fragment key={index}>
               <Grid2 xs={6}>
+                {item.category}
                 <Tooltip title={item.tooltip} placement="bottom">
-                  <Typography>{item.category}</Typography>
+                  <IconButton size="small">
+                    <InfoOutlinedIcon sx={{ width: "20px", height: "20px" }} />
+                  </IconButton>
                 </Tooltip>
               </Grid2>
               <Grid2 xs={6}>
@@ -311,8 +315,11 @@ const Settings = () => {
           {settings_form_arr.map((item, index) => (
             <React.Fragment key={index}>
               <Grid2 xs={12}>
+                {item.category}
                 <Tooltip title={item.tooltip} placement="bottom">
-                  <Typography>{item.category}</Typography>
+                  <IconButton size="small">
+                    <InfoOutlinedIcon sx={{ width: "20px", height: "20px" }} />
+                  </IconButton>
                 </Tooltip>
                 <IconButton onClick={() => item.add_fields(item.contains)}>
                   <AddOutlinedIcon />
