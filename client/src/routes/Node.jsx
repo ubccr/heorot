@@ -113,7 +113,7 @@ const Node = () => {
             <Tab label="Console" />
             <Tab label="Redfish" />
             <Tab label="Notes" />
-            {node.split("-")[0] === "swe" && <Tab label="Port Management" />}
+            {/* {node.split("-")[0] === "swe" && <Tab label="Port Management" />} */}
           </Tabs>
         </Box>
         <Box sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
