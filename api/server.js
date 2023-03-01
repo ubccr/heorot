@@ -47,7 +47,7 @@ app.use("/warranty", auth, warrantyRouter)
 
 const switchesRouter = require("./routes/switches.js")
 app.use("/switches", auth, switchesRouter)
-console.log(process.env.npm_package_version)
+
 app.get("/plugins", async function (req, res) {
   let warranty,
     ome,
