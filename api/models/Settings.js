@@ -19,6 +19,7 @@ const settingsSchema = new Schema(
           { name: "Dell 12th Gen", model: "(R|C)[0-9]2[0-9]{1,2}", bios: "2.9.0", bmc: "2.65.65.65" },
         ],
       },
+      refresh_interval: { type: String, default: "" },
     },
     switches: {
       username: { type: String, default: "" },

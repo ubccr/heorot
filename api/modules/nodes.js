@@ -37,6 +37,32 @@ const fetch_node = async (node, refetch) => {
   }
 }
 
-const dell = async (bmc) => {}
+const refetch_all_nodes = async (hours = 1) => {
+  console.log("Starting refresh of Redfish data")
+  let expired_time = new Date()
+  expired_time.setHours(expired_time.getHours() - hours)
+
+  let nodes = await Nodes.find({}, { node: 1, redfish: 1, _id: 0, updatedAt: 1 })
+
+  let response = await Promise.all(
+    nodes.filter((val) => val.updatedAt < expired_time).map((node) => fetch_node(node.node, "true"))
+  )
+  console.log(response)
+  return response
+}
+
+function schedule_node_refresh() {
+  refetch_all_nodes()
+    .then(function () {
+      console.log("Refreshed all Redfish data, waiting an hour")
+      setTimeout(function () {
+        console.log("Refetching Redfish data...")
+        schedule_node_refresh()
+      }, 1000 * 60 * 60)
+    })
+    .catch((err) => console.error("Error refreshing Redfish data automatically", err))
+}
+
+schedule_node_refresh()
 
 module.exports = { fetch_node }
