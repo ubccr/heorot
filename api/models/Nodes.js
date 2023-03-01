@@ -29,7 +29,7 @@ const nodesSchema = new Schema(
 
       model: { type: String },
       manufacturer: { type: String },
-      service_tag: { type: String, unique: true },
+      service_tag: { type: String },
       bios_version: { type: String },
       boot_order: { type: String },
       hostname: { type: String },
