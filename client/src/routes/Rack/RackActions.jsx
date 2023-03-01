@@ -139,6 +139,7 @@ const RackActions = ({ nodes }) => {
     onSuccess: async (data, variables, context) => {
       let data_json = await data.json()
       enqueueSnackbar(data_json.message, { variant: "success" })
+      if (data_json.error?.length > 0) console.error(data_json.error)
     },
   })
   return (
