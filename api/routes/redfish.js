@@ -5,6 +5,7 @@ const app = express.Router()
 const { getBMC } = require("../modules/grendel")
 const { redfish_auth, redfish_logout } = require("../modules/redfish/auth")
 const { dell_clearSel, sm_clearSel, hpe_clearSel } = require("../modules/redfish/clearSel")
+const { dell_badRequestFix } = require("../modules/redfish/dell")
 const { dell_resetBmc, sm_resetBmc, hpe_resetBmc } = require("../modules/redfish/resetBmc")
 const { dell_resetNode, sm_resetNode, hpe_resetNode } = require("../modules/redfish/resetNode")
 
@@ -101,12 +102,12 @@ app.put("/v1/resetBmc/:node", async (req, res) => {
   }
 })
 
-app.put("/v1/resetNode/:node/:pxe?", async (req, res) => {
-  const node = req.params.node.split(",")
+app.put("/v1/resetNode/:nodes/:pxe?", async (req, res) => {
+  const nodes = req.params.nodes.split(",")
   const pxe = req.params.pxe ?? "false"
 
   let response = await Promise.all(
-    node.map(async (val) => {
+    nodes.map(async (val) => {
       let bmc = await getBMC(val)
       if (bmc.status === "success") {
         const uri = `https://${bmc.address}`
@@ -136,6 +137,48 @@ app.put("/v1/resetNode/:node/:pxe?", async (req, res) => {
   if (response.length === 1) res.json(response[0])
   else {
     if (successes.length >= 1) message += `Successfully power cycled ${successes.length} node(s). `
+    if (errors.length >= 1) {
+      status = "error"
+      message += `${errors.length} node(s) failed. (see browser console for details)`
+    }
+    res.json({ status: status, message: message, error: errors })
+  }
+})
+
+app.get("/v1/badReqFix/:nodes", async (req, res) => {
+  const nodes = req.params.nodes.split(",")
+
+  let response = await Promise.all(
+    nodes.map(async (val) => {
+      let bmc = await getBMC(val)
+      if (bmc.status === "success") {
+        const uri = `https://${bmc.address}`
+        let auth = await redfish_auth(uri)
+        if (auth.status === "success") {
+          if (auth.oem === "Dell") api_res = await dell_badRequestFix(uri, auth, val)
+          else if (auth.oem === "Supermicro")
+            api_res = { status: "error", message: "Supermicro nodes are not supported" }
+          else if (auth.oem === "HPE") api_res = { status: "error", message: "HP nodes are not supported" }
+          else
+            api_res = {
+              status: "error",
+              message: "failed to parse OEM from Redfish call",
+            }
+
+          await redfish_logout(auth.location, uri, auth.token)
+          return api_res
+        } else return auth
+      } else return bmc
+    })
+  )
+  let errors = response.filter((val) => val.status === "error")
+  let successes = response.filter((val) => val.status === "success")
+  let status = "success"
+  let message = ""
+
+  if (response.length === 1) res.json(response[0])
+  else {
+    if (successes.length >= 1) message += `Successfully applied Bad Reqest fix for ${successes.length} node(s). `
     if (errors.length >= 1) {
       status = "error"
       message += `${errors.length} node(s) failed. (see browser console for details)`

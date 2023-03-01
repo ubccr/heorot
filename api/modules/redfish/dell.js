@@ -223,6 +223,26 @@ const dell_query = async (auth) => {
   return response
 }
 
+const dell_badRequestFix = async (uri, auth, fqdn) => {
+  let idrac_name = fqdn.split(".")[0]
+  let domain_name = fqdn.split(".").splice(1).join(".")
+
+  const endpoint = "/redfish/v1/Managers/iDRAC.Embedded.1/Attributes"
+  const body = JSON.stringify({
+    Attributes: {
+      "NIC.1.DNSDomainFromDHCP": "Disabled",
+      "NIC.1.DNSDomainNameFromDHCP": "Disabled",
+      "NIC.1.DNSDomainName": domain_name,
+      "NIC.1.DNSRacName": idrac_name,
+    },
+  })
+  console.log(uri)
+  let test = await api_request(endpoint, auth, "PATCH", true, body)
+  console.log(test)
+  return test
+}
+
 module.exports = {
   dell_query,
+  dell_badRequestFix,
 }
