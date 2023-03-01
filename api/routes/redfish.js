@@ -145,7 +145,7 @@ app.put("/v1/resetNode/:nodes/:pxe?", async (req, res) => {
   }
 })
 
-app.get("/v1/badReqFix/:nodes", async (req, res) => {
+app.put("/v1/badReqFix/:nodes", async (req, res) => {
   const nodes = req.params.nodes.split(",")
   let response = await Promise.all(
     nodes.map(async (val) => {
