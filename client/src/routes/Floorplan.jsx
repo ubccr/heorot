@@ -90,7 +90,7 @@ const Floorplan = () => {
             {query.isFetched &&
               outputType === "sw_model" &&
               color === true &&
-              query.data.config.color_mapping.model_color.map((val, index) => (
+              query.data.config.model_color.map((val, index) => (
                 <Chip key={index} label={val.display} color={val.color} {...legendProps} />
               ))}
 
@@ -98,7 +98,7 @@ const Floorplan = () => {
             {query.isFetched &&
               outputType === "sw_version" &&
               color === true &&
-              query.data.config.color_mapping.version_color.map((val, index) => (
+              query.data.config.version_color.map((val, index) => (
                 <Chip key={index} label={val.display} color={val.color} {...legendProps} />
               ))}
           </Grid>
