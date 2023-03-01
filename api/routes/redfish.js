@@ -147,15 +147,15 @@ app.put("/v1/resetNode/:nodes/:pxe?", async (req, res) => {
 
 app.get("/v1/badReqFix/:nodes", async (req, res) => {
   const nodes = req.params.nodes.split(",")
-
   let response = await Promise.all(
     nodes.map(async (val) => {
       let bmc = await getBMC(val)
+      console.log(nodes, bmc)
       if (bmc.status === "success") {
-        const uri = `https://${bmc.address}`
+        const uri = `https://${bmc.ip}` // use IP since DNS won't resolve
         let auth = await redfish_auth(uri)
         if (auth.status === "success") {
-          if (auth.oem === "Dell") api_res = await dell_badRequestFix(uri, auth, val)
+          if (auth.oem === "Dell") api_res = await dell_badRequestFix(uri, auth, bmc.address)
           else if (auth.oem === "Supermicro")
             api_res = { status: "error", message: "Supermicro nodes are not supported" }
           else if (auth.oem === "HPE") api_res = { status: "error", message: "HP nodes are not supported" }

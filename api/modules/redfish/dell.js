@@ -1,3 +1,4 @@
+const { reset } = require("nodemon")
 const { formatBytes } = require("../math")
 const { api_request } = require("./api_request")
 
@@ -236,10 +237,15 @@ const dell_badRequestFix = async (uri, auth, fqdn) => {
       "NIC.1.DNSRacName": idrac_name,
     },
   })
-  console.log(uri)
-  let test = await api_request(endpoint, auth, "PATCH", true, body)
-  console.log(test)
-  return test
+  let res = await api_request(endpoint, auth, "PATCH", false, body)
+  console.log(res)
+  if (res.status === "success") {
+    let res_json = await res.data.json()
+    res_json.status = res.status
+    if (res.data.status === 200) res_json.message = "Successfully modified iDRAC values"
+    else res_json.message = "Error sending redfish request"
+    return res_json
+  } else return res
 }
 
 module.exports = {

@@ -52,20 +52,22 @@ async function grendelRequest(path, method = "GET", body = {}) {
   }
 }
 async function getBMC(node) {
-  let bmcInterface = ""
+  let fqdn = ""
+  let ip = ""
   let grendelRes = await grendelRequest(`/v1/host/find/${node}`)
   if (grendelRes.result.length > 0) {
     let grendelNode = grendelRes.result[0]
     grendelNode.interfaces.forEach((element) => {
       if (element.bmc === true) {
-        if (element.fqdn !== "") bmcInterface = element.fqdn
-        else bmcInterface = element.ip
+        fqdn = element.fqdn
+        ip = element.ip.split("/")[0]
       }
     })
 
     return {
       status: grendelRes.status,
-      address: bmcInterface,
+      address: fqdn,
+      ip: ip,
       node: grendelNode,
     }
   } else {
