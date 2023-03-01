@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -17,10 +18,10 @@ import {
   TextField,
 } from "@mui/material"
 import React, { useContext, useState } from "react"
+import { useMutation, useQuery } from "react-query"
 
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
-import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
 const RackActions = ({ nodes }) => {
@@ -117,6 +118,29 @@ const RackActions = ({ nodes }) => {
     redfish_query.refetch()
     setOpen(false)
   }
+  // Bad req fix
+  const badReqFix = useMutation({
+    mutationFn: (data) => {
+      let payload = {
+        method: "PUT",
+        headers: {
+          "x-access-token": user.accessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+      return fetch(`${apiConfig.apiUrl}/redfish/v1/badReqFix/${nodes}`, payload)
+    },
+    onError: async (error, variables, context) => {
+      let error_json = await error.json()
+      enqueueSnackbar(error_json.message, { variant: "error" })
+      console.error(error_json.error)
+    },
+    onSuccess: async (data, variables, context) => {
+      let data_json = await data.json()
+      enqueueSnackbar(data_json.message, { variant: "success" })
+    },
+  })
   return (
     <>
       <Box sx={{ padding: "5px" }}>
@@ -189,6 +213,9 @@ const RackActions = ({ nodes }) => {
             {redfish_query.isFetching && <LinearProgress color="primary" />}
           </Grid>
           <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", gap: "5px" }}>
+            <Button variant="outlined" onClick={() => badReqFix.mutate()}>
+              {badReqFix.isLoading ? <CircularProgress color="primary" size={15} /> : "Fix Bad Request Error"}
+            </Button>
             <Button variant="outlined" onClick={() => handleNodeAction("clearSel")}>
               Clear SELs
             </Button>
