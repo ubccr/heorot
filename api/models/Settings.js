@@ -56,16 +56,16 @@ const settingsSchema = new Schema(
       model_color: {
         type: [{ display: { type: String }, color: { type: String }, model: { type: String } }],
         default: [
-          { display: "No Management Switch", color: "primary", model: "/^S/" },
-          { display: "Management Switch", color: "error", model: "/^PC/" },
+          { display: "No Management Switch", color: "primary", model: "^S" },
+          { display: "Management Switch", color: "error", model: "^PC" },
         ],
       },
       version_color: {
         type: [{ display: { type: String }, color: { type: String }, version: { type: String } }],
         default: [
-          { display: "OS8", color: "error", version: "/^8/" },
-          { display: "OS9", color: "warning", version: "/^9/" },
-          { display: "OS10", color: "primary", version: "/^10/" },
+          { display: "OS8", color: "error", version: "^8" },
+          { display: "OS9", color: "warning", version: "^9" },
+          { display: "OS10", color: "primary", version: "^10" },
         ],
       },
       floorX: { type: [String], default: [..."defghijklmnopqrstuvw"] },
