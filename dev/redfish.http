@@ -26,3 +26,22 @@ Authorization: Basic username:password
         "NIC.1.DNSRacName": "bmc-z01-01"
     }
 }
+
+### Example firmware update
+POST https://{bmc ip}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.InstallFromRepository HTTP/1.1
+Content-Type: application/json
+Authorization: Basic username:password
+
+{
+  "ShareType": "HTTPS",
+  "IPAddress": "downloads.dell.com",
+  "ApplyUpdate": "True" // If set to "False" the query below will return a list of available firmware updates, but no updates will be applied and queued into jobs
+}
+###
+POST https://{bmc ip}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.GetRepoBasedUpdateList HTTP/1.1
+Content-Type: application/json
+Authorization: Basic username:password
+
+{ 
+    
+}
