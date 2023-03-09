@@ -36,8 +36,10 @@ const fetch_node = async (node, refetch) => {
     }
   }
 }
-
+// Needs to not run if hours is set to 0
+// When refresh interval is updated, start function
 const refetch_all_nodes = async (hours = 1) => {
+  // if (hours === 0) return
   console.log("Starting refresh of Redfish data")
   let expired_time = new Date()
   expired_time.setHours(expired_time.getHours() - hours)
@@ -47,11 +49,11 @@ const refetch_all_nodes = async (hours = 1) => {
   let response = await Promise.all(
     nodes.filter((val) => val.updatedAt < expired_time).map((node) => fetch_node(node.node, "true"))
   )
-  console.log(response)
   return response
 }
 
 function schedule_node_refresh() {
+  // config.settings.bmc.refresh_interval
   refetch_all_nodes()
     .then(function () {
       console.log("Refreshed all Redfish data, waiting an hour")
