@@ -10,8 +10,8 @@ const settingsSchema = new Schema(
       firmware_versions: {
         type: [{ name: { type: String }, model: { type: String }, bios: { type: String }, bmc: { type: String } }],
         default: [
-          { name: "Dell 15th Gen", model: "(R|C)[0-9]5[0-9]{1,2}", bios: "1.8.2", bmc: "6.10.30.00" },
-          { name: "Dell 15th Gen - AMD", model: "(R|C)[0-9]5[0-9]5", bios: "2.9.3", bmc: "6.10.30.00" },
+          { name: "Dell 15th Gen", model: "(R|C)[0-9]5[0-9]{1,2}", bios: "1.9.2", bmc: "6.10.30.00" },
+          { name: "Dell 15th Gen - AMD", model: "(R|C)[0-9]5[0-9]5", bios: "2.10.2", bmc: "6.10.30.00" },
           { name: "Dell 14th Gen", model: "(R|C)[0-9]4[0-9]{1,2}", bios: "2.17.1", bmc: "6.10.30.00" },
           { name: "Dell 14th Gen - R240 & R340", model: "R[2-3]40", bios: "2.12.2", bmc: "6.10.30.00" },
           { name: "Dell 13th Gen", model: "(R|C)[0-9]3[0-9]{1,2}", bios: "2.15.0", bmc: "2.83.83.83" },
