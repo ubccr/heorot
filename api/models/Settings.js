@@ -1,7 +1,6 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 const crypto = require("crypto")
-// require("mongoose-String")(mongoose)
 
 const settingsSchema = new Schema(
   {
@@ -19,7 +18,7 @@ const settingsSchema = new Schema(
           { name: "Dell 12th Gen", model: "(R|C)[0-9]2[0-9]{1,2}", bios: "2.9.0", bmc: "2.65.65.65" },
         ],
       },
-      refresh_interval: { type: String, default: "" },
+      refresh_interval: { type: Number, default: 0 },
     },
     switches: {
       username: { type: String, default: "" },
