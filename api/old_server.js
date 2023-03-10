@@ -64,7 +64,7 @@ app.get("/plugins", async function (req, res) {
     bmc,
     floorplan,
     node_prefixes: config.settings.rack.prefix.find((val) => val.type === "node")?.prefix ?? ["cpn", "srv"],
-    version: process.env.npm_package_version ?? "1.4.0",
+    version: process.env.npm_package_version ?? "1.4.1",
   })
 })
 
