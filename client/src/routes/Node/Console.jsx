@@ -15,18 +15,20 @@ import { useState } from "react"
 
 const Console = ({ node, query }) => {
   const [user] = useContext(UserContext)
-  // get bmc function
-  const [bmc, setBmc] = useState(undefined)
-  useEffect(() => {
-    if (query.isFetched === true) {
-      setBmc(query.data.result.interfaces.find((e) => e.bmc === true).fqdn)
-    }
-  }, [node])
-
-  //  xterm
   const termRef = useRef(null)
 
   useEffect(() => {
+    let bmc =
+      query.data.result.interfaces.length > 1
+        ? query.data.result.interfaces.find((e) => e.bmc === true)?.fqdn
+        : query.data.result.interfaces[0]?.fqdn
+    if (bmc.length < 2) {
+      let tmpBmc =
+        query.data.result.interfaces.length > 1
+          ? query.data.result.interfaces.find((e) => e.bmc === true)?.ip
+          : query.data.result.interfaces[0]?.ip
+      bmc = tmpBmc.split("/")[0]
+    }
     if (bmc === undefined) return
     const terminal = new Terminal({ cursorBlink: true, cols: 90, rows: 30 })
     const socket = io(`wss://${apiConfig.apiUrl.substring(8)}`)
@@ -67,7 +69,7 @@ const Console = ({ node, query }) => {
       socket.close()
       terminal.dispose()
     }
-  }, [node, bmc])
+  }, [node])
 
   return <Box ref={termRef} sx={{ overflowX: "scroll" }} />
 }
