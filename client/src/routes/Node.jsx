@@ -125,7 +125,12 @@ const Node = () => {
         <Box sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
           {tab === 0 && query.isFetched && <Grendel query={query} />}
           {tab === 1 && query.isFetched && <Console node={node} query={query} />}
-          {tab === 2 && query.isFetched && <Redfish query={query} setRefresh={setRefresh} />}
+          {node.split("-")[0] !== "swe" && tab === 2 && query.isFetched && (
+            <Redfish query={query} setRefresh={setRefresh} />
+          )}
+          {node.split("-")[0] === "swe" && tab === 2 && query.isFetched && (
+            <Switches query={query} setRefresh={setRefresh} />
+          )}
           {tab === 3 && query.isFetched && <Notes query={query} />}
           {tab === 4 && query.isFetched && <Switches query={query} />}
         </Box>
