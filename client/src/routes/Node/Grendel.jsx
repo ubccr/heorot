@@ -5,10 +5,8 @@ import {
   Chip,
   CircularProgress,
   Collapse,
-  Fade,
   FormControl,
   FormControlLabel,
-  Grow,
   IconButton,
   MenuItem,
   Select,
@@ -19,7 +17,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography,
 } from "@mui/material"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
 import React, { useContext, useEffect } from "react"
@@ -28,9 +25,8 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined"
 import ChevronLeftOutlinedIcon from "@mui/icons-material/ChevronLeftOutlined"
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined"
 import CloseOutlined from "@mui/icons-material/CloseOutlined"
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
+import LaunchIcon from "@mui/icons-material/Launch"
 import { TransitionGroup } from "react-transition-group"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
@@ -372,6 +368,15 @@ const Grendel = ({ query }) => {
                           />
                         </Grid2>
                         <Grid2 xs={6} sx={{ display: "flex", justifyContent: "end", alignItems: "center" }}>
+                          {watch(`interfaces.${index}.bmc`) === true && (
+                            <IconButton
+                              size="small"
+                              sx={{ maxHeight: "34px" }}
+                              onClick={() => window.open(`https://${watch(`interfaces.${index}.fqdn`)}`)}
+                            >
+                              <LaunchIcon />
+                            </IconButton>
+                          )}
                           <IconButton size="small" sx={{ maxHeight: "34px" }} onClick={() => interface_remove(index)}>
                             <CloseOutlined />
                           </IconButton>
