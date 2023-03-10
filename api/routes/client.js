@@ -10,6 +10,8 @@ const { fetch_node } = require("../modules/nodes")
 const Settings = require("../models/Settings")
 const { encrypt, decrypt } = require("../modules/encryption")
 const { syncDBSettings } = require("../modules/db")
+const { getCache, timeComp } = require("../modules/cache")
+const { getSw } = require("../modules/switches")
 
 app.get("/", (req, res) => {
   let routes = []
@@ -109,6 +111,18 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
 
     let dbRequest = await Nodes.findOne({ node: node })
 
+    // Switches:
+    let switch_data = { status: "error", message: "Failed to get switch data" }
+    if (node.split("-")[0] === "swe") {
+      let getCacheRes = await getCache(node)
+      if (getCacheRes !== null && refresh !== "true" && getCacheRes.cache.status !== "error") {
+        if (timeComp(getCacheRes.updatedAt)) getSw(node)
+        switch_data = getCacheRes.cache
+      } else {
+        switch_data = await getSw(node)
+      }
+    }
+
     res.json({
       status: "success",
       node: node,
@@ -116,6 +130,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
       next_node: nextNode,
       result: nodeRes.result[0],
       redfish: dbRequest?.redfish,
+      switch_data: switch_data,
       warranty: dbRequest?.warranty,
       notes: dbRequest?.notes ?? "",
       firmware_options: config.settings.boot_firmware,
