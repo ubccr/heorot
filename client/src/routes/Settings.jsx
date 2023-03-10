@@ -120,6 +120,11 @@ const Settings = () => {
       ],
     },
     {
+      category: "Refresh Interval",
+      tooltip: "Number of minutes to automatically refresh all redfish queries. (Set to 0 to disable)",
+      fields: [{ name: "Minutes", value: "bmc.refresh_interval", options: { type: "number" } }],
+    },
+    {
       category: "Switches",
       tooltip: "Authentication credentials for switch SSH login. Private keys can also be used, path must be absolute",
       fields: [
@@ -296,26 +301,27 @@ const Settings = () => {
           </Grid2>
           {settings_form.map((item, index) => (
             <React.Fragment key={index}>
-              <Grid2 xs={6}>
+              <Grid2 xs={12}>
                 {item.category}
                 <Tooltip title={item.tooltip} placement="bottom">
                   <IconButton size="small">
                     <InfoOutlinedIcon sx={{ width: "20px", height: "20px" }} />
                   </IconButton>
                 </Tooltip>
-              </Grid2>
-              <Grid2 xs={6}>
-                {item.fields.map((settings_field, index) => (
-                  <Controller
-                    name={settings_field.value}
-                    key={index}
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                      <TextField size="small" {...field} label={settings_field.name} {...settings_field.options} />
-                    )}
-                  />
-                ))}
+                <Grid2 container spacing={1} sx={{ marginTop: "5px" }}>
+                  {item.fields.map((settings_field, index) => (
+                    <Grid2 key={index}>
+                      <Controller
+                        name={settings_field.value}
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <TextField size="small" {...field} label={settings_field.name} {...settings_field.options} />
+                        )}
+                      />
+                    </Grid2>
+                  ))}
+                </Grid2>
               </Grid2>
             </React.Fragment>
           ))}
@@ -334,7 +340,7 @@ const Settings = () => {
               </Grid2>
               <Grid2 xs={12}>
                 {item.fields.map((settings_field, index) => (
-                  <Grid2 container spacing={2} key={settings_field.id}>
+                  <Grid2 container spacing={1} key={settings_field.id}>
                     {Object.keys(settings_field)
                       .filter((val) => val !== "id")
                       .map((val) => (
