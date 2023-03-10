@@ -130,7 +130,7 @@ const getSwInfoV2 = async (node) => {
     return { status: "success", info: switchCalcs(output, parseType), result: output }
     // return output
   } catch (err) {
-    console.error(err)
+    console.error(`failed to connect to ${fqdn}`, err)
     return {
       status: "error",
       message: `Switch SSH connection error on switch ${node}`,
