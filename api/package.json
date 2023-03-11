@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon -e ts,js server.ts",
+    "build": "tsc"
   },
   "author": "Josh Furlani",
   "license": "ISC",
