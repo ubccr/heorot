@@ -10,6 +10,8 @@ mongoose.connect(`mongodb://${config.db.host}/${config.db.database}`, config.db.
 let db = mongoose.connection
 db.on("error", console.error.bind(console, "MongoDB Connection Error:"))
 
+mongoose.set("strictQuery", true)
+
 // Create Settings document if it does not exist
 
 Settings.updateOne({}, {}, { upsert: true, new: true, setDefaultsOnInsert: true }, function (error, result) {
