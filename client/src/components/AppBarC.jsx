@@ -66,7 +66,7 @@ const AppBarC = () => {
                 alignItems: "center",
               }}
             >
-              <img src="./favicon.ico" width="30" height="30" alt="" />
+              <img src="/favicon.ico" width="30" height="30" alt="" />
             </Box>
           </Typography>
 
