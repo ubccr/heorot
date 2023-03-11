@@ -1,6 +1,8 @@
 const { formatBytes } = require("../math")
 const { api_request } = require("./api_request")
 
+// TODO: Needs a rewrite with proper error handling
+
 const dell_query = async (auth) => {
   let urls = [
     "/redfish/v1/Systems/System.Embedded.1",
@@ -89,7 +91,7 @@ const dell_query = async (auth) => {
 
   // boot order
   let bootArr = systems.Boot.BootOrder === undefined ? null : systems.Boot.BootOrder.join(",")
-  let boot_order = s_bios.SetBootOrderEn !== undefined ? s_bios.SetBootOrderEn : bootArr
+  let boot_order = s_bios?.SetBootOrderEn !== undefined ? s_bios?.SetBootOrderEn : bootArr
 
   // GPU
   let physical_gpu = 0
