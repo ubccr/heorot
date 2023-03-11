@@ -176,7 +176,6 @@ const Grendel = ({ query }) => {
       enqueueSnackbar(res.message, { variant: res.status })
     }
   }
-
   return (
     <TableContainer>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -226,19 +225,17 @@ const Grendel = ({ query }) => {
             <TableRow>
               <TableCell>Tags:</TableCell>
               <TableCell align="right">
-                <Box sx={{ display: "inline-flex", gap: "4px", alignItems: "center" }}>
-                  <TransitionGroup>
+                <Box sx={{ display: "flex", gap: "4px", alignItems: "center", justifyContent: "end" }}>
+                  <Box sx={{ display: "flex", gap: "4px", justifyContent: "end", flexWrap: "wrap" }}>
                     {tag_fields.map((item, index) => (
-                      <Collapse
+                      <Chip
                         key={item.id}
-                        sx={{ display: "inline-flex", alignItems: "center", marginLeft: "2px", marginRight: "2px" }}
-                        orientation="horizontal"
-                        timeout={500}
-                      >
-                        <Chip label={tag_fields[index].tag} size="small" onDelete={() => tag_remove(index)} />
-                      </Collapse>
+                        label={tag_fields[index].tag}
+                        size="small"
+                        onDelete={() => tag_remove(index)}
+                      />
                     ))}
-                  </TransitionGroup>
+                  </Box>
                   <Collapse in={tagExpand} orientation="horizontal" timeout={500}>
                     <Box sx={{ display: "inline-flex" }}>
                       <TextField
@@ -346,7 +343,7 @@ const Grendel = ({ query }) => {
               <TableCell colSpan={2} sx={{ overflow: "hidden", paddingTop: "10px", paddingBottom: "10px" }}>
                 <Grid2 container spacing={2} sx={{ display: "flex", justifyContent: "end" }}>
                   {interface_fields.map((item, index) => (
-                    <Grid2 key={item.id} xs={12} sm={12} md={6} lg={3}>
+                    <Grid2 key={item.id} xs={12} sm={12} md={6}>
                       <Grid2
                         container
                         spacing={1}
