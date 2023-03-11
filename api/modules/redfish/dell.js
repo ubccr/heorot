@@ -14,20 +14,22 @@ const dell_query = async (auth) => {
   ]
 
   let query_res = await api_request(urls, auth)
+  if (query_res?.status === "error") return query_res
+
   let systems = query_res.data[0]
-  let s_bios = query_res.data[1].Attributes
+  let s_bios = query_res.data[1]?.Attributes
   let managers = query_res.data[2]
   let sel = query_res.data[6]
-  let cpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/CPU/))
-  let gpu_urls = query_res.data[4].Members.map((val) => val["@odata.id"]).filter((val) => val.match(/Video/))
-  let storage_urls = query_res.data[5].Members?.map((val) => val["@odata.id"])
-  let s_volume_urls = query_res.data[5].Members?.map((val) => val["@odata.id"] + "/Volumes")
-  let pci_urls = systems.PCIeDevices?.map((val) => val["@odata.id"]) ?? []
-  let network_urls = query_res.data[7].Members?.map((val) => val["@odata.id"] + "/NetworkPorts")
+  let cpu_urls = query_res.data[4]?.Members.map((val) => val["@odata.id"]).filter((val) => val.match(/CPU/))
+  let gpu_urls = query_res.data[4]?.Members.map((val) => val["@odata.id"]).filter((val) => val.match(/Video/))
+  let storage_urls = query_res.data[5]?.Members?.map((val) => val["@odata.id"])
+  let s_volume_urls = query_res.data[5]?.Members?.map((val) => val["@odata.id"] + "/Volumes")
+  let pci_urls = systems?.PCIeDevices?.map((val) => val["@odata.id"]) ?? []
+  let network_urls = query_res.data[7]?.Members?.map((val) => val["@odata.id"] + "/NetworkPorts")
 
   // second query
   let query_res_2 = await Promise.all([
-    await api_request(query_res.data[3].Members[0]["@odata.id"], auth),
+    await api_request(query_res.data[3]?.Members?.[0]["@odata.id"], auth),
     await api_request(cpu_urls, auth),
     await api_request(gpu_urls, auth),
     await api_request(storage_urls, auth),
@@ -37,16 +39,16 @@ const dell_query = async (auth) => {
   ])
 
   let pci_devices = query_res_2[5].data ?? []
-  let bmc = query_res_2[0].data
-  let cpu = query_res_2[1].data
-  let hdd = query_res_2[3].data.length !== undefined ? query_res_2[3].data : []
+  let bmc = query_res_2[0]?.data
+  let cpu = query_res_2[1]?.data
+  let hdd = query_res_2[3]?.data.length !== undefined ? query_res_2[3]?.data : []
   let gpu =
-    query_res_2[2].data.length > 0
-      ? query_res_2[2].data
-      : pci_devices.filter((val) => ["NVIDIA Corporation"].includes(val.Manufacturer)) // add AMD?
+    query_res_2[2]?.data.length > 0
+      ? query_res_2[2]?.data
+      : pci_devices.filter((val) => ["NVIDIA Corporation"]?.includes(val?.Manufacturer)) // add AMD?
   let storage = hdd.find((val) => val.Drives?.length > 0) ?? []
   let ib = pci_devices.filter(
-    (val) => ["Mellanox Technologies"].includes(val.Manufacturer) || val.Description.match(/Omni/g)
+    (val) => ["Mellanox Technologies"].includes(val.Manufacturer) || val.Description?.match(/Omni/g)
   ) // find Mellanox IB & Omni path cards
 
   let network_port_urls = []
@@ -66,7 +68,7 @@ const dell_query = async (auth) => {
   let query_res_3 = await Promise.all([
     await api_request(enclosure_url, auth),
     await api_request(drive_urls, auth),
-    await api_request(storage?.Volumes["@odata.id"] ?? "", auth),
+    await api_request(storage?.Volumes?.["@odata.id"] ?? "", auth),
     await api_request(volume_urls, auth),
     await api_request(network_port_urls, auth),
   ])
@@ -210,7 +212,7 @@ const dell_query = async (auth) => {
     },
     sel: {
       count: sel["Members@odata.count"],
-      logs: sel.Members.map((val) => {
+      logs: sel.Members?.map((val) => {
         return {
           created: val.Created,
           message: val.Message,

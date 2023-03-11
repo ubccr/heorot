@@ -26,7 +26,8 @@ async function api_request(url, auth, method = "GET", json = true, body = undefi
       res = await Promise.all(
         url.map(async (u) => {
           const res = await fetch(auth.uri + u, header)
-          return res.json()
+          if (json === true && res.status === 200) return await res.json()
+          else return res
         })
       )
     }
