@@ -1,3 +1,4 @@
+const config = require("../config")
 const Nodes = require("../models/Nodes")
 const { grendelRequest } = require("./grendel")
 const { redfishRequest } = require("./redfish/redfish")
@@ -36,16 +37,15 @@ const fetch_node = async (node, refetch) => {
     }
   }
 }
-// Needs to not run if hours is set to 0
-// When refresh interval is updated, start function
-const refetch_all_nodes = async (hours = 1) => {
-  // if (hours === 0) return
+
+const refetch_all_nodes = async (minutes = 0) => {
+  if (minutes === 0) return
   console.log("Starting refresh of Redfish data")
   let expired_time = new Date()
-  expired_time.setHours(expired_time.getHours() - hours)
+  expired_time.setMinutes(expired_time.getMinutes() - minutes)
 
   let nodes = await Nodes.find({}, { node: 1, redfish: 1, _id: 0, updatedAt: 1 })
-
+  // console.log(nodes.filter((val) => val.updatedAt < expired_time))
   let response = await Promise.all(
     nodes.filter((val) => val.updatedAt < expired_time).map((node) => fetch_node(node.node, "true"))
   )
@@ -53,18 +53,19 @@ const refetch_all_nodes = async (hours = 1) => {
 }
 
 function schedule_node_refresh() {
-  // config.settings.bmc.refresh_interval
-  refetch_all_nodes()
+  refetch_all_nodes(config.settings.bmc?.refresh_interval ?? 0)
     .then(function () {
-      console.log("Refreshed all Redfish data, waiting an hour")
-      setTimeout(function () {
-        console.log("Refetching Redfish data...")
-        schedule_node_refresh()
-      }, 1000 * 60 * 60)
+      console.log(`Refreshed all Redfish data, waiting ${config.settings.bmc?.refresh_interval} minute(s)`)
+      if (config.settings.bmc?.refresh_interval > 0) {
+        setTimeout(function () {
+          console.log("Refetching Redfish data...")
+          schedule_node_refresh()
+        }, 1000 * 60 * config.settings.bmc?.refresh_interval ?? 60)
+      }
     })
     .catch((err) => console.error("Error refreshing Redfish data automatically", err))
 }
 
 schedule_node_refresh()
 
-module.exports = { fetch_node }
+module.exports = { fetch_node, schedule_node_refresh }
