@@ -71,8 +71,9 @@ const rackGen = async (grendel, rackArr, refetch) => {
       // fallback function to use grendel tags for height
       if (height === 0 || width === 0) {
         let default_width = node[0].name.split("-").length === 4 ? "2" : "1"
-        str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "1"
-        str_width = node[0].tags.find((val) => val.match(/^[0-9]{1,2}w/)) ?? default_width
+        let str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "1"
+        console.log(str_height)
+        let str_width = node[0].tags.find((val) => val.match(/^[0-9]{1,2}w/)) ?? default_width
 
         height = parseInt(str_height.replace("u", "")) ?? 1
         width = parseInt(str_width.replace("w", "")) ?? 1
