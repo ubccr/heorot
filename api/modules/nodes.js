@@ -1,7 +1,7 @@
 const config = require("../config")
 const Nodes = require("../models/Nodes")
 const { grendelRequest } = require("./grendel")
-const { redfishRequest } = require("./redfish/redfish")
+const { redfishRequest } = require("./redfish.ts")
 
 const fetch_node = async (node, refetch) => {
   let status = "error"
