@@ -14,7 +14,7 @@ const Node = ({ node }) => {
   useEffect(() => {
     if (
       node.redfish.status !== "error" &&
-      node.redfish.storage.drives.length + node.redfish.storage.volumes.length <= 3
+      node.redfish.storage.drives?.length + node.redfish.storage.volumes?.length <= 3
     ) {
       setHideButton(true)
       setExpandDrives(true)
