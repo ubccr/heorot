@@ -1,4 +1,4 @@
-let config = require("../config")
+let config = require("../../config/config")
 const mongoose = require("mongoose")
 const Settings = require("../models/Settings")
 const { decrypt } = require("./encryption")

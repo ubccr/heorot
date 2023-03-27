@@ -1,5 +1,5 @@
 const crypto = require("crypto")
-const config = require("../config")
+const config = require("../../config/config")
 const Settings = require("../models/Settings")
 
 const algorithm = "aes-256-cbc"

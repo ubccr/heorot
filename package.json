@@ -4,8 +4,8 @@
   "description": "Heorot API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "ts-node-dev --respawn ./server.ts",
+    "start": "node ./dist/server.js",
+    "dev": "ts-node-dev --respawn ./api/server.ts",
     "build": "tsc"
   },
   "author": "Josh Furlani",

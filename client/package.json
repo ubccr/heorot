@@ -30,7 +30,8 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "postbuild": "mv ./build ../dist/build"
   },
   "eslintConfig": {
     "plugins": [

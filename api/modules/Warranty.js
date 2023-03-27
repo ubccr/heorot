@@ -1,6 +1,6 @@
 const fetch = require("node-fetch")
 
-let config = require("../config")
+let config = require("../../config/config")
 const { decrypt } = require("./encryption")
 
 async function warrantyApiReq(serviceTag) {

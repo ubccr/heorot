@@ -51,7 +51,7 @@ app.use("/warranty", auth, warrantyRouter);
 const switchesRouter = require("./routes/switches.js");
 app.use("/switches", auth, switchesRouter);
 app.get("/plugins", function (req, res) {
-    var _a, _b, _c;
+    var _j, _q, _10;
     return __awaiter(this, void 0, void 0, function* () {
         let warranty, ome, bmc = false;
         if (config.settings.dell_warranty_api.id !== "")
@@ -67,11 +67,11 @@ app.get("/plugins", function (req, res) {
             ome,
             bmc,
             floorplan,
-            node_prefixes: (_b = (_a = config.settings.rack.prefix.find((val) => val.type === "node")) === null || _a === void 0 ? void 0 : _a.prefix) !== null && _b !== void 0 ? _b : [
+            node_prefixes: (_q = (_j = config.settings.rack.prefix.find((val) => val.type === "node")) === null || _j === void 0 ? void 0 : _j.prefix) !== null && _q !== void 0 ? _q : [
                 "cpn",
                 "srv",
             ],
-            version: (_c = process.env.npm_package_version) !== null && _c !== void 0 ? _c : "1.4.1",
+            version: (_10 = process.env.npm_package_version) !== null && _10 !== void 0 ? _10 : "1.4.1",
         });
     });
 });

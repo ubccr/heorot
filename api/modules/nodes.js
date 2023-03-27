@@ -1,4 +1,4 @@
-const config = require("../config")
+const config = require("../../config/config")
 const Nodes = require("../models/Nodes")
 const { grendelRequest } = require("./grendel")
 const { redfishRequest } = require("./redfish.ts")

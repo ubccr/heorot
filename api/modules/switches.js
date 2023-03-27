@@ -1,6 +1,6 @@
 const { NodeSSH } = require("node-ssh")
 const { grendelRequest } = require("../modules/grendel")
-const config = require("../config")
+const config = require("../../config/config")
 const xml2js = require("xml2js")
 const fs = require("fs")
 const { setCache } = require("./cache")

@@ -8,11 +8,11 @@ import https from "https"
 import jwt from "jsonwebtoken"
 import { resolve } from "path"
 
+let config = require("../config/config")
+// import config from "@app/config"
 const auth = require("./modules/auth")
 
 const app = express()
-
-let config = require("./config")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

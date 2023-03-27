@@ -2,7 +2,7 @@ const express = require("express")
 const app = express()
 const cors = require("cors")
 
-let config = require("./config")
+let config = require("@app/config/config")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

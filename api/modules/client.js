@@ -1,4 +1,4 @@
-const config = require("../config.js")
+const config = require("../../config/config.js")
 const { fetch_node } = require("./nodes.js")
 
 const rackGen = async (grendel, rackArr, refetch) => {

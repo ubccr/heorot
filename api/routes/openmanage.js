@@ -3,7 +3,7 @@ const app = express.Router()
 const https = require("https")
 const fetch = require("node-fetch")
 
-let config = require("../config")
+let config = require("../../config/config")
 
 const agent = new https.Agent({
   rejectUnauthorized: false,

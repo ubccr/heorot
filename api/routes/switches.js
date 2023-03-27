@@ -1,6 +1,5 @@
 const express = require("express")
 const app = express.Router()
-const Cache = require("../models/Cache")
 const Switches = require("../models/Switches")
 
 const { setCache, getCache, timeComp } = require("../modules/cache")

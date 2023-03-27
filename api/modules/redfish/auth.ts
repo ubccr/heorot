@@ -1,8 +1,7 @@
 import fetch from "node-fetch"
 import https from "https"
 
-let config = require("../../config")
-// import config from "../../config"
+let config = require("../../../config/config")
 
 const agent = new https.Agent({
   rejectUnauthorized: false,

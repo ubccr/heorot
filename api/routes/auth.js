@@ -1,6 +1,6 @@
 const express = require("express")
 const app = express.Router()
-let config = require("../config")
+let config = require("../../config/config")
 
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
