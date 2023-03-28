@@ -11,22 +11,22 @@ import StorageIcon from "@mui/icons-material/Storage"
 const Node = ({ node }) => {
   const [expandDrives, setExpandDrives] = useState(false)
   const [hideButton, setHideButton] = useState(false)
-  useEffect(() => {
-    if (
-      node.redfish.status !== "error" &&
-      node.redfish.storage.drives?.length + node.redfish.storage.volumes?.length <= 3
-    ) {
-      setHideButton(true)
-      setExpandDrives(true)
-    }
+  // useEffect(() => {
+  //   if (
+  //     node.redfish.success !== false &&
+  //     node.redfish.storage.drives?.length + node.redfish.storage.volumes?.length <= 3
+  //   ) {
+  //     setHideButton(true)
+  //     setExpandDrives(true)
+  //   }
 
-    return () => {
-      setExpandDrives(false)
-    }
-  }, [node])
+  //   return () => {
+  //     setExpandDrives(false)
+  //   }
+  // }, [node])
 
   // default display for faild queries
-  if (node.redfish.status === "error")
+  if (node.redfish.success === false || node.redfish.success === undefined)
     return (
       <Box sx={{ width: "100%" }}>
         <Link to={`/Node/${node.grendel.name}`}>{node.grendel.name}</Link>
@@ -63,12 +63,14 @@ const Node = ({ node }) => {
 
   let memory = {
     titleArr: [
-      { name: "Speed:", data: node.redfish.memory.speed },
+      { name: "Speed:", data: node.redfish.memory.speed_MhZ },
       { name: "Status:", data: node.redfish.memory.status },
+      { name: "Non-Volatile:", data: Number(node.redfish.memory.total_NV_size_MiB / 1024).toFixed(0) },
+      { name: "Volatile:", data: Number(node.redfish.memory.total_V_size_MiB / 1024).toFixed(0) },
     ],
     icon: <i className="bi bi-memory" style={{ marginLeft: "5px", fontSize: "12pt" }} />,
     color: statusColor(node.redfish.memory.status),
-    label: node.redfish.memory.size,
+    label: `${Number(node.redfish.memory.total_size_MiB / 1024).toFixed(0)} GB`,
   }
 
   return (
@@ -88,63 +90,65 @@ const Node = ({ node }) => {
 
             <Grid item xs={4} sx={{ display: "flex", justifyContent: "end", gap: "3px" }}>
               {node.redfish.network !== undefined &&
-                node.redfish.network.map((val, index) => {
-                  let color = "border.secondary"
-                  let bColor = "default"
-                  let speed = val.speed ?? "0"
+                node.redfish.network.map((adapter, index) => {
+                  return adapter.ports.map((val, index) => {
+                    let color = "border.secondary"
+                    let bColor = "default"
+                    let speed = val.speed ?? "0"
 
-                  if (val.speed === 100000) {
-                    bColor = "info"
-                    speed = "100 GbE"
-                  } else if (val.speed === 40000) {
-                    bColor = "error"
-                    speed = "40 GbE"
-                  } else if (val.speed === 10000) {
-                    bColor = "primary"
-                    speed = "10 GbE"
-                  } else if (val.speed === 1000) {
-                    bColor = "success"
-                    speed = "1 GbE"
-                  } else if (val.speed === 100) {
-                    bColor = "warning"
-                    speed = "100 MbE"
-                  }
+                    if (val.speed === 100000) {
+                      bColor = "info"
+                      speed = "100 GbE"
+                    } else if (val.speed === 40000) {
+                      bColor = "error"
+                      speed = "40 GbE"
+                    } else if (val.speed === 10000) {
+                      bColor = "primary"
+                      speed = "10 GbE"
+                    } else if (val.speed === 1000) {
+                      bColor = "success"
+                      speed = "1 GbE"
+                    } else if (val.speed === 100) {
+                      bColor = "warning"
+                      speed = "100 MbE"
+                    }
 
-                  let titleArr = [
-                    { name: "Port:", data: val.port },
-                    { name: "NIC:", data: val.id },
-                    { name: "Type:", data: val.type },
-                    { name: "MAC:", data: val.mac },
-                    { name: "Speed:", data: speed },
-                    { name: "Status:", data: val.status },
-                  ]
+                    let titleArr = [
+                      { name: "Port:", data: val.port },
+                      { name: "NIC:", data: val.id },
+                      { name: "Type:", data: val.type },
+                      { name: "MAC:", data: val.mac },
+                      { name: "Speed:", data: speed },
+                      { name: "Status:", data: val.status },
+                    ]
 
-                  if (val.link === "Up") color = "border.table.double"
+                    if (val.link === "Up") color = "border.table.double"
 
-                  let icon = (
-                    <Icon fontSize="small" sx={{ color: "white" }}>
-                      <i className=" bi-ethernet" />
-                    </Icon>
-                  )
-                  if (val.type === "InfiniBand")
-                    icon = (
+                    let icon = (
                       <Icon fontSize="small" sx={{ color: "white" }}>
-                        <i className=" bi-info-square" />
+                        <i className=" bi-ethernet" />
                       </Icon>
                     )
+                    if (val.type === "InfiniBand")
+                      icon = (
+                        <Icon fontSize="small" sx={{ color: "white" }}>
+                          <i className=" bi-info-square" />
+                        </Icon>
+                      )
 
-                  // let icon = val.id.match(/([0-9]-[0-9])|[0-9]/g)
+                    // let icon = val.id.match(/([0-9]-[0-9])|[0-9]/g)
 
-                  return (
-                    <DataDisplay
-                      type="avatar"
-                      titleArr={titleArr}
-                      icon={icon}
-                      color={bColor}
-                      backgroundColor={color}
-                      key={index}
-                    />
-                  )
+                    return (
+                      <DataDisplay
+                        type="avatar"
+                        titleArr={titleArr}
+                        icon={icon}
+                        color={bColor}
+                        backgroundColor={color}
+                        key={index}
+                      />
+                    )
+                  })
                 })}
             </Grid>
           </Grid>
@@ -178,16 +182,17 @@ const Node = ({ node }) => {
           sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}
         >
           <Box>
-            {node.redfish.processor !== undefined &&
-              node.redfish.processor.map((val, index) => {
+            {node.redfish.processor.processors !== undefined &&
+              node.redfish.processor.processors.map((val, index) => {
                 let icon = <i className="bi bi-cpu" style={{ marginLeft: "5px", fontSize: "12pt" }} />
                 let titleArr = [
                   { name: "Model:", data: val.model },
-                  { name: "Hyper-Threading:", data: val.logical_proc },
-                  { name: "Cores:", data: val.cores },
-                  { name: "Threads:", data: val.threads },
-                  { name: "Turbo:", data: val.turbo },
-                  { name: "Frequency:", data: val.frequency },
+                  { name: "Architecture:", data: val.architecture },
+                  // { name: "Hyper-Threading:", data: val.logical_proc },
+                  { name: "Cores:", data: val.total_cores },
+                  { name: "Threads:", data: val.total_threads },
+                  // { name: "Turbo:", data: val.turbo },
+                  // { name: "Frequency:", data: val.frequency },
                   { name: "Max Frequency:", data: val.max_frequency },
                 ]
                 return (
@@ -201,8 +206,8 @@ const Node = ({ node }) => {
                 )
               })}
             <DataDisplay titleArr={memory.titleArr} icon={memory.icon} color={memory.color} label={memory.label} />
-            {node.redfish.gpu !== undefined &&
-              node.redfish.gpu.gpus.map((val, index) => {
+            {node.redfish.gpus !== undefined &&
+              node.redfish.gpus.map((val, index) => {
                 let icon = <i className="bi bi-gpu-card" style={{ marginLeft: "5px", fontSize: "12pt" }} />
                 let titleArr = [
                   { name: "Model:", data: val.model },
@@ -238,65 +243,34 @@ const Node = ({ node }) => {
                 )
               })}
           </Box>
-          <Box sx={{ display: "inline-flex", maxWidth: "320px" }}>
-            <Collapse collapsedSize={30} in={expandDrives}>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
-                {node.redfish.storage.volumes !== undefined &&
-                  node.redfish.storage.volumes.map((val, index) => {
-                    if (val.volume_type !== "RawDevice" && val.raid_type !== "") {
-                      let icon = <StorageIcon fontSize="small" />
+          {/* <Box sx={{ display: "inline-flex", maxWidth: "320px" }}> */}
+          {/* <Collapse collapsedSize={30} in={expandDrives}> */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
+            {node.redfish.storage.map((val) => {
+              return val.volumes.map((vol, index) => {
+                let icon = <StorageIcon fontSize="small" />
 
-                      let titleArr = [
-                        { name: "Name:", data: val.name },
-                        { name: "Description:", data: val.description },
-                        { name: "Volume Type:", data: val.volume_type },
-                        { name: "RAID Type:", data: val.raid_type },
-                      ]
+                let titleArr = [
+                  { name: "Name:", data: vol.name },
+                  { name: "Description:", data: vol.description },
+                  { name: "Volume Type:", data: vol.volume_type },
+                  { name: "RAID Type:", data: vol.raid_type },
+                ]
 
-                      return (
-                        <DataDisplay
-                          titleArr={titleArr}
-                          icon={icon}
-                          color={statusColor(val.status)}
-                          label={`${val.capacity} ${val.raid_type}`}
-                          key={index}
-                        />
-                      )
-                    }
-                  })}
-                {node.redfish.storage.drives !== undefined &&
-                  node.redfish.storage.drives.map((val, index) => {
-                    let icon = <></>
-                    if (val.type === "SSD")
-                      icon = <i className="bi bi-device-ssd" style={{ marginLeft: "5px", fontSize: "12pt" }} />
-                    if (val.type === "HDD")
-                      icon = <i className="bi-device-hdd" style={{ marginLeft: "5px", fontSize: "12pt" }} />
-
-                    let titleArr = [
-                      { name: "Name:", data: val.name },
-                      { name: "Slot", data: val.slot },
-                      { name: "Manufacturer:", data: val.manufacturer },
-                      { name: "Protocol", data: `${val.capable_speed} Gbps ${val.protocol}` },
-                      val.rotation_speed !== null ? { name: "Rotation Speed:", data: `${val.rotation_speed} RPM` } : {},
-                      val.predicted_write_endurance !== null && val.predicted_write_endurance !== 0
-                        ? { name: "Write Endurance:", data: `${val.predicted_write_endurance}%` }
-                        : {},
-                      val.hotspare_type !== "None" ? { name: "Hotspare Type:", data: val.hotspare_type } : {},
-                    ]
-
-                    return (
-                      <DataDisplay
-                        titleArr={titleArr}
-                        icon={icon}
-                        color={statusColor(val.status)}
-                        label={`${val.capacity}`}
-                        key={index}
-                      />
-                    )
-                  })}
-              </Box>
-            </Collapse>
-            {!hideButton && (
+                return (
+                  <DataDisplay
+                    titleArr={titleArr}
+                    icon={icon}
+                    color={statusColor(vol.status)}
+                    label={`${Number(vol.capacity / 1073741824).toFixed(2)} GB - ${vol.raid_type ?? vol.volume_type}`}
+                    key={index}
+                  />
+                )
+              })
+            })}
+          </Box>
+          {/* </Collapse> */}
+          {/* {!hideButton && (
               <IconButton
                 size="small"
                 sx={{ width: "25px", height: "25px" }}
@@ -304,8 +278,8 @@ const Node = ({ node }) => {
               >
                 {expandDrives ? <KeyboardArrowDownIcon /> : <KeyboardArrowLeftIcon />}
               </IconButton>
-            )}
-          </Box>
+            )} */}
+          {/* </Box> */}
         </Grid>
       </Grid>
     </>

@@ -40,23 +40,23 @@ const Redfish = ({ query, setRefresh }) => {
   const [diskChassisArr, setDiskChassisArr] = useState([])
   useEffect(() => {
     // This should probably be server side
-    if (
-      !!data &&
-      data.status !== "error" &&
-      data.storage.slotCount !== null &&
-      data.storage.drives[0].slot !== undefined
-    ) {
-      let slotCount_num = Number(data.storage.slot_count)
-      let tmp_arr = new Array(slotCount_num)
-      for (let x = 0; x < slotCount_num; x++) {
-        let drive = data.storage.drives.find((val) => Number(val.slot) === x)
-        if (drive) tmp_arr[x] = drive
-        else tmp_arr[x] = { name: "", status: "empty" }
-      }
-      setDiskChassisArr(tmp_arr)
-    } else if (!!data) {
-      setDiskChassisArr(data.storage.drives)
-    }
+    // if (
+    //   !!data &&
+    //   data.status !== "error" &&
+    //   data.storage.slotCount !== null &&
+    //   data.storage.drives[0].slot !== undefined
+    // ) {
+    //   let slotCount_num = Number(data.storage.slot_count)
+    //   let tmp_arr = new Array(slotCount_num)
+    //   for (let x = 0; x < slotCount_num; x++) {
+    //     let drive = data.storage.drives.find((val) => Number(val.slot) === x)
+    //     if (drive) tmp_arr[x] = drive
+    //     else tmp_arr[x] = { name: "", status: "empty" }
+    //   }
+    //   setDiskChassisArr(tmp_arr)
+    // } else if (!!data) {
+    //   setDiskChassisArr(data.storage.drives)
+    // }
   }, [query])
 
   const clearSEL_query = useQuery(
@@ -113,12 +113,12 @@ const Redfish = ({ query, setRefresh }) => {
                 <Typography variant="h2" fontSize={14} sx={{ marginBottom: "5px" }}>
                   BMC Version: {data.bmc.version}
                 </Typography>
-                <Typography variant="h1" fontSize={16}>
+                {/* <Typography variant="h1" fontSize={16}>
                   Memory: {data.memory.size} at {data.memory.speed}
-                </Typography>
-                <Typography variant="h1" fontSize={14}>
-                  Boot Order: {data.boot_order}
-                </Typography>
+                </Typography> */}
+                {/* <Typography variant="h1" fontSize={14}>
+                  Boot Order: {data.boot_info.map((val) => val.name).join(", ")}
+                </Typography> */}
               </CardContent>
             </Card>
           </Grid2>
@@ -130,10 +130,10 @@ const Redfish = ({ query, setRefresh }) => {
                   BMC
                 </Typography>
                 <Typography variant="h1" fontSize={16}>
-                  Address: {data.bmc.addresses.ip} ({data.bmc.addresses.type})
+                  Address: {data.bmc.ip} ({data.bmc.type})
                 </Typography>
                 <Typography variant="h2" fontSize={16}>
-                  Gateway: {data.bmc.addresses.gateway}
+                  Gateway: {data.bmc.gateway}
                 </Typography>
                 <Typography variant="h2" fontSize={16}>
                   VLAN: {data.bmc.vlan}
@@ -151,19 +151,21 @@ const Redfish = ({ query, setRefresh }) => {
                 <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                   Volumes
                 </Typography>
-                {data.storage.volumes.map((val, index) => (
-                  <React.Fragment key={index}>
-                    <Typography variant="h1" fontSize={16}>
-                      Name: {val.name}
-                    </Typography>
-                    <Typography variant="h1" fontSize={14}>
-                      Type: {val.volume_type} {val.raid_type}
-                    </Typography>
-                    <Typography variant="h1" fontSize={14} sx={{ marginBottom: "5px" }}>
-                      Capacity: {val.capacity}
-                    </Typography>
-                  </React.Fragment>
-                ))}
+                {data.storage.map((adapter) => {
+                  return adapter.volumes.map((val, index) => (
+                    <React.Fragment key={index}>
+                      <Typography variant="h1" fontSize={16}>
+                        Name: {val.name}
+                      </Typography>
+                      <Typography variant="h1" fontSize={14}>
+                        Type: {val.volume_type} {val.raid_type}
+                      </Typography>
+                      <Typography variant="h1" fontSize={14} sx={{ marginBottom: "5px" }}>
+                        Capacity: {Number(val.capacity / 1073741824).toFixed(2)}
+                      </Typography>
+                    </React.Fragment>
+                  ))
+                })}
               </CardContent>
             </Card>
           </Grid2>
@@ -233,32 +235,29 @@ const Redfish = ({ query, setRefresh }) => {
           <Grid2 xs={12}>
             <Divider />
           </Grid2>
-
-          {data.processor.length > 0 && (
+          {data.processor.processors.length > 0 && (
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px" }}>
                 <CardContent>
                   <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                     CPUs
                   </Typography>
-                  {data.processor.map((val, index) => (
+                  {data.processor.processors.map((val, index) => (
                     <React.Fragment key={index}>
-                      <Typography variant="h2" fontSize={16}>
+                      <Typography variant="h2" fontSize={16} sx={{ marginBottom: "5px" }}>
                         {index + 1}: {val.model.split("@")[0]}
                       </Typography>
                       <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
-                        Cores: {val.cores}
+                        Architecture: {val.architecture}
                       </Typography>
-                      {val.logical_proc === "Enabled" && (
-                        <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
-                          Threads: {val.threads}
-                        </Typography>
-                      )}
                       <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
-                        Frequency: {val.frequency} MHz
+                        Cores: {val.total_cores}
+                      </Typography>
+                      <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
+                        Threads: {val.total_threads}
                       </Typography>
                       <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px", marginBottom: "10px" }}>
-                        Turbo Frequency: {val.max_frequency} MHz
+                        Frequency: {val.max_frequency} MHz
                       </Typography>
                     </React.Fragment>
                   ))}
@@ -266,22 +265,25 @@ const Redfish = ({ query, setRefresh }) => {
               </Card>
             </Grid2>
           )}
-
-          {data.gpu.gpus.length > 0 && (
+          {data.gpus.length > 0 && (
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px" }}>
                 <CardContent>
                   <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                     GPUs
                   </Typography>
-
-                  <Typography variant="h2" fontSize={16} sx={{ marginBottom: "5px" }}>
-                    SR-IOV: {data.gpu.vGPU ? "true" : "false"}
-                  </Typography>
-                  {data.gpu.gpus.map((val, index) => (
-                    <Typography variant="h2" fontSize={16} sx={{ marginBottom: "10px" }} key={index}>
-                      {index + 1}: {val.model}
-                    </Typography>
+                  {data.gpus.map((val, index) => (
+                    <React.Fragment key={index}>
+                      <Typography variant="h2" fontSize={16} sx={{ marginBottom: "5px" }}>
+                        {index + 1}: {val.model}
+                      </Typography>
+                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px" }}>
+                        Manufacturer: {val.manufacturer}
+                      </Typography>
+                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px", marginBottom: "10px" }}>
+                        Status: {val.status}
+                      </Typography>
+                    </React.Fragment>
                   ))}
                 </CardContent>
               </Card>
@@ -297,11 +299,14 @@ const Redfish = ({ query, setRefresh }) => {
                   </Typography>
                   {data.pcie.map((val, index) => (
                     <React.Fragment key={index}>
-                      <Typography variant="h2" fontSize={16}>
-                        {index + 1}: {val.name}
+                      <Typography variant="h2" fontSize={16} sx={{ marginBottom: "5px" }}>
+                        {index + 1}: {val.model}
                       </Typography>
-                      <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px", marginBottom: "10px" }}>
+                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px" }}>
                         Manufacturer: {val.manufacturer}
+                      </Typography>
+                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px", marginBottom: "10px" }}>
+                        Status: {val.status}
                       </Typography>
                     </React.Fragment>
                   ))}
@@ -365,7 +370,7 @@ const Redfish = ({ query, setRefresh }) => {
             </Card>
           </Grid2>
 
-          {query.data.warranty !== undefined && (
+          {query.data.warranty.entitlements.length > 0 && (
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px" }}>
                 <CardContent>
@@ -398,29 +403,31 @@ const Redfish = ({ query, setRefresh }) => {
           <Grid2 xs={12} sx={{ marginTop: "5px", marginBottom: "5px" }}>
             <Divider />
           </Grid2>
-          {data.network.map((val, index) => (
-            <Grid2 xs={12} sm={6} lg={3} key={index}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Typography variant="h1" fontSize={18}>
-                    {val.id}
-                  </Typography>
-                  <Typography variant="h2" fontSize={16}>
-                    Link: {val.link}
-                  </Typography>
-                  <Typography variant="h2" fontSize={16}>
-                    Type: {val.type}
-                  </Typography>
-                  <Typography variant="h2" fontSize={16}>
-                    MAC: {val.mac}
-                  </Typography>
-                  <Typography variant="h2" fontSize={16}>
-                    Speed: {val.speed / 1000} Gb
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid2>
-          ))}
+          {data.network.map((adapter, adapter_index) => {
+            return adapter.ports.map((port, port_index) => (
+              <Grid2 xs={12} sm={6} lg={3} key={`${adapter_index},${port_index}`}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="h1" fontSize={18}>
+                      {port.id}
+                    </Typography>
+                    <Typography variant="h2" fontSize={16}>
+                      Link: {port.link}
+                    </Typography>
+                    <Typography variant="h2" fontSize={16}>
+                      Type: {port.type}
+                    </Typography>
+                    <Typography variant="h2" fontSize={16}>
+                      MAC: {port.mac}
+                    </Typography>
+                    <Typography variant="h2" fontSize={16}>
+                      Speed: {port.speed / 1000} Gb
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid2>
+            ))
+          })}
         </Grid2>
       </Box>
     </>
