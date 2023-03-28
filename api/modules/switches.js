@@ -9,7 +9,6 @@ const Switches = require("../models/Switches")
 const getSwInfoV2 = async (node) => {
   // Grendel
   const grendelRes = await grendelRequest(`/v1/host/find/${node}`)
-
   if (grendelRes.result.length === 0) {
     return { status: "error", message: "No matching node name found in Grendel" }
   }
@@ -44,7 +43,6 @@ const getSwInfoV2 = async (node) => {
     commands = ["show inventory | no-more", "show interfaces status | no-more", "show mac-address-table | no-more"]
     parseType = "OS8"
     return oldSwInfo(commands, fqdn, parseType)
-    // return { status: "error", message: "Dell OS8 switches are not supported" }
   } else if (grendel.tags.includes("Dell_PC3")) {
     commands = ["show system", "show interfaces status", "enable", "show bridge address-table"]
     parseType = "PC3"
@@ -130,10 +128,10 @@ const getSwInfoV2 = async (node) => {
     return { status: "success", info: switchCalcs(output, parseType), result: output }
     // return output
   } catch (err) {
-    console.error(`failed to connect to ${fqdn}`, err)
     return {
       status: "error",
       message: `Switch SSH connection error on switch ${node}`,
+      // silent: true,
     }
   }
 }
@@ -324,7 +322,7 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
         sshObj.firstRun = false
         if (output !== null) responseArr.push({ command: command, output }) // get rid of null from "enable" command
       })
-      callback = (response) => {
+      const callback = (response) => {
         resolve(responseArr)
       }
       SSH.on("error", (error, type) => {
@@ -342,7 +340,8 @@ const oldSwInfo = async (commands, fqdn, parseType) => {
   } catch (err) {
     return {
       status: "error",
-      message: JSON.stringify(err),
+      message: `SSH connection error on ${fqdn}. Error: ${JSON.stringify(err)}`,
+      error: err,
     }
   }
 }
