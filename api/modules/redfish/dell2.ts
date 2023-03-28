@@ -161,7 +161,7 @@ async function BMC_info(auth: Auth) {
         type: managers_nic_res.data.IPv4Addresses[0].AddressOrigin,
         gateway: managers_nic_res.data.IPv4Addresses[0].Gateway,
         subnet_mask: managers_nic_res.data.IPv4Addresses[0].SubnetMask,
-        dns: managers_nic_res.data.NameServers,
+        dns: managers_nic_res.data.NameServers.filter((val) => !["::", "0.0.0.0"].includes(val)),
       },
     }
   } catch (error) {
