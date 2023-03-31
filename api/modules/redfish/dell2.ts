@@ -305,7 +305,7 @@ async function PCI_devices(auth: Auth) {
 interface Dimms {
   name: string
   status: string
-  speed_Mhz: number
+  speed_MHz: number
   module_type: string
   capacity_MiB: number
   error_correction: string
@@ -341,7 +341,7 @@ async function Memory_info(auth: Auth) {
         dimms.push({
           name: val.data.Name,
           status: val.data.Status.Health,
-          speed_Mhz: val.data.OperatingSpeedMhz,
+          speed_MHz: val.data.OperatingSpeedMhz,
           module_type: val.data.BaseModuleType ?? "",
           capacity_MiB: val.data.CapacityMiB,
           error_correction: val.data.ErrorCorrection,
@@ -369,7 +369,7 @@ async function Memory_info(auth: Auth) {
       total_size_MiB,
       total_NV_size_MiB,
       total_V_size_MiB,
-      speed_MhZ: dimms[0].speed_Mhz,
+      speed_MHz: dimms[0].speed_MHz,
       dimms,
     }
     output = { success: true, data }
@@ -544,16 +544,6 @@ async function Storage_info(auth: Auth) {
 
     for (const controller of controller_res) {
       if (!controller.data || controller.data["Drives@odata.count"] < 1) continue
-      // get enclosure info (slot_count)
-      let enclosure_url = controller.data.Links.Enclosures[0]["@odata.id"]
-      let slot_count = 0
-      if (enclosure_url.match(/Enclosure.Internal/)) {
-        let enclosure_res: apiResponse<Redfish_Chassis_enclosure_id> = await api_request(enclosure_url, auth)
-        if (enclosure_res.data?.Oem?.Dell.DellChassisEnclosure !== undefined)
-          slot_count = enclosure_res.data?.Oem?.Dell.DellChassisEnclosure?.SlotCount ?? 0
-        else if (enclosure_res.data?.Oem?.Dell.DellEnclosure !== undefined)
-          slot_count = enclosure_res.data?.Oem?.Dell.DellEnclosure?.SlotCount ?? 0
-      }
       // get drives and volumes
       let drives_res: apiResponse<Redfish_Systems_Storage_id_Drives>[] = await Promise.all(
         controller.data.Drives.map((drives_res) => api_request(drives_res["@odata.id"], auth))
@@ -567,6 +557,16 @@ async function Storage_info(auth: Auth) {
       let volumes_res: apiResponse<Redfish_Systems_Storage_id_Volumes_id>[] = await Promise.all(
         volume_urls.data.Members.map((val) => api_request(val["@odata.id"], auth))
       )
+      // get enclosure info (slot_count)
+      let enclosure_url = controller.data.Links.Enclosures[0]["@odata.id"]
+      let slot_count = drives_res.length ?? 0
+      if (enclosure_url.match(/Enclosure.Internal/)) {
+        let enclosure_res: apiResponse<Redfish_Chassis_enclosure_id> = await api_request(enclosure_url, auth)
+        if (enclosure_res.data?.Oem?.Dell.DellChassisEnclosure !== undefined)
+          slot_count = enclosure_res.data?.Oem?.Dell.DellChassisEnclosure?.SlotCount ?? 0
+        else if (enclosure_res.data?.Oem?.Dell.DellEnclosure !== undefined)
+          slot_count = enclosure_res.data?.Oem?.Dell.DellEnclosure?.SlotCount ?? 0
+      }
 
       let drives: Drives[] = []
       drives_res.forEach((val) => {
@@ -590,6 +590,7 @@ async function Storage_info(auth: Auth) {
             hotspare_type: val.data.HotspareType,
           })
       })
+      for (let x = drives.length; x < slot_count; x++) drives.push({ status: "empty" } as Drives)
       let volumes: Volumes[] = []
       volumes_res.forEach((val) => {
         if (val.data)

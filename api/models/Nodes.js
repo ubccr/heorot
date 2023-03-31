@@ -83,12 +83,12 @@ const nodesSchema = new Schema(
         total_size_MiB: { type: Number },
         total_NV_size_MiB: { type: Number },
         total_V_size_MiB: { type: Number },
-        speed_MhZ: { type: Number },
+        speed_MHz: { type: Number },
         dimms: [
           {
             name: { type: String },
             status: { type: String },
-            speed_Mhz: { type: Number },
+            speed_MHz: { type: Number },
             module_type: { type: String },
             capacity_MiB: { type: Number },
             error_correction: { type: String },
@@ -141,7 +141,7 @@ const nodesSchema = new Schema(
             {
               status: { type: String },
               slot: { type: String },
-              capacity: { type: String },
+              capacity: { type: Number },
               type: { type: String },
               name: { type: String },
               model: { type: String },
@@ -164,7 +164,7 @@ const nodesSchema = new Schema(
               status: { type: String },
               volume_type: { type: String },
               raid_type: { type: String },
-              capacity: { type: String },
+              capacity: { type: Number },
             },
           ],
         },
