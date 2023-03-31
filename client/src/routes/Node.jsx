@@ -123,16 +123,16 @@ const Node = () => {
           </Tabs>
         </Box>
         <Box sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
-          {tab === 0 && query.isFetched && <Grendel query={query} />}
-          {tab === 1 && query.isFetched && <Console node={node} query={query} />}
-          {node.split("-")[0] !== "swe" && tab === 2 && query.isFetched && (
+          {tab === 0 && query.isFetched && query.data.status !== "error" && <Grendel query={query} />}
+          {tab === 1 && query.isFetched && query.data.status !== "error" && <Console node={node} query={query} />}
+          {node.split("-")[0] !== "swe" && tab === 2 && query.isFetched && query.data.status !== "error" && (
             <Redfish query={query} setRefresh={setRefresh} />
           )}
-          {node.split("-")[0] === "swe" && tab === 2 && query.isFetched && (
+          {node.split("-")[0] === "swe" && tab === 2 && query.isFetched && query.data.status !== "error" && (
             <Switches query={query} setRefresh={setRefresh} />
           )}
-          {tab === 3 && query.isFetched && <Notes query={query} />}
-          {tab === 4 && query.isFetched && <Switches query={query} />}
+          {tab === 3 && query.isFetched && query.data.status !== "error" && <Notes query={query} />}
+          {tab === 4 && query.isFetched && query.data.status !== "error" && <Switches query={query} />}
         </Box>
       </BgContainer>
     </>
