@@ -3,6 +3,12 @@ import { Box, Card, CardContent, Typography } from "@mui/material"
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
 
 const Switches = ({ query, setRefresh }) => {
+  if (query.data.switch_data.status === "error")
+    return (
+      <Typography variant="h2" fontSize={22}>
+        Error: {query.data.switch_data.message}
+      </Typography>
+    )
   let data = query.data.switch_data
   const cards = [
     {
