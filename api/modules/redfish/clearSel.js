@@ -1,4 +1,4 @@
-const { api_request } = require("./redfish")
+const { api_request } = require("../redfish")
 
 const body = JSON.stringify({ Action: "ClearLog" })
 

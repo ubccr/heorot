@@ -1,6 +1,6 @@
-const mongoose = require("mongoose")
+import crypto from "crypto"
+import mongoose from "mongoose"
 const Schema = mongoose.Schema
-const crypto = require("crypto")
 
 const settingsSchema = new Schema(
   {

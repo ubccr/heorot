@@ -1,11 +1,10 @@
 const express = require("express")
 const app = express.Router()
 
-// TODO: Deprecate
 const { getBMC } = require("../modules/grendel")
 const { redfish_auth, redfish_logout } = require("../modules/redfish/auth")
 const { dell_clearSel, sm_clearSel, hpe_clearSel } = require("../modules/redfish/clearSel")
-const { dell_badRequestFix } = require("../modules/redfish/dell")
+const { dell_badRequestFix } = require("../modules/redfish/badReqFix")
 const { dell_resetBmc, sm_resetBmc, hpe_resetBmc } = require("../modules/redfish/resetBmc")
 const { dell_resetNode, sm_resetNode, hpe_resetNode } = require("../modules/redfish/resetNode")
 
@@ -150,13 +149,17 @@ app.put("/v1/badReqFix/:nodes", async (req, res) => {
   let response = await Promise.all(
     nodes.map(async (val) => {
       let bmc = await getBMC(val)
-      console.log(nodes, bmc)
+
       if (bmc.status === "success") {
         const uri = `https://${bmc.ip}` // use IP since DNS won't resolve
         let auth = await redfish_auth(uri)
         if (auth.status === "success") {
-          if (auth.oem === "Dell") api_res = await dell_badRequestFix(uri, auth, bmc.address)
-          else if (auth.oem === "Supermicro")
+          let api_res = { status: "error", message: "" }
+          if (auth.oem === "Dell") {
+            if (parseInt(auth.version.split(".")[2]) <= 4)
+              api_res = { status: "error", message: "Dell iDRAC version is not supported" }
+            else api_res = await dell_badRequestFix(bmc.address, auth)
+          } else if (auth.oem === "Supermicro")
             api_res = { status: "error", message: "Supermicro nodes are not supported" }
           else if (auth.oem === "HPE") api_res = { status: "error", message: "HP nodes are not supported" }
           else
@@ -165,7 +168,9 @@ app.put("/v1/badReqFix/:nodes", async (req, res) => {
               message: "failed to parse OEM from Redfish call",
             }
 
-          await redfish_logout(auth.location, uri, auth.token)
+          let logout_res = await redfish_logout(uri, auth)
+          if (logout_res.status === "error") console.error(`Failed to logout of bmc: ${bmc.node}`, logout_res)
+
           return api_res
         } else return auth
       } else return bmc

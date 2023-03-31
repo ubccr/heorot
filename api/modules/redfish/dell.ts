@@ -456,7 +456,7 @@ interface SEL_log {
   message: string
   severity: string
 }
-export interface Func_SEL_res {
+interface Func_SEL_res {
   count: number
   logs: Array<SEL_log>
 }

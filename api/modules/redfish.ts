@@ -1,8 +1,8 @@
+import { Auth, redfish_auth, redfish_logout } from "./redfish/auth"
 import fetch, { RequestInit } from "node-fetch"
-import redfish_auth, { Auth, redfish_logout } from "./redfish/auth"
 
 import { Agent } from "https"
-import dell_redfish from "./redfish/dell2"
+import dell_redfish from "./redfish/dell"
 
 const { getBMC } = require("./grendel")
 
@@ -25,7 +25,7 @@ export async function api_request(
   auth: Auth,
   method = "GET",
   req_json = true,
-  body = undefined
+  body: undefined | string = undefined
 ): Promise<apiResponse<any>> {
   let output: apiResponse<any> = { success: false }
   try {
@@ -58,20 +58,21 @@ export const redfishRequest = async (node: string) => {
   if (bmc.status !== "success") return bmc
 
   let url = `https://${bmc.address}`
-
   let auth = await redfish_auth(url) // authenticate to BMC and collect info
   if (auth.status !== "success") return auth
 
-  let output = await dell_redfish(auth)
-
-  let res_logout = await redfish_logout(url, auth)
-  if (res_logout.status === "error") console.error(`Failed to logout of ${node}`, res_logout)
-
-  return output
+  try {
+    let output = await dell_redfish(auth)
+    return output
+  } catch (error) {
+    console.log("Error in redfishRequest: ", error)
+  } finally {
+    let res_logout = await redfish_logout(url, auth)
+    if (res_logout.status === "error") console.error(`Failed to logout of ${node}`, res_logout)
+  }
 }
 
 function redfish_error_handler(data: any, auth: Auth) {
-  console.log(data)
   if (auth.oem === "Dell")
     return {
       success: false,

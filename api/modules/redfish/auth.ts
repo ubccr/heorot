@@ -18,7 +18,7 @@ export interface Auth {
   error?: any
 }
 
-export default async function redfish_auth(uri: string): Promise<Auth> {
+export async function redfish_auth(uri: string): Promise<Auth> {
   const payload = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -107,3 +107,4 @@ export async function redfish_logout(url: string, auth: Auth) {
   }
   return output
 }
+module.exports = { redfish_auth, redfish_logout }

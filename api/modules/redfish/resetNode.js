@@ -1,4 +1,4 @@
-const { api_request } = require("./redfish")
+const { api_request } = require("../redfish")
 
 async function dell_resetNode(uri, token, pxe) {
   if (pxe === "true") {

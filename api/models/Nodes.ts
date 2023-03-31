@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+import mongoose from "mongoose"
 const Schema = mongoose.Schema
 const nodesSchema = new Schema(
   {
@@ -45,7 +45,6 @@ const nodesSchema = new Schema(
         status: { type: String },
         version: { type: String },
         mac: { type: String },
-        // hostname: { type: String },
         vlan: { type: String },
         ip: { type: String },
         type: { type: String },
@@ -73,13 +72,11 @@ const nodesSchema = new Schema(
         {
           status: { type: String },
           manufacturer: { type: String },
-          name: { type: String },
+          model: { type: String },
         },
       ],
       memory: {
         status: { type: String },
-        // size: { type: String },
-        // speed: { type: String },
         total_size_MiB: { type: Number },
         total_NV_size_MiB: { type: Number },
         total_V_size_MiB: { type: Number },
