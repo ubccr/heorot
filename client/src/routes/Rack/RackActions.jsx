@@ -133,12 +133,12 @@ const RackActions = ({ nodes }) => {
     },
     onError: async (error, variables, context) => {
       let error_json = await error.json()
-      enqueueSnackbar(error_json.message, { variant: "error" })
+      enqueueSnackbar(error_json.message, { variant: error_json.status })
       console.error(error_json.error)
     },
     onSuccess: async (data, variables, context) => {
       let data_json = await data.json()
-      enqueueSnackbar(data_json.message, { variant: "success" })
+      enqueueSnackbar(data_json.message, { variant: data_json.status })
       if (data_json.error?.length > 0) console.error(data_json.error)
     },
   })

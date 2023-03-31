@@ -215,7 +215,7 @@ const Node = ({ node }) => {
                 let titleArr = [
                   { name: "Status:", data: val.status },
                   { name: "Manufacturer:", data: val.manufacturer },
-                  { name: "Name:", data: val.name },
+                  { name: "Name:", data: val.model },
                 ]
                 return (
                   <DataDisplay
