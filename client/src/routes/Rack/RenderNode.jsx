@@ -1,30 +1,13 @@
-import { Box, Collapse, Grid, Icon, IconButton } from "@mui/material"
-import React, { useEffect, useState } from "react"
+import { Box, Grid, Icon, IconButton } from "@mui/material"
 
 import DataDisplay from "./components/DataDisplay"
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft"
 import { Link } from "react-router-dom"
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
+import React from "react"
 import StorageIcon from "@mui/icons-material/Storage"
+import formatReadable from "../../components/formatReadable"
 
 const Node = ({ node }) => {
-  const [expandDrives, setExpandDrives] = useState(false)
-  const [hideButton, setHideButton] = useState(false)
-  // useEffect(() => {
-  //   if (
-  //     node.redfish.success !== false &&
-  //     node.redfish.storage.drives?.length + node.redfish.storage.volumes?.length <= 3
-  //   ) {
-  //     setHideButton(true)
-  //     setExpandDrives(true)
-  //   }
-
-  //   return () => {
-  //     setExpandDrives(false)
-  //   }
-  // }, [node])
-
   // default display for faild queries
   if (node.redfish.success === false || node.redfish.success === undefined)
     return (
@@ -65,8 +48,8 @@ const Node = ({ node }) => {
     titleArr: [
       { name: "Speed:", data: node.redfish.memory.speed_MhZ },
       { name: "Status:", data: node.redfish.memory.status },
-      { name: "Non-Volatile:", data: Number(node.redfish.memory.total_NV_size_MiB / 1024).toFixed(0) },
-      { name: "Volatile:", data: Number(node.redfish.memory.total_V_size_MiB / 1024).toFixed(0) },
+      { name: "Non-Volatile:", data: formatReadable(node.redfish.memory.total_NV_size_MiB, 0, "MB") },
+      { name: "Volatile:", data: formatReadable(node.redfish.memory.total_V_size_MiB, 0, "MB") },
     ],
     icon: <i className="bi bi-memory" style={{ marginLeft: "5px", fontSize: "12pt" }} />,
     color: statusColor(node.redfish.memory.status),
@@ -90,66 +73,68 @@ const Node = ({ node }) => {
 
             <Grid item xs={4} sx={{ display: "flex", justifyContent: "end", gap: "3px" }}>
               {node.redfish.network !== undefined &&
-                node.redfish.network.map((adapter, index) => {
-                  return adapter.ports.map((val, index) => {
-                    let color = "border.secondary"
-                    let bColor = "default"
-                    let speed = val.speed ?? "0"
+                node.redfish.network.map((adapter, index) => (
+                  <Box key={index} sx={{ marginRight: "3px", gap: "1px", display: "flex" }}>
+                    {adapter.ports.map((val, index) => {
+                      let color = "border.secondary"
+                      let bColor = "default"
+                      let speed = val.speed ?? "0"
 
-                    if (val.speed === 100000) {
-                      bColor = "info"
-                      speed = "100 GbE"
-                    } else if (val.speed === 40000) {
-                      bColor = "error"
-                      speed = "40 GbE"
-                    } else if (val.speed === 10000) {
-                      bColor = "primary"
-                      speed = "10 GbE"
-                    } else if (val.speed === 1000) {
-                      bColor = "success"
-                      speed = "1 GbE"
-                    } else if (val.speed === 100) {
-                      bColor = "warning"
-                      speed = "100 MbE"
-                    }
+                      if (val.speed === 100000) {
+                        bColor = "info"
+                        speed = "100 GbE"
+                      } else if (val.speed === 40000) {
+                        bColor = "error"
+                        speed = "40 GbE"
+                      } else if (val.speed === 10000) {
+                        bColor = "primary"
+                        speed = "10 GbE"
+                      } else if (val.speed === 1000) {
+                        bColor = "success"
+                        speed = "1 GbE"
+                      } else if (val.speed === 100) {
+                        bColor = "warning"
+                        speed = "100 MbE"
+                      }
 
-                    let titleArr = [
-                      { name: "Port:", data: val.port },
-                      { name: "NIC:", data: val.id },
-                      { name: "Type:", data: val.type },
-                      { name: "MAC:", data: val.mac },
-                      { name: "Speed:", data: speed },
-                      { name: "Status:", data: val.status },
-                    ]
+                      let titleArr = [
+                        { name: "Port:", data: val.port },
+                        { name: "NIC:", data: val.id },
+                        { name: "Type:", data: val.type },
+                        { name: "MAC:", data: val.mac },
+                        { name: "Speed:", data: speed },
+                        { name: "Status:", data: val.status },
+                      ]
 
-                    if (val.link === "Up") color = "border.table.double"
+                      if (val.link === "Up") color = "border.table.double"
 
-                    let icon = (
-                      <Icon fontSize="small" sx={{ color: "white" }}>
-                        <i className=" bi-ethernet" />
-                      </Icon>
-                    )
-                    if (val.type === "InfiniBand")
-                      icon = (
+                      let icon = (
                         <Icon fontSize="small" sx={{ color: "white" }}>
-                          <i className=" bi-info-square" />
+                          <i className=" bi-ethernet" />
                         </Icon>
                       )
+                      if (val.type === "InfiniBand")
+                        icon = (
+                          <Icon fontSize="small" sx={{ color: "white" }}>
+                            <i className=" bi-info-square" />
+                          </Icon>
+                        )
 
-                    // let icon = val.id.match(/([0-9]-[0-9])|[0-9]/g)
+                      // let icon = val.id.match(/([0-9]-[0-9])|[0-9]/g)
 
-                    return (
-                      <DataDisplay
-                        type="avatar"
-                        titleArr={titleArr}
-                        icon={icon}
-                        color={bColor}
-                        backgroundColor={color}
-                        key={index}
-                      />
-                    )
-                  })
-                })}
+                      return (
+                        <DataDisplay
+                          type="avatar"
+                          titleArr={titleArr}
+                          icon={icon}
+                          color={bColor}
+                          backgroundColor={color}
+                          key={index}
+                        />
+                      )
+                    })}
+                  </Box>
+                ))}
             </Grid>
           </Grid>
         </Grid>

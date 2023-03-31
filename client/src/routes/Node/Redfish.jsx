@@ -23,6 +23,7 @@ import { green, grey, orange } from "@mui/material/colors"
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
+import formatReadable from "../../components/formatReadable"
 import { useQuery } from "react-query"
 import { useSnackbar } from "notistack"
 
@@ -36,28 +37,6 @@ const Redfish = ({ query, setRefresh }) => {
   const [openSEL, setOpenSEL] = useState(false)
   const [user] = useContext(UserContext)
   const { enqueueSnackbar } = useSnackbar()
-
-  const [diskChassisArr, setDiskChassisArr] = useState([])
-  useEffect(() => {
-    // This should probably be server side
-    // if (
-    //   !!data &&
-    //   data.status !== "error" &&
-    //   data.storage.slotCount !== null &&
-    //   data.storage.drives[0].slot !== undefined
-    // ) {
-    //   let slotCount_num = Number(data.storage.slot_count)
-    //   let tmp_arr = new Array(slotCount_num)
-    //   for (let x = 0; x < slotCount_num; x++) {
-    //     let drive = data.storage.drives.find((val) => Number(val.slot) === x)
-    //     if (drive) tmp_arr[x] = drive
-    //     else tmp_arr[x] = { name: "", status: "empty" }
-    //   }
-    //   setDiskChassisArr(tmp_arr)
-    // } else if (!!data) {
-    //   setDiskChassisArr(data.storage.drives)
-    // }
-  }, [query])
 
   const clearSEL_query = useQuery(
     ["clearSel-node", query],
@@ -113,9 +92,9 @@ const Redfish = ({ query, setRefresh }) => {
                 <Typography variant="h2" fontSize={14} sx={{ marginBottom: "5px" }}>
                   BMC Version: {data.bmc.version}
                 </Typography>
-                {/* <Typography variant="h1" fontSize={16}>
-                  Memory: {data.memory.size} at {data.memory.speed}
-                </Typography> */}
+                <Typography variant="h1" fontSize={16}>
+                  Memory: {formatReadable(data.memory.total_size_MiB, 0, "MB")} at {data.memory.speed_MHz} MHz
+                </Typography>
                 {/* <Typography variant="h1" fontSize={14}>
                   Boot Order: {data.boot_info.map((val) => val.name).join(", ")}
                 </Typography> */}
@@ -161,7 +140,7 @@ const Redfish = ({ query, setRefresh }) => {
                         Type: {val.volume_type} {val.raid_type}
                       </Typography>
                       <Typography variant="h1" fontSize={14} sx={{ marginBottom: "5px" }}>
-                        Capacity: {Number(val.capacity / 1073741824).toFixed(2)}
+                        Capacity: {formatReadable(val.capacity)}
                       </Typography>
                     </React.Fragment>
                   ))
@@ -314,61 +293,62 @@ const Redfish = ({ query, setRefresh }) => {
               </Card>
             </Grid2>
           )}
-          <Grid2 xs={12} sm={6} lg={3}>
-            <Card variant="outlined" sx={{ height: "270px" }}>
-              <CardContent>
-                <TableContainer>
-                  <Table
-                    size="small"
-                    sx={{ tableLayout: "fixed", height: "230px", width: `${diskChassisArr.length * 40}px` }}
-                  >
-                    <TableHead>
-                      <TableRow>
-                        {diskChassisArr.length > 0 &&
-                          diskChassisArr.map((val, index) => (
+          {data.storage.map((controller, index) => (
+            <Grid2 xs={12} sm={6} lg={controller.slot_count < 12 ? 3 : 6} key={index}>
+              <Card variant="outlined" sx={{ height: "270px" }}>
+                <CardContent>
+                  <TableContainer>
+                    <Table
+                      size="small"
+                      sx={{ tableLayout: "fixed", height: "230px", width: `${controller.slot_count * 40}px` }}
+                    >
+                      <TableHead>
+                        <TableRow>
+                          {controller.drives.map((val, index) => (
                             <TableCell align="center" key={index}>
                               {index}
                             </TableCell>
                           ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                        {diskChassisArr.length > 0 &&
-                          diskChassisArr.map((val, index) => (
-                            <TableCell
-                              key={index}
-                              sx={{
-                                border: 1,
-                                borderColor: grey[300],
-                                textOrientation: "mixed",
-                                writingMode: "vertical-rl",
-                              }}
-                            >
-                              {val.status !== "empty" && (
-                                <Box sx={{ display: "flex", alignItems: "center" }}>
-                                  <i
-                                    className="bi bi-activity"
-                                    style={{
-                                      color: val.status === "OK" ? green[300] : orange[300],
-                                      fontSize: "15px",
-                                    }}
-                                  />
-                                  <Box sx={{ display: "flex-col", textAlign: "center", height: "100%" }}>
-                                    <Typography fontSize={12}>{val.name}</Typography>
-                                    <Typography fontSize={12}>{val.capacity}</Typography>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        <TableRow>
+                          {controller.drives.length > 0 &&
+                            controller.drives.map((drive, index) => (
+                              <TableCell
+                                key={index}
+                                sx={{
+                                  border: 1,
+                                  borderColor: grey[300],
+                                  textOrientation: "mixed",
+                                  writingMode: "vertical-rl",
+                                }}
+                              >
+                                {drive.status !== "empty" && (
+                                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                                    <i
+                                      className="bi bi-activity"
+                                      style={{
+                                        color: drive.status === "OK" ? green[300] : orange[300],
+                                        fontSize: "15px",
+                                      }}
+                                    />
+                                    <Box sx={{ display: "flex-col", textAlign: "center", height: "100%" }}>
+                                      <Typography fontSize={12}>{drive.name}</Typography>
+                                      <Typography fontSize={12}>{formatReadable(drive.capacity)}</Typography>
+                                    </Box>
                                   </Box>
-                                </Box>
-                              )}
-                            </TableCell>
-                          ))}
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </CardContent>
-            </Card>
-          </Grid2>
+                                )}
+                              </TableCell>
+                            ))}
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </CardContent>
+              </Card>
+            </Grid2>
+          ))}
 
           {query.data.warranty.entitlements.length > 0 && (
             <Grid2 xs={12} sm={6} lg={3}>
