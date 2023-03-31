@@ -63,7 +63,7 @@ const Redfish = ({ query, setRefresh }) => {
         No Redfish data found!
       </Typography>
     )
-  if (data.status === "error")
+  if (data.success === false)
     return (
       <Typography variant="h1" fontSize={20}>
         Error querying node: {data.error === undefined ? data.message : data.error?.code}
