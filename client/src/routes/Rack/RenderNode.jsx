@@ -53,7 +53,7 @@ const Node = ({ node }) => {
     ],
     icon: <i className="bi bi-memory" style={{ marginLeft: "5px", fontSize: "12pt" }} />,
     color: statusColor(node.redfish.memory.status),
-    label: `${Number(node.redfish.memory.total_size_MiB / 1024).toFixed(0)} GB`,
+    label: formatReadable(node.redfish.memory.total_size_MiB, 0, "MB"),
   }
 
   return (
@@ -119,9 +119,6 @@ const Node = ({ node }) => {
                             <i className=" bi-info-square" />
                           </Icon>
                         )
-
-                      // let icon = val.id.match(/([0-9]-[0-9])|[0-9]/g)
-
                       return (
                         <DataDisplay
                           type="avatar"
@@ -173,11 +170,8 @@ const Node = ({ node }) => {
                 let titleArr = [
                   { name: "Model:", data: val.model },
                   { name: "Architecture:", data: val.architecture },
-                  // { name: "Hyper-Threading:", data: val.logical_proc },
                   { name: "Cores:", data: val.total_cores },
                   { name: "Threads:", data: val.total_threads },
-                  // { name: "Turbo:", data: val.turbo },
-                  // { name: "Frequency:", data: val.frequency },
                   { name: "Max Frequency:", data: val.max_frequency },
                 ]
                 return (
@@ -228,8 +222,6 @@ const Node = ({ node }) => {
                 )
               })}
           </Box>
-          {/* <Box sx={{ display: "inline-flex", maxWidth: "320px" }}> */}
-          {/* <Collapse collapsedSize={30} in={expandDrives}> */}
           <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap" }}>
             {node.redfish.storage.map((val) => {
               return val.volumes.map((vol, index) => {
@@ -247,24 +239,13 @@ const Node = ({ node }) => {
                     titleArr={titleArr}
                     icon={icon}
                     color={statusColor(vol.status)}
-                    label={`${Number(vol.capacity / 1073741824).toFixed(2)} GB - ${vol.raid_type ?? vol.volume_type}`}
+                    label={`${formatReadable(vol.capacity)} - ${vol.raid_type ?? vol.volume_type}`}
                     key={index}
                   />
                 )
               })
             })}
           </Box>
-          {/* </Collapse> */}
-          {/* {!hideButton && (
-              <IconButton
-                size="small"
-                sx={{ width: "25px", height: "25px" }}
-                onClick={() => setExpandDrives(!expandDrives)}
-              >
-                {expandDrives ? <KeyboardArrowDownIcon /> : <KeyboardArrowLeftIcon />}
-              </IconButton>
-            )} */}
-          {/* </Box> */}
         </Grid>
       </Grid>
     </>
