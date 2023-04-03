@@ -1,7 +1,6 @@
+import config from "../../../config/config.js"
 import fetch from "node-fetch"
 import https from "https"
-
-let config = require("../../../config/config")
 
 const agent = new https.Agent({
   rejectUnauthorized: false,
@@ -38,7 +37,7 @@ export async function redfish_auth(uri: string): Promise<Auth> {
     // initial query to obtain redfish info
     let res_redfish_info = await fetch(`${uri}/redfish/v1`, { agent })
     if (!res_redfish_info.ok) throw res_redfish_info
-    let redfish_info = await res_redfish_info.json()
+    let redfish_info: any = await res_redfish_info.json()
 
     // query to login and get x-auth-token
     let res_redfish_login = await fetch(`${uri}/redfish/v1/SessionService/Sessions`, payload)
@@ -79,13 +78,13 @@ export async function redfish_auth(uri: string): Promise<Auth> {
 }
 
 export async function redfish_logout(url: string, auth: Auth) {
-  interface Output {
+  interface Ioutput {
     status: string
     code?: number
     message?: string
     error?: any
   }
-  let output: Output = {
+  let output: Ioutput = {
     status: "error",
   }
 
@@ -107,4 +106,3 @@ export async function redfish_logout(url: string, auth: Auth) {
   }
   return output
 }
-module.exports = { redfish_auth, redfish_logout }

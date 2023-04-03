@@ -1,24 +1,13 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const { NodeSSH } = require("node-ssh");
-const { grendelRequest } = require("../modules/grendel");
-const config = require("../config");
-const xml2js = require("xml2js");
-const fs = require("fs");
-const { setCache } = require("./cache");
-const Switches = require("../models/Switches");
-const getSwInfoV2 = (node) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j;
+import { NodeSSH } from "node-ssh";
+import { Switches } from "../models/Switches.js";
+import config from "../../config/config.js";
+import fs from "fs";
+import { grendelRequest } from "../modules/grendel.js";
+import { setCache } from "./cache.js";
+import xml2js from "xml2js";
+export const getSwInfoV2 = async (node) => {
     // Grendel
-    const grendelRes = yield grendelRequest(`/v1/host/find/${node}`);
+    const grendelRes = await grendelRequest(`/v1/host/find/${node}`);
     if (grendelRes.result.length === 0) {
         return { status: "error", message: "No matching node name found in Grendel" };
     }
@@ -28,7 +17,7 @@ const getSwInfoV2 = (node) => __awaiter(void 0, void 0, void 0, function* () {
     let grendel = grendelRes.result[0];
     if (grendel.interfaces.length === 0)
         return { status: "error", message: `${node} has no interfaces to query` };
-    let bmcInterface = (_j = grendel.interfaces.find((val) => val.bmc === true)) !== null && _j !== void 0 ? _j : grendel.interfaces[0];
+    let bmcInterface = grendel.interfaces.find((val) => val.bmc === true) ?? grendel.interfaces[0];
     const fqdn = bmcInterface.fqdn !== "" ? bmcInterface.fqdn : bmcInterface.ip;
     // Switch version logic
     let parseType = "";
@@ -54,7 +43,6 @@ const getSwInfoV2 = (node) => __awaiter(void 0, void 0, void 0, function* () {
         commands = ["show inventory | no-more", "show interfaces status | no-more", "show mac-address-table | no-more"];
         parseType = "OS8";
         return oldSwInfo(commands, fqdn, parseType);
-        // return { status: "error", message: "Dell OS8 switches are not supported" }
     }
     else if (grendel.tags.includes("Dell_PC3")) {
         commands = ["show system", "show interfaces status", "enable", "show bridge address-table"];
@@ -122,34 +110,36 @@ const getSwInfoV2 = (node) => __awaiter(void 0, void 0, void 0, function* () {
         },
     };
     try {
-        yield conn.connect(SSHConfig);
-        let data = commands.map((cmd) => __awaiter(void 0, void 0, void 0, function* () {
-            return yield conn.execCommand(cmd);
-        }));
-        let raw = yield Promise.all(data);
-        let parsed = raw.map((val) => __awaiter(void 0, void 0, void 0, function* () {
+        await conn.connect(SSHConfig);
+        let data = commands.map(async (cmd) => {
+            return await conn.execCommand(cmd);
+        });
+        let raw = await Promise.all(data);
+        let parsed = raw.map(async (val) => {
             // TODO: better error handling
             let tmp = {};
             if (val.code === 0) {
-                tmp = yield parseOutputV2(val.stdout, parseType);
+                tmp = await parseOutputV2(val.stdout, parseType);
             }
             else
                 console.error(val.stderr);
-            return Object.assign({}, tmp);
-        }));
-        let output = yield Promise.all(parsed);
+            return {
+                ...tmp,
+            };
+        });
+        let output = await Promise.all(parsed);
         return { status: "success", info: switchCalcs(output, parseType), result: output };
         // return output
     }
     catch (err) {
-        console.error(`failed to connect to ${fqdn}`, err);
         return {
             status: "error",
             message: `Switch SSH connection error on switch ${node}`,
+            // silent: true,
         };
     }
-});
-const parseOutputV2 = (data, type) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const parseOutputV2 = async (data, type) => {
     if (type === "EOS") {
         let tmp = JSON.parse(data);
         let output = {};
@@ -171,7 +161,6 @@ const parseOutputV2 = (data, type) => __awaiter(void 0, void 0, void 0, function
             let tmpArr = Object.entries(tmp.interfaceStatuses);
             output = tmpArr
                 .map((val) => {
-                var _j;
                 let status = val[1].linkStatus === "notconnect" ? "Down" : "Up";
                 let duplex = val[1].duplex === "duplexFull" ? "Full" : val[1].duplex;
                 if (val[0].match("^Ethernet"))
@@ -182,13 +171,16 @@ const parseOutputV2 = (data, type) => __awaiter(void 0, void 0, void 0, function
                         speed: `${val[1].bandwidth / 1000000000}G`,
                         type: val[1].interfaceType,
                         duplex: duplex,
-                        vlan: (_j = val[1].vlanInformation.vlanId) !== null && _j !== void 0 ? _j : val[1].vlanInformation.vlanExplanation,
+                        vlan: val[1].vlanInformation.vlanId ?? val[1].vlanInformation.vlanExplanation,
                     };
             })
                 .filter(Boolean);
-            output.sort((a, b) => a.port.split("/")[0] - b.port.split("/")[0] ||
-                a.port.split("/")[1] - b.port.split("/")[1] ||
-                a.port.split("/")[2] - b.port.split("/")[2]);
+            // output.sort(
+            //   (a, b) =>
+            //     a.port.split("/")[0] - b.port.split("/")[0] ||
+            //     a.port.split("/")[1] - b.port.split("/")[1] ||
+            //     a.port.split("/")[2] - b.port.split("/")[2]
+            // )
         }
         else if (tmp.hasOwnProperty("unicastTable")) {
             // EOS show mac address-table
@@ -209,7 +201,7 @@ const parseOutputV2 = (data, type) => __awaiter(void 0, void 0, void 0, function
     }
     else if (type === "OS10") {
         try {
-            let convertTmp = yield xml2js.parseStringPromise(data);
+            let convertTmp = await xml2js.parseStringPromise(data);
             let tmp = {};
             if (convertTmp["rpc-reply"].hasOwnProperty("bulk"))
                 tmp = convertTmp["rpc-reply"].bulk[0].data[0];
@@ -272,10 +264,10 @@ const parseOutputV2 = (data, type) => __awaiter(void 0, void 0, void 0, function
             console.error(err);
         }
     }
-});
-const oldSwInfo = (commands, fqdn, parseType) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const oldSwInfo = async (commands, fqdn, parseType) => {
     try {
-        const output = yield new Promise((resolve, reject) => {
+        const output = await new Promise((resolve, reject) => {
             let host = {
                 server: {
                     host: fqdn,
@@ -339,7 +331,7 @@ const oldSwInfo = (commands, fqdn, parseType) => __awaiter(void 0, void 0, void 
                 if (output !== null)
                     responseArr.push({ command: command, output }); // get rid of null from "enable" command
             });
-            callback = (response) => {
+            const callback = (response) => {
                 resolve(responseArr);
             };
             SSH.on("error", (error, type) => {
@@ -357,10 +349,11 @@ const oldSwInfo = (commands, fqdn, parseType) => __awaiter(void 0, void 0, void 
     catch (err) {
         return {
             status: "error",
-            message: JSON.stringify(err),
+            message: `SSH connection error on ${fqdn}. Error: ${JSON.stringify(err)}`,
+            error: err,
         };
     }
-});
+};
 const parseOldOutput = (data, command, parseType) => {
     if (command.includes("inventory")) {
         // OS9 show inventory
@@ -666,10 +659,9 @@ const switchCalcs = (data, parseType) => {
         console.error(err);
     }
 };
-const getSw = (node) => __awaiter(void 0, void 0, void 0, function* () {
-    var _q, _10, _11, _12, _13;
-    let res = yield getSwInfoV2(node);
-    let setCacheRes = yield setCache(node, res);
+export const getSw = async (node) => {
+    let res = await getSwInfoV2(node);
+    let setCacheRes = await setCache(node, res);
     // New switches DB collection
     if (res.status === "success") {
         // TODO: modify switch queries to match DB name scheme
@@ -678,11 +670,11 @@ const getSw = (node) => __awaiter(void 0, void 0, void 0, function* () {
             interfaces: res.result[1].output,
             mac_address_table: res.result[2].output,
             system: {
-                model: (_q = res.result[0].output.model) !== null && _q !== void 0 ? _q : "",
-                uptime: (_10 = res.result[0].output.uptime) !== null && _10 !== void 0 ? _10 : "",
-                version: (_11 = res.result[0].output.version) !== null && _11 !== void 0 ? _11 : "",
-                vendor: (_12 = res.result[0].output.vendor) !== null && _12 !== void 0 ? _12 : "",
-                service_tag: (_13 = res.result[0].output.serviceTag) !== null && _13 !== void 0 ? _13 : "",
+                model: res.result[0].output.model ?? "",
+                uptime: res.result[0].output.uptime ?? "",
+                version: res.result[0].output.version ?? "",
+                vendor: res.result[0].output.vendor ?? "",
+                service_tag: res.result[0].output.serviceTag ?? "",
             },
             info: {
                 total_oversubscription: res.info.totalOversubscription,
@@ -696,8 +688,7 @@ const getSw = (node) => __awaiter(void 0, void 0, void 0, function* () {
             },
         };
         // TODO: error handling
-        yield Switches.findOneAndUpdate({ node: node }, data, { new: true, upsert: true });
+        await Switches.findOneAndUpdate({ node: node }, data, { new: true, upsert: true });
     }
     return res;
-});
-module.exports = { getSwInfoV2, getSw };
+};

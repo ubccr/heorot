@@ -6,4 +6,5 @@ node_modules
 *.cert
 
 config.js
+config.ts
 docker-compose.yml

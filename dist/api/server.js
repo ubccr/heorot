@@ -1,93 +1,80 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const ssh2_1 = require("ssh2");
-const socket_io_1 = require("socket.io");
-const cors_1 = __importDefault(require("cors"));
-const express_1 = __importDefault(require("express"));
-const fs_1 = __importDefault(require("fs"));
-const https_1 = __importDefault(require("https"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const path_1 = require("path");
-const auth = require("./modules/auth");
-const app = (0, express_1.default)();
-let config = require("./config");
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
-const cert = {
-    key: fs_1.default.readFileSync(config.keys.serverKey),
-    cert: fs_1.default.readFileSync(config.keys.serverCert),
-};
-app.use(express_1.default.static(__dirname + "/build"));
-app.use((0, cors_1.default)());
-require("./modules/db");
-app.get("/", function (_, res) {
-    res.sendFile((0, path_1.resolve)(__dirname, "build", "index.html"));
-});
+import * as url from "url";
+import { Client } from "ssh2";
+import { Server } from "socket.io";
+import auth from "./modules/auth.js";
 // --- routes ---
-const authRouter = require("./routes/auth.js");
+import authRouter from "./routes/auth.js";
+import clientRouter from "./routes/client.js";
+import config from "../config/config.js";
+import cors from "cors";
+import express from "express";
+import fs from "fs";
+import grendelRouter from "./routes/grendel.js";
+import https from "https";
+import jwt from "jsonwebtoken";
+import openmanageRouter from "./routes/openmanage.js";
+import redfishRouter from "./routes/redfish.js";
+import { resolve } from "path";
+import switchesRouter from "./routes/switches.js";
+import { syncDBSettings } from "./modules/db.js";
+import warrantyRouter from "./routes/warranty.js";
+// const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+const cert = {
+    key: fs.readFileSync(config.keys.serverKey),
+    cert: fs.readFileSync(config.keys.serverCert),
+};
+syncDBSettings();
+app.use(express.static(__dirname + "/build"));
+app.use(cors());
+app.get("/", function (_, res) {
+    res.sendFile(resolve(__dirname, "build", "index.html"));
+});
 app.use("/auth", authRouter);
-const clientRouter = require("./routes/client.js");
 app.use("/client", auth, clientRouter);
-const redfishRouter = require("./routes/redfish.js");
 app.use("/redfish", auth, redfishRouter);
-const grendelRouter = require("./routes/grendel.js");
 app.use("/grendel", auth, grendelRouter);
-const openmanageRouter = require("./routes/openmanage.js");
 app.use("/openmanage", auth, openmanageRouter);
-const warrantyRouter = require("./routes/warranty.js");
 app.use("/warranty", auth, warrantyRouter);
-const switchesRouter = require("./routes/switches.js");
 app.use("/switches", auth, switchesRouter);
-app.get("/plugins", function (req, res) {
-    var _j, _q, _10;
-    return __awaiter(this, void 0, void 0, function* () {
-        let warranty, ome, bmc = false;
-        if (config.settings.dell_warranty_api.id !== "")
-            warranty = true;
-        if (config.settings.openmanage.address !== "")
-            ome = true;
-        if (config.settings.bmc.username !== "")
-            bmc = true;
-        let floorplan = config.settings.floorplan;
-        res.json({
-            status: "success",
-            warranty,
-            ome,
-            bmc,
-            floorplan,
-            node_prefixes: (_q = (_j = config.settings.rack.prefix.find((val) => val.type === "node")) === null || _j === void 0 ? void 0 : _j.prefix) !== null && _q !== void 0 ? _q : [
-                "cpn",
-                "srv",
-            ],
-            version: (_10 = process.env.npm_package_version) !== null && _10 !== void 0 ? _10 : "1.4.1",
-        });
+app.get("/plugins", async function (req, res) {
+    let warranty, ome, bmc = false;
+    if (config.settings.dell_warranty_api.id !== "")
+        warranty = true;
+    if (config.settings.openmanage.address !== "")
+        ome = true;
+    if (config.settings.bmc.username !== "")
+        bmc = true;
+    let floorplan = config.settings.floorplan;
+    res.json({
+        status: "success",
+        warranty,
+        ome,
+        bmc,
+        floorplan,
+        node_prefixes: config.settings.rack.prefix.find((val) => val.type === "node")?.prefix ?? [
+            "cpn",
+            "srv",
+        ],
+        version: process.env.npm_package_version ?? "1.4.1",
     });
 });
-const HttpsServer = https_1.default.createServer(cert, app);
-const io = new socket_io_1.Server(HttpsServer, {
+const HttpsServer = https.createServer(cert, app);
+const io = new Server(HttpsServer, {
     cors: { origin: config.origin },
 });
 io.on("connection", function (socket) {
     socket.on("auth", function (token) {
-        jsonwebtoken_1.default.verify(token, config.settings.jwt_secret, (err) => {
+        jwt.verify(token, config.settings.jwt_secret, (err) => {
             if (!err) {
                 socket.emit("auth", "authenticated");
                 socket.on("node", function (data) {
                     const username = data.split("-")[0] === "swe" ? config.settings.switches.username : config.settings.bmc.username;
                     const password = data.split("-")[0] === "swe" ? config.settings.switches.password : config.settings.bmc.password;
-                    const privateKey = data.split("-")[0] === "swe" ? fs_1.default.readFileSync(config.settings.switches.private_key_path) : undefined;
+                    const privateKey = data.split("-")[0] === "swe" ? fs.readFileSync(config.settings.switches.private_key_path) : undefined;
                     let SSHConnection = {
                         host: data,
                         port: 22,
@@ -114,7 +101,7 @@ io.on("connection", function (socket) {
                             ],
                         },
                     };
-                    var conn = new ssh2_1.Client();
+                    var conn = new Client();
                     conn
                         .on("ready", function () {
                         socket.emit("clear", true);

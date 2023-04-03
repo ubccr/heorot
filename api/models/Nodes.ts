@@ -197,5 +197,4 @@ const nodesSchema = new Schema(
   { timestamps: true }
 )
 
-const Nodes = mongoose.model("Nodes", nodesSchema)
-module.exports = Nodes
+export const Nodes = mongoose.model("Nodes", nodesSchema)

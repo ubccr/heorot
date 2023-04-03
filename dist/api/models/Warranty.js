@@ -1,5 +1,4 @@
-"use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const warrantySchema = new Schema({
     nodeName: { type: String, required: true, unique: true },
@@ -9,5 +8,4 @@ const warrantySchema = new Schema({
     productLineDescription: { type: String, required: true },
     entitlements: { type: Array },
 }, { timestamps: true });
-const Warranty = mongoose.model("Warranty", warrantySchema);
-module.exports = Warranty;
+export const Warranty = mongoose.model("Warranty", warrantySchema);

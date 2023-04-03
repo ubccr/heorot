@@ -1,5 +1,4 @@
-"use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
     username: { type: String, required: true, unique: true },
@@ -8,5 +7,4 @@ const userSchema = new Schema({
     background: { type: String, required: true },
     theme: { type: String, required: true },
 }, { timestamps: true });
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+export const User = mongoose.model("User", userSchema);

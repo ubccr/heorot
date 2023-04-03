@@ -1,22 +1,11 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const express = require("express");
+import { dell_clearSel, hpe_clearSel, sm_clearSel } from "../modules/redfish/clearSel.js";
+import { dell_resetBmc, hpe_resetBmc, sm_resetBmc } from "../modules/redfish/resetBmc.js";
+import { dell_resetNode, hpe_resetNode, sm_resetNode } from "../modules/redfish/resetNode.js";
+import { redfish_auth, redfish_logout } from "../modules/redfish/auth.js";
+import dell_badRequestFix from "../modules/redfish/badReqFix.js";
+import express from "express";
+import { getBMC } from "../modules/grendel.js";
 const app = express.Router();
-// TODO: Deprecate
-const { getBMC } = require("../modules/grendel");
-const { redfish_auth, redfish_logout } = require("../modules/redfish/auth");
-const { dell_clearSel, sm_clearSel, hpe_clearSel } = require("../modules/redfish/clearSel");
-const { dell_badRequestFix } = require("../modules/redfish/dell");
-const { dell_resetBmc, sm_resetBmc, hpe_resetBmc } = require("../modules/redfish/resetBmc");
-const { dell_resetNode, sm_resetNode, hpe_resetNode } = require("../modules/redfish/resetNode");
 app.get("/", (req, res) => {
     let routes = [];
     app.stack.forEach((element) => {
@@ -28,26 +17,27 @@ app.get("/", (req, res) => {
         availibleRoutes: routes,
     });
 });
-app.put("/v1/clearSel/:node", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.put("/v1/clearSel/:node", async (req, res) => {
     const node = req.params.node.split(",");
-    let response = yield Promise.all(node.map((val) => __awaiter(void 0, void 0, void 0, function* () {
-        let bmc = yield getBMC(val);
+    let response = await Promise.all(node.map(async (val) => {
+        let bmc = await getBMC(val);
         if (bmc.status === "success") {
             const uri = `https://${bmc.address}`;
-            let auth = yield redfish_auth(uri);
+            let auth = await redfish_auth(uri);
             if (auth.status === "success") {
+                let api_res = { status: "error", message: "" };
                 if (auth.oem === "Dell")
-                    api_res = yield dell_clearSel(uri, auth.token);
+                    api_res = await dell_clearSel(uri, auth);
                 else if (auth.oem === "Supermicro")
-                    api_res = yield sm_clearSel(uri, auth.token);
+                    api_res = await sm_clearSel(uri, auth);
                 else if (auth.oem === "HPE")
-                    api_res = yield hpe_clearSel(uri, auth.token);
+                    api_res = await hpe_clearSel(uri, auth);
                 else
                     api_res = {
                         status: "error",
                         message: "failed to parse OEM from Redfish call",
                     };
-                yield redfish_logout(auth.location, uri, auth.token);
+                await redfish_logout(uri, auth);
                 return api_res;
             }
             else
@@ -55,7 +45,7 @@ app.put("/v1/clearSel/:node", (req, res) => __awaiter(void 0, void 0, void 0, fu
         }
         else
             return bmc;
-    })));
+    }));
     let errors = response.filter((val) => val.status === "error");
     let successes = response.filter((val) => val.status === "success");
     let status = "success";
@@ -71,27 +61,28 @@ app.put("/v1/clearSel/:node", (req, res) => __awaiter(void 0, void 0, void 0, fu
         }
         res.json({ status: status, message: message, error: errors });
     }
-}));
-app.put("/v1/resetBmc/:node", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+app.put("/v1/resetBmc/:node", async (req, res) => {
     const node = req.params.node.split(",");
-    let response = yield Promise.all(node.map((val) => __awaiter(void 0, void 0, void 0, function* () {
-        let bmc = yield getBMC(val);
+    let response = await Promise.all(node.map(async (val) => {
+        let bmc = await getBMC(val);
         if (bmc.status === "success") {
             const uri = `https://${bmc.address}`;
-            let auth = yield redfish_auth(uri);
+            let auth = await redfish_auth(uri);
             if (auth.status === "success") {
+                let api_res = { status: "error", message: "" };
                 if (auth.oem === "Dell")
-                    api_res = yield dell_resetBmc(uri, auth.token);
+                    api_res = await dell_resetBmc(uri, auth);
                 else if (auth.oem === "Supermicro")
-                    api_res = yield sm_resetBmc(uri, auth.token);
+                    api_res = await sm_resetBmc(uri, auth);
                 else if (auth.oem === "HPE")
-                    api_res = yield hpe_resetBmc(uri, auth.token);
+                    api_res = await hpe_resetBmc(uri, auth);
                 else
                     api_res = {
                         status: "error",
                         message: "failed to parse OEM from Redfish call",
                     };
-                yield redfish_logout(auth.location, uri, auth.token);
+                await redfish_logout(uri, auth);
                 return api_res;
             }
             else
@@ -99,7 +90,7 @@ app.put("/v1/resetBmc/:node", (req, res) => __awaiter(void 0, void 0, void 0, fu
         }
         else
             return bmc;
-    })));
+    }));
     let errors = response.filter((val) => val.status === "error");
     let successes = response.filter((val) => val.status === "success");
     let status = "success";
@@ -115,29 +106,29 @@ app.put("/v1/resetBmc/:node", (req, res) => __awaiter(void 0, void 0, void 0, fu
         }
         res.json({ status: status, message: message, error: errors });
     }
-}));
-app.put("/v1/resetNode/:nodes/:pxe?", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j;
+});
+app.put("/v1/resetNode/:nodes/:pxe?", async (req, res) => {
     const nodes = req.params.nodes.split(",");
-    const pxe = (_j = req.params.pxe) !== null && _j !== void 0 ? _j : "false";
-    let response = yield Promise.all(nodes.map((val) => __awaiter(void 0, void 0, void 0, function* () {
-        let bmc = yield getBMC(val);
+    const pxe = req.params.pxe ?? "false";
+    let response = await Promise.all(nodes.map(async (val) => {
+        let bmc = await getBMC(val);
         if (bmc.status === "success") {
             const uri = `https://${bmc.address}`;
-            let auth = yield redfish_auth(uri);
+            let auth = await redfish_auth(uri);
             if (auth.status === "success") {
+                let api_res = { status: "error", message: "" };
                 if (auth.oem === "Dell")
-                    api_res = yield dell_resetNode(uri, auth.token, pxe);
+                    api_res = await dell_resetNode(uri, auth, pxe);
                 else if (auth.oem === "Supermicro")
-                    api_res = yield sm_resetNode(uri, auth.token, pxe);
+                    api_res = await sm_resetNode(uri, auth, pxe);
                 else if (auth.oem === "HPE")
-                    api_res = yield hpe_resetNode(uri, auth.token, pxe);
+                    api_res = await hpe_resetNode(uri, auth, pxe);
                 else
                     api_res = {
                         status: "error",
                         message: "failed to parse OEM from Redfish call",
                     };
-                yield redfish_logout(auth.location, uri, auth.token);
+                await redfish_logout(uri, auth);
                 return api_res;
             }
             else
@@ -145,7 +136,7 @@ app.put("/v1/resetNode/:nodes/:pxe?", (req, res) => __awaiter(void 0, void 0, vo
         }
         else
             return bmc;
-    })));
+    }));
     let errors = response.filter((val) => val.status === "error");
     let successes = response.filter((val) => val.status === "success");
     let status = "success";
@@ -161,18 +152,22 @@ app.put("/v1/resetNode/:nodes/:pxe?", (req, res) => __awaiter(void 0, void 0, vo
         }
         res.json({ status: status, message: message, error: errors });
     }
-}));
-app.put("/v1/badReqFix/:nodes", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+app.put("/v1/badReqFix/:nodes", async (req, res) => {
     const nodes = req.params.nodes.split(",");
-    let response = yield Promise.all(nodes.map((val) => __awaiter(void 0, void 0, void 0, function* () {
-        let bmc = yield getBMC(val);
-        console.log(nodes, bmc);
+    let response = await Promise.all(nodes.map(async (val) => {
+        let bmc = await getBMC(val);
         if (bmc.status === "success") {
             const uri = `https://${bmc.ip}`; // use IP since DNS won't resolve
-            let auth = yield redfish_auth(uri);
+            let auth = await redfish_auth(uri);
             if (auth.status === "success") {
-                if (auth.oem === "Dell")
-                    api_res = yield dell_badRequestFix(uri, auth, bmc.address);
+                let api_res = { status: "error", message: "" };
+                if (auth.oem === "Dell" && bmc.address) {
+                    if (auth.version && parseInt(auth.version.split(".")[2]) <= 4)
+                        api_res = { status: "error", message: "Dell iDRAC version is not supported" };
+                    else
+                        api_res = await dell_badRequestFix(bmc.address, auth);
+                }
                 else if (auth.oem === "Supermicro")
                     api_res = { status: "error", message: "Supermicro nodes are not supported" };
                 else if (auth.oem === "HPE")
@@ -182,7 +177,9 @@ app.put("/v1/badReqFix/:nodes", (req, res) => __awaiter(void 0, void 0, void 0, 
                         status: "error",
                         message: "failed to parse OEM from Redfish call",
                     };
-                yield redfish_logout(auth.location, uri, auth.token);
+                let logout_res = await redfish_logout(uri, auth);
+                if (logout_res.status === "error")
+                    console.error(`Failed to logout of bmc: ${bmc.node}`, logout_res);
                 return api_res;
             }
             else
@@ -190,7 +187,7 @@ app.put("/v1/badReqFix/:nodes", (req, res) => __awaiter(void 0, void 0, void 0, 
         }
         else
             return bmc;
-    })));
+    }));
     let errors = response.filter((val) => val.status === "error");
     let successes = response.filter((val) => val.status === "success");
     let status = "success";
@@ -206,5 +203,5 @@ app.put("/v1/badReqFix/:nodes", (req, res) => __awaiter(void 0, void 0, void 0, 
         }
         res.json({ status: status, message: message, error: errors });
     }
-}));
-module.exports = app;
+});
+export default app;

@@ -1,19 +1,29 @@
+import * as url from "url"
+
 import { Client, ConnectConfig } from "ssh2"
 
 import { Server } from "socket.io"
+import auth from "./modules/auth.js"
+// --- routes ---
+import authRouter from "./routes/auth.js"
+import clientRouter from "./routes/client.js"
+import config from "../config/config.js"
 import cors from "cors"
 import express from "express"
 import fs from "fs"
+import grendelRouter from "./routes/grendel.js"
 import https from "https"
 import jwt from "jsonwebtoken"
+import openmanageRouter from "./routes/openmanage.js"
+import redfishRouter from "./routes/redfish.js"
 import { resolve } from "path"
+import switchesRouter from "./routes/switches.js"
+import { syncDBSettings } from "./modules/db.js"
+import warrantyRouter from "./routes/warranty.js"
 
-let config = require("../config/config")
-// import config from "@app/config"
-const auth = require("./modules/auth")
-
+// const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url))
 const app = express()
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -22,36 +32,27 @@ const cert = {
   cert: fs.readFileSync(config.keys.serverCert),
 }
 
+syncDBSettings()
 app.use(express.static(__dirname + "/build"))
 
 app.use(cors())
-
-require("./modules/db")
 
 app.get("/", function (_, res) {
   res.sendFile(resolve(__dirname, "build", "index.html"))
 })
 
-// --- routes ---
-const authRouter = require("./routes/auth.js")
 app.use("/auth", authRouter)
 
-const clientRouter = require("./routes/client.js")
 app.use("/client", auth, clientRouter)
 
-const redfishRouter = require("./routes/redfish.js")
 app.use("/redfish", auth, redfishRouter)
 
-const grendelRouter = require("./routes/grendel.js")
 app.use("/grendel", auth, grendelRouter)
 
-const openmanageRouter = require("./routes/openmanage.js")
 app.use("/openmanage", auth, openmanageRouter)
 
-const warrantyRouter = require("./routes/warranty.js")
 app.use("/warranty", auth, warrantyRouter)
 
-const switchesRouter = require("./routes/switches.js")
 app.use("/switches", auth, switchesRouter)
 
 app.get("/plugins", async function (req, res) {

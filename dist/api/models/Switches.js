@@ -1,5 +1,4 @@
-"use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const switchesSchema = new Schema({
     node: { type: String, required: true, unique: true },
@@ -51,5 +50,4 @@ const switchesSchema = new Schema({
     },
     notes: { type: String },
 }, { timestamps: true });
-const Switches = mongoose.model("Switches", switchesSchema);
-module.exports = Switches;
+export const Switches = mongoose.model("Switches", switchesSchema);

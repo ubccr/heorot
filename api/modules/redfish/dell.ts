@@ -22,7 +22,7 @@ import {
   Redfish_Systems_Storage_id_Volumes,
   Redfish_Systems_Storage_id_Volumes_id,
 } from "../../types/redfish"
-import { apiResponse, api_request } from "../redfish"
+import { apiResponse, api_request } from "../redfish.js"
 
 import { Auth } from "./auth"
 

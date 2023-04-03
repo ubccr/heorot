@@ -54,5 +54,4 @@ const switchesSchema = new Schema(
   { timestamps: true }
 )
 
-const Switches = mongoose.model("Switches", switchesSchema)
-module.exports = Switches
+export const Switches = mongoose.model("Switches", switchesSchema)

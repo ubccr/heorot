@@ -1,21 +1,11 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const express = require("express");
+import { Nodes } from "../models/Nodes.js";
+import { Warranty } from "../models/Warranty.js";
+import { biosApi } from "../modules/nodeApi.js";
+import express from "express";
+import { fetch_node } from "../modules/nodes.js";
+import { grendelRequest } from "../modules/grendel.js";
+import { warrantyApiReq } from "../modules/Warranty.js";
 const app = express.Router();
-const Nodes = require("../models/Nodes");
-const Warranty = require("../models/Warranty");
-const { grendelRequest } = require("../modules/grendel");
-const { biosApi } = require("../modules/nodeApi");
-const { fetch_node } = require("../modules/nodes");
-const { warrantyApiReq } = require("../modules/Warranty");
 app.get("/", (req, res) => {
     let routes = [];
     app.stack.forEach((element) => {
@@ -27,21 +17,21 @@ app.get("/", (req, res) => {
         availibleRoutes: routes,
     });
 });
-app.get("/add/:tags", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/add/:tags", async (req, res) => {
     const tags = req.params.tags;
-    let response = yield grendelRequest(`/v1/host/tags/${tags}`);
+    let response = await grendelRequest(`/v1/host/tags/${tags}`);
     if (response.status === "success") {
         let arr = [];
         for (const nodes of response.result) {
             if (nodes.name.substring(0, 3) === "cpn" || nodes.name.substring(0, 3) === "srv") {
-                let query = yield Warranty.findOne({ nodeName: nodes.name }).exec();
+                let query = await Warranty.findOne({ nodeName: nodes.name }).exec();
                 if (query === null) {
                     let bmc = nodes.interfaces.find((element) => {
                         if (element.bmc === true)
                             return true;
                     });
                     if (bmc !== undefined) {
-                        let biosRes = yield biosApi(bmc.fqdn);
+                        let biosRes = await biosApi(bmc.fqdn);
                         if (biosRes.message === "success") {
                             let st = biosRes.ServiceTag;
                             arr.push({
@@ -67,10 +57,10 @@ app.get("/add/:tags", (req, res) => __awaiter(void 0, void 0, void 0, function* 
             else {
                 serviceTagString = arr[0].serviceTag;
             }
-            let warrantyRes = yield warrantyApiReq(serviceTagString);
+            let warrantyRes = await warrantyApiReq(serviceTagString);
             if (warrantyRes.status === "success") {
                 let data = [];
-                warrantyRes.result.forEach((val, index) => {
+                warrantyRes.result.forEach((val) => {
                     if (val.invalid === false) {
                         let arrData = arr.find((element) => {
                             if (element.serviceTag === val.serviceTag)
@@ -86,22 +76,23 @@ app.get("/add/:tags", (req, res) => __awaiter(void 0, void 0, void 0, function* 
                         });
                     }
                 });
-                Warranty.collection.insertMany(data, function (err, warranty) {
-                    if (err)
-                        res.json({
-                            status: "error",
-                            message: "An error occured while saving to the DB",
-                            color: "error",
-                            err,
-                        });
-                    else
-                        res.json({
-                            status: "success",
-                            message: warranty.insertedCount + " Nodes successfully added to the DB",
-                            color: "success",
-                            warranty: warranty,
-                        });
-                });
+                try {
+                    let warranty_insert_res = await Warranty.collection.insertMany(data);
+                    res.json({
+                        status: "success",
+                        message: warranty_insert_res.insertedCount + " Nodes successfully added to the DB",
+                        color: "success",
+                        warranty: warranty_insert_res,
+                    });
+                }
+                catch (err) {
+                    res.json({
+                        status: "error",
+                        message: "An error occured while saving to the DB",
+                        color: "error",
+                        err,
+                    });
+                }
             }
         }
         else {
@@ -112,8 +103,8 @@ app.get("/add/:tags", (req, res) => __awaiter(void 0, void 0, void 0, function* 
             });
         }
     }
-}));
-app.get("/get/:node", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+app.get("/get/:node", async (req, res) => {
     const node = req.params.node;
     Warranty.findOne({ nodeName: node }, function (err, node) {
         if (err) {
@@ -127,7 +118,7 @@ app.get("/get/:node", (req, res) => __awaiter(void 0, void 0, void 0, function* 
         else {
             if (node !== null) {
                 let result = {};
-                node.entitlements.forEach((val, index) => {
+                node.entitlements.forEach((val) => {
                     if (val.serviceLevelCode === "ND" || val.serviceLevelCode === "P+") {
                         let date = new Date(val.endDate);
                         let currentDate = new Date();
@@ -163,9 +154,8 @@ app.get("/get/:node", (req, res) => __awaiter(void 0, void 0, void 0, function* 
             }
         }
     });
-}));
-app.post("/v1/add", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j, _q, _10, _11;
+});
+app.post("/v1/add", async (req, res) => {
     /*
     body: {
       tags?: ["foo", "bar"],
@@ -173,37 +163,36 @@ app.post("/v1/add", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
       service_tags: ["AAA000", "BBB000"]
     }
     */
-    const tags = (_j = req.body.tags) === null || _j === void 0 ? void 0 : _j.join(",");
-    const refresh = (_10 = (_q = req.body) === null || _q === void 0 ? void 0 : _q.refresh) !== null && _10 !== void 0 ? _10 : false;
-    const service_tags = (_11 = req.body) === null || _11 === void 0 ? void 0 : _11.service_tags;
+    const tags = req.body.tags?.join(",");
+    const refresh = req.body?.refresh ?? false;
+    const service_tags = req.body?.service_tags;
     if (service_tags !== undefined) {
         // skip node queries to allow for nodes not in DB
-        let warranty_res = yield warrantyApiReq(filtered_service_tag_arr.join(","));
+        let warranty_res = await warrantyApiReq(service_tags.join(","));
         res.json(warranty_res);
         return;
     }
     // Get list of nodes from grendel
     let grendel_res = {};
     if (tags === undefined || tags === "") {
-        grendel_res = yield grendelRequest(`/v1/host/list`);
+        grendel_res = await grendelRequest(`/v1/host/list`);
     }
     else {
-        grendel_res = yield grendelRequest(`/v1/host/tags/${tags}`);
+        grendel_res = await grendelRequest(`/v1/host/tags/${tags}`);
     }
     if (grendel_res.status !== "success") {
         res.json(grendel_res);
         return;
     }
     // generate string of service tags
-    let db_query = yield Nodes.find({}, { node: 1, redfish: { service_tag: 1 }, warranty: 1 });
-    let service_tag_arr = yield Promise.all(grendel_res.result.map((grendel_val) => __awaiter(void 0, void 0, void 0, function* () {
-        var _12, _13;
+    let db_query = await Nodes.find({}, { node: 1, redfish: { service_tag: 1 }, warranty: 1 });
+    let service_tag_arr = await Promise.all(grendel_res.result.map(async (grendel_val) => {
         // find node in db query
         let match = db_query.find((db_val) => db_val.node === grendel_val.name);
         // if no ST is found attempt to query node
-        if (match && ((_12 = match.redfish) === null || _12 === void 0 ? void 0 : _12.service_tag) === undefined) {
-            match = yield fetch_node(grendel_val.name, "true");
-            if (match && ((_13 = match.redfish) === null || _13 === void 0 ? void 0 : _13.service_tag) === undefined)
+        if (match && match.redfish?.service_tag === undefined) {
+            match = await fetch_node(grendel_val.name, "true");
+            if (match && match.redfish?.service_tag === undefined)
                 return; // if still no ST is found, return
         }
         if (refresh && match) {
@@ -212,7 +201,7 @@ app.post("/v1/add", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         else if (!refresh && match && match.warranty.entitlements.length === 0) {
             return match.redfish.service_tag; // return ST if found, refresh === false, and db entry has no warranty entitlements
         }
-    })));
+    }));
     let filtered_service_tag_arr = service_tag_arr.filter(Boolean);
     if (filtered_service_tag_arr.length === 0) {
         let response = refresh === true
@@ -222,7 +211,7 @@ app.post("/v1/add", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return;
     }
     // Dell query
-    let warranty_res = yield warrantyApiReq(filtered_service_tag_arr.join(","));
+    let warranty_res = await warrantyApiReq(filtered_service_tag_arr.join(","));
     if (warranty_res.status !== "success") {
         res.json(warranty_res);
         return;
@@ -238,15 +227,15 @@ app.post("/v1/add", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 entitlements: val.entitlements,
             },
         };
-        let db_res = yield Nodes.updateOne(filter, update);
+        let db_res = await Nodes.updateOne(filter, update);
         if (db_res.modifiedCount === 1)
             modified_count++;
     }
     res.json({ status: "success", message: `${modified_count} out of ${warranty_res.result.length} nodes updated` });
-}));
-app.get("/v1/get/:node", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+app.get("/v1/get/:node", async (req, res) => {
     const node = req.params.node;
-    let db_res = yield Nodes.findOne({ node: node }, { warranty: 1 });
+    let db_res = await Nodes.findOne({ node: node }, { warranty: 1 });
     res.json(db_res);
-}));
-module.exports = app;
+});
+export default app;

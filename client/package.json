@@ -31,7 +31,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "postbuild": "mv ./build ../dist/build"
+    "postbuild": "mv ./build ../api/build"
   },
   "eslintConfig": {
     "plugins": [

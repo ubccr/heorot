@@ -1,10 +1,9 @@
-import { Auth, redfish_auth, redfish_logout } from "./redfish/auth"
+import { Auth, redfish_auth, redfish_logout } from "./redfish/auth.js"
 import fetch, { RequestInit } from "node-fetch"
 
 import { Agent } from "https"
-import dell_redfish from "./redfish/dell"
-
-const { getBMC } = require("./grendel")
+import dell_redfish from "./redfish/dell.js"
+import { getBMC } from "./grendel.js"
 
 const agent = new Agent({
   rejectUnauthorized: false,

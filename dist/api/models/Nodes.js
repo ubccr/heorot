@@ -1,5 +1,4 @@
-"use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const nodesSchema = new Schema({
     node: { type: String, required: true, unique: true },
@@ -44,7 +43,6 @@ const nodesSchema = new Schema({
             status: { type: String },
             version: { type: String },
             mac: { type: String },
-            // hostname: { type: String },
             vlan: { type: String },
             ip: { type: String },
             type: { type: String },
@@ -72,22 +70,20 @@ const nodesSchema = new Schema({
             {
                 status: { type: String },
                 manufacturer: { type: String },
-                name: { type: String },
+                model: { type: String },
             },
         ],
         memory: {
             status: { type: String },
-            // size: { type: String },
-            // speed: { type: String },
             total_size_MiB: { type: Number },
             total_NV_size_MiB: { type: Number },
             total_V_size_MiB: { type: Number },
-            speed_MhZ: { type: Number },
+            speed_MHz: { type: Number },
             dimms: [
                 {
                     name: { type: String },
                     status: { type: String },
-                    speed_Mhz: { type: Number },
+                    speed_MHz: { type: Number },
                     module_type: { type: String },
                     capacity_MiB: { type: Number },
                     error_correction: { type: String },
@@ -140,7 +136,7 @@ const nodesSchema = new Schema({
                     {
                         status: { type: String },
                         slot: { type: String },
-                        capacity: { type: String },
+                        capacity: { type: Number },
                         type: { type: String },
                         name: { type: String },
                         model: { type: String },
@@ -163,7 +159,7 @@ const nodesSchema = new Schema({
                         status: { type: String },
                         volume_type: { type: String },
                         raid_type: { type: String },
-                        capacity: { type: String },
+                        capacity: { type: Number },
                     },
                 ],
             },
@@ -196,5 +192,4 @@ const nodesSchema = new Schema({
         ],
     },
 }, { timestamps: true });
-const Nodes = mongoose.model("Nodes", nodesSchema);
-module.exports = Nodes;
+export const Nodes = mongoose.model("Nodes", nodesSchema);

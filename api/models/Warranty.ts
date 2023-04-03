@@ -12,5 +12,4 @@ const warrantySchema = new Schema(
   { timestamps: true }
 )
 
-const Warranty = mongoose.model("Warranty", warrantySchema)
-module.exports = Warranty
+export const Warranty = mongoose.model("Warranty", warrantySchema)

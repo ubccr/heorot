@@ -1,20 +1,9 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const express = require("express");
+import { getCache, setCache, timeComp } from "../modules/cache.js";
+import { Switches } from "../models/Switches.js";
+import express from "express";
+import { getSwInfoV2 } from "../modules/switches.js";
+import { grendelRequest } from "../modules/grendel.js";
 const app = express.Router();
-const Cache = require("../models/Cache");
-const Switches = require("../models/Switches");
-const { setCache, getCache, timeComp } = require("../modules/cache");
-const { getSwInfoV2 } = require("../modules/switches");
-const { grendelRequest } = require("../modules/grendel");
 app.get("/", (req, res) => {
     let routes = [];
     app.stack.forEach((element) => {
@@ -26,24 +15,23 @@ app.get("/", (req, res) => {
         availibleRoutes: routes,
     });
 });
-app.get("/v1/query/:node/:refetch?", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/v1/query/:node/:refetch?", async (req, res) => {
     const node = req.params.node;
     const refetch = req.params.refetch;
-    let getCacheRes = yield getCache(node);
+    let getCacheRes = await getCache(node);
     if (getCacheRes !== null && refetch !== "true" && getCacheRes.cache.status !== "error") {
         if (timeComp(getCacheRes.updatedAt))
             getSw(node);
         res.json(getCacheRes.cache);
     }
     else {
-        let resSw = yield getSw(node);
+        let resSw = await getSw(node);
         res.json(resSw);
     }
-}));
-const getSw = (node) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j, _q, _10, _11, _12;
-    let res = yield getSwInfoV2(node);
-    let setCacheRes = yield setCache(node, res);
+});
+const getSw = async (node) => {
+    let res = await getSwInfoV2(node);
+    let setCacheRes = await setCache(node, res);
     // New switches DB collection
     if (res.status === "success") {
         // TODO: modify switch queries to match DB name scheme
@@ -52,11 +40,11 @@ const getSw = (node) => __awaiter(void 0, void 0, void 0, function* () {
             interfaces: res.result[1].output,
             mac_address_table: res.result[2].output,
             system: {
-                model: (_j = res.result[0].output.model) !== null && _j !== void 0 ? _j : "",
-                uptime: (_q = res.result[0].output.uptime) !== null && _q !== void 0 ? _q : "",
-                version: (_10 = res.result[0].output.version) !== null && _10 !== void 0 ? _10 : "",
-                vendor: (_11 = res.result[0].output.vendor) !== null && _11 !== void 0 ? _11 : "",
-                service_tag: (_12 = res.result[0].output.serviceTag) !== null && _12 !== void 0 ? _12 : "",
+                model: res.result[0].output.model ?? "",
+                uptime: res.result[0].output.uptime ?? "",
+                version: res.result[0].output.version ?? "",
+                vendor: res.result[0].output.vendor ?? "",
+                service_tag: res.result[0].output.serviceTag ?? "",
             },
             info: {
                 total_oversubscription: res.info.totalOversubscription,
@@ -70,14 +58,14 @@ const getSw = (node) => __awaiter(void 0, void 0, void 0, function* () {
             },
         };
         // TODO: error handling
-        yield Switches.findOneAndUpdate({ node: node }, data, { new: true, upsert: true });
+        await Switches.findOneAndUpdate({ node: node }, data, { new: true, upsert: true });
     }
     return res;
-});
-app.get("/v1/refetchAll", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let grendelRes = yield grendelRequest(`/v1/host/tags/switch`);
+};
+app.get("/v1/refetchAll", async (req, res) => {
+    let grendelRes = await grendelRequest(`/v1/host/tags/switch`);
     if (grendelRes.status === "success") {
-        let output = yield Promise.all(grendelRes.result.map((val) => __awaiter(void 0, void 0, void 0, function* () { return yield getSw(val.name); })));
+        let output = await Promise.all(grendelRes.result.map(async (val) => await getSw(val.name)));
         let failed = output
             .map((val) => {
             if (val.status !== "success")
@@ -90,7 +78,7 @@ app.get("/v1/refetchAll", (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
     else
         res.json(grendelRes);
-}));
+});
 // app.get("/v1/allSwitches", async (req, res) => {
 //   let switchesQuery = await Cache.find({ node: /^swe/ })
 //   if (switchesQuery !== null) {
@@ -103,4 +91,4 @@ app.get("/v1/refetchAll", (req, res) => __awaiter(void 0, void 0, void 0, functi
 //     res.json({ status: "success", result: tmp })
 //   } else res.json({ status: "error", message: "Failed to load cached switches from the DB", silent: true })
 // })
-module.exports = app;
+export default app;

@@ -8,5 +8,4 @@ const cacheSchema = new Schema(
   { timestamps: true }
 )
 
-const Cache = mongoose.model("Cache", cacheSchema)
-module.exports = Cache
+export const Cache = mongoose.model("Cache", cacheSchema)

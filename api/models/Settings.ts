@@ -1,6 +1,49 @@
 import crypto from "crypto"
 import mongoose from "mongoose"
 const Schema = mongoose.Schema
+// export interface Isettings {
+//   bmc: {
+//     username: string
+//     password: string
+//     firmware_versions: [{ name: string; model: string; bios: string; bmc: string }]
+//     refresh_interval: number
+//   }
+//   switches: {
+//     username: string
+//     password: string
+//     private_key_path: string
+//   }
+//   openmanage: {
+//     username: string
+//     password: string
+//     address: string
+//   }
+//   dell_warranty_api: {
+//     id: string
+//     secret: string
+//   }
+//   jwt_secret: string
+//   boot_firmware: string[]
+//   floorplan: {
+//     tag_mapping: [{ tag: string; color: string }]
+//     tag_multiple: {
+//       tag: string
+//       color: string
+//     }
+//     default_color: string
+//     secondary_color: string
+//     model_color: [{ display: string; color: string; model: string }]
+//     version_color: [{ display: string; color: string; version: string }]
+//     floorX: string[]
+//     floorY: string[]
+//   }
+//   rack: {
+//     max: number
+//     min: number
+//     prefix: [{ type: string; prefix: string[] }]
+//     node_size: [{ models: string[]; height: number; width: number }]
+//   }
+// }
 
 const settingsSchema = new Schema(
   {
@@ -120,5 +163,4 @@ const settingsSchema = new Schema(
   },
   { capped: { size: 1024, max: 1, autoIndexId: true }, _id: false }
 )
-const Settings = mongoose.model("Settings", settingsSchema)
-module.exports = Settings
+export const Settings = mongoose.model("Settings", settingsSchema)

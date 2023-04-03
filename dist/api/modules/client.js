@@ -1,31 +1,26 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-const config = require("../config.js");
-const { fetch_node } = require("./nodes.js");
-const rackGen = (grendel, rackArr, refetch) => __awaiter(void 0, void 0, void 0, function* () {
-    var _j, _q;
+import config from "../../config/config.js";
+import { fetch_node } from "./nodes.js";
+export async function rackGen(grendel, rackArr, refetch) {
     // find all nodes with matching rack name and send redfish requests
-    let node_prefix = (_q = (_j = config.settings.rack.prefix.find((val) => val.type === "node")) === null || _j === void 0 ? void 0 : _j.prefix) !== null && _q !== void 0 ? _q : [];
+    let node_prefix = config.settings.rack.prefix.find((val) => val.type === "node")?.prefix ?? [];
     if (node_prefix.length === 0)
         console.error("Could not map array: 'config.settings.rack.prefix' to a type of node");
     let nodes_arr = grendel.result.filter((val) => node_prefix.includes(val.name.split("-")[0]));
-    let redfish_arr = yield Promise.all(nodes_arr.map((val) => fetch_node(val.name, refetch)));
+    let redfish_arr = await Promise.all(nodes_arr.map((val) => fetch_node(val.name, refetch)));
     // loop through arr generated in routes/client.js
     return rackArr.map((val) => {
-        var _j, _q, _10, _11, _12, _13, _14;
         // get all nodes matching the same u that are not pdus
-        let pdu_prefix = (_q = (_j = config.settings.rack.prefix.find((val) => val.type === "pdu")) === null || _j === void 0 ? void 0 : _j.prefix) !== null && _q !== void 0 ? _q : [];
+        let pdu_prefix = config.settings?.rack.prefix.find((val) => val.type === "pdu")?.prefix ?? [];
         if (node_prefix.length === 0)
             console.error("Could not map array: 'config.settings.rack.prefix' to a type of pdu");
         let node = grendel.result.filter((n) => parseInt(n.name.split("-")[2]) === val.u && !pdu_prefix.includes(n.name.split("-")[0]));
+        // interface Inode_output {
+        //   grendel: ,
+        //   latest_bios: string,
+        //   latest_bmc: string,
+        //   redfish: ,
+        //   notes: ,
+        // }
         let node_output = [];
         if (node !== undefined) {
             // loop through nodes
@@ -40,9 +35,8 @@ const rackGen = (grendel, rackArr, refetch) => __awaiter(void 0, void 0, void 0,
                 // get latest firmware versions
                 let latest_bios = "";
                 let latest_bmc = "";
-                config.settings.bmc.firmware_versions.forEach((val) => {
-                    var _j;
-                    if ((_j = redfish_output === null || redfish_output === void 0 ? void 0 : redfish_output.redfish.model) === null || _j === void 0 ? void 0 : _j.match(val.model)) {
+                config.settings.bmc?.firmware_versions.forEach((val) => {
+                    if (redfish_output?.redfish.model?.match(val.model)) {
                         latest_bios = val.bios;
                         latest_bmc = val.bmc;
                     }
@@ -51,8 +45,8 @@ const rackGen = (grendel, rackArr, refetch) => __awaiter(void 0, void 0, void 0,
                     grendel: n,
                     latest_bios,
                     latest_bmc,
-                    redfish: redfish_output === null || redfish_output === void 0 ? void 0 : redfish_output.redfish,
-                    notes: redfish_output === null || redfish_output === void 0 ? void 0 : redfish_output.notes,
+                    redfish: redfish_output?.redfish,
+                    notes: redfish_output?.notes,
                 };
             });
         }
@@ -60,8 +54,8 @@ const rackGen = (grendel, rackArr, refetch) => __awaiter(void 0, void 0, void 0,
         if (node.length > 0) {
             // try to calculate height and width from model name
             if (node_output[0].redfish !== undefined) {
-                let node_model = (_10 = node_output[0].redfish.model) !== null && _10 !== void 0 ? _10 : "";
-                config.settings.rack.node_size.forEach((size) => {
+                let node_model = node_output[0].redfish.model ?? "";
+                config.settings.rack?.node_size.forEach((size) => {
                     size.models.forEach((models) => {
                         if (node_model.match(models)) {
                             height = size.height;
@@ -73,17 +67,21 @@ const rackGen = (grendel, rackArr, refetch) => __awaiter(void 0, void 0, void 0,
             // fallback function to use grendel tags for height
             if (height === 0 || width === 0) {
                 let default_width = node[0].name.split("-").length === 4 ? "2" : "1";
-                let str_height = (_11 = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/))) !== null && _11 !== void 0 ? _11 : "1";
-                let str_width = (_12 = node[0].tags.find((val) => val.match(/^[0-9]{1,2}w/))) !== null && _12 !== void 0 ? _12 : default_width;
-                height = (_13 = parseInt(str_height.replace("u", ""))) !== null && _13 !== void 0 ? _13 : 1;
-                width = (_14 = parseInt(str_width.replace("w", ""))) !== null && _14 !== void 0 ? _14 : 1;
+                let str_height = node[0].tags.find((val) => val.match(/^[0-9]{1,2}u/)) ?? "1";
+                let str_width = node[0].tags.find((val) => val.match(/^[0-9]{1,2}w/)) ?? default_width;
+                height = parseInt(str_height.replace("u", "")) ?? 1;
+                width = parseInt(str_width.replace("w", "")) ?? 1;
             }
         }
-        return Object.assign(Object.assign({}, val), { height,
-            width, nodes: node_output });
+        return {
+            ...val,
+            height,
+            width,
+            nodes: node_output,
+        };
     });
-});
-function floorplan(grendel_query, switch_query) {
+}
+export function floorplan(grendel_query, switch_query) {
     const floorX = config.settings.floorplan.floorX;
     const floorY = config.settings.floorplan.floorY;
     let nodes = new Map();
@@ -103,10 +101,9 @@ function floorplan(grendel_query, switch_query) {
     let floorplan = [];
     floorX.forEach((row) => {
         floorY.forEach((col) => {
-            var _j, _q;
             let rack = row + col;
-            let rackArr = (_j = nodes.get(rack)) !== null && _j !== void 0 ? _j : [];
-            let switchArr = (_q = switches.get(rack)) !== null && _q !== void 0 ? _q : [];
+            let rackArr = nodes.get(rack) ?? [];
+            let switchArr = switches.get(rack) ?? [];
             let nodeCounts = nodeCount(rackArr);
             let switchInfo = swDisplay(switches.get(rack));
             floorplan.push({
@@ -176,11 +173,11 @@ const compareTags = (arr) => {
 // switch display info
 const swDisplay = (switches) => {
     let output = {
-        sw_models: [],
+        sw_models: new Array(),
         sw_models_color: config.settings.floorplan.default_color,
-        sw_versions: [],
+        sw_versions: new Array(),
         sw_versions_color: config.settings.floorplan.default_color,
-        sw_ratios: [],
+        sw_ratios: new Array(),
         sw_ratios_color: config.settings.floorplan.default_color,
     };
     let tmpModels = [];
@@ -243,4 +240,3 @@ const shortenVersion = (version) => {
     else
         return "undefined";
 };
-module.exports = { rackGen, floorplan };

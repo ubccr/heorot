@@ -1,6 +1,6 @@
-import { apiResponse, api_request } from "../redfish"
+import { apiResponse, api_request } from "../redfish.js"
 
-import { Auth } from "./auth"
+import { Auth } from "./auth.js"
 
 // TODO: migrate to new response format: {success: boolean}
 export default async function dell_badRequestFix(fqdn: string, auth: Auth) {
@@ -21,4 +21,3 @@ export default async function dell_badRequestFix(fqdn: string, auth: Auth) {
   if (res.data.status === 200) return { status: "success", message: "Successfully modified iDRAC values" }
   else return { status: "error", message: "Error sending redfish request" }
 }
-module.exports = { dell_badRequestFix }
