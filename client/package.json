@@ -30,6 +30,7 @@
   },
   "scripts": {
     "start": "vite",
+    "prebuild": "rm -rd ../api/build",
     "build": "vite build",
     "postbuild": "mv ./build ../api/build"
   },

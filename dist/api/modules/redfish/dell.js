@@ -10,10 +10,6 @@ export default async function dell_redfish(auth) {
         SEL(auth),
         Storage_info(auth),
     ]);
-    for (const response of API_response) {
-        if (response.success === false)
-            return response;
-    }
     return {
         success: true,
         ...API_response[0].data,

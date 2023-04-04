@@ -39,21 +39,21 @@ const refetch_all_nodes = async (minutes = 0) => {
     let expired_time = new Date();
     expired_time.setMinutes(expired_time.getMinutes() - minutes);
     let nodes = await Nodes.find({}, { node: 1, redfish: 1, _id: 0, updatedAt: 1 });
-    // console.log(nodes.filter((val) => val.updatedAt < expired_time))
     let response = await Promise.all(nodes.filter((val) => val.updatedAt < expired_time).map((node) => fetch_node(node.node, "true")));
     return response;
 };
 export function schedule_node_refresh() {
-    refetch_all_nodes(config.settings?.bmc.refresh_interval ?? 0)
+    let refresh_interval = config.settings?.bmc.refresh_interval ?? 0;
+    refetch_all_nodes(refresh_interval ?? 0)
         .then(function () {
-        console.log(`Refreshed all Redfish data, waiting ${config.settings?.bmc.refresh_interval} minute(s)`);
-        if (config.settings?.bmc.refresh_interval > 0) {
+        console.log(`Refreshed all Redfish data, waiting ${refresh_interval} minute(s)`);
+        if (refresh_interval > 0) {
             setTimeout(function () {
                 console.log("Refetching Redfish data...");
                 schedule_node_refresh();
-            }, 1000 * 60 * config.settings.bmc?.refresh_interval ?? 60);
+            }, 1000 * 60 * refresh_interval ?? 60);
         }
     })
         .catch((err) => console.error("Error refreshing Redfish data automatically", err));
 }
-schedule_node_refresh();
+// schedule_node_refresh()

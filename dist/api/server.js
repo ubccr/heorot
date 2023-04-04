@@ -6,6 +6,7 @@ import auth from "./modules/auth.js";
 import authRouter from "./routes/auth.js";
 import clientRouter from "./routes/client.js";
 import config from "../config/config.js";
+import { connectDB } from "./modules/db.js";
 import cors from "cors";
 import express from "express";
 import fs from "fs";
@@ -16,8 +17,8 @@ import openmanageRouter from "./routes/openmanage.js";
 import redfishRouter from "./routes/redfish.js";
 import { resolve } from "path";
 import switchesRouter from "./routes/switches.js";
-import { syncDBSettings } from "./modules/db.js";
 import warrantyRouter from "./routes/warranty.js";
+connectDB();
 // const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 const app = express();
@@ -27,7 +28,6 @@ const cert = {
     key: fs.readFileSync(config.keys.serverKey),
     cert: fs.readFileSync(config.keys.serverCert),
 };
-syncDBSettings();
 app.use(express.static(__dirname + "/build"));
 app.use(cors());
 app.get("/", function (_, res) {
