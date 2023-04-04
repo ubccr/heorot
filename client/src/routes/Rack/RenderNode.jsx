@@ -20,14 +20,14 @@ const Node = ({ node }) => {
 
   let biosColor = "default"
   let latest_bios_int = parseInt(node.latest_bios.replace(/\./g, "")) ?? 0
-  let bios_int = parseInt(node.redfish.bios_version.replace(/\./g, "")) ?? 0
+  let bios_int = parseInt(node.redfish.bios_version?.replace(/\./g, "")) ?? 0
 
   if (latest_bios_int <= bios_int) biosColor = "success"
   else if (latest_bios_int > bios_int && bios_int !== 0) biosColor = "warning"
 
   let bmcColor = "default"
   let latest_bmc_int = parseInt(node.latest_bmc.replace(/\./g, "")) ?? 0
-  let bmc_int = parseInt(node.redfish.bmc.version.replace(/\./g, "")) ?? 0
+  let bmc_int = parseInt(node.redfish.bmc.version?.replace(/\./g, "")) ?? 0
 
   if (latest_bmc_int <= bmc_int) bmcColor = "success"
   else if (latest_bmc_int > bmc_int && bmc_int !== 0) bmcColor = "warning"
