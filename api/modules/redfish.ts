@@ -61,8 +61,8 @@ export const redfishRequest = async (node: string) => {
   if (auth.status !== "success") return auth
 
   try {
-    let output = await dell_redfish(auth)
-    return output
+    if (auth.oem === "Dell") return await dell_redfish(auth)
+    else return { success: false, message: "Unsupported OEM type" }
   } catch (error) {
     console.log("Error in redfishRequest: ", error)
   } finally {
