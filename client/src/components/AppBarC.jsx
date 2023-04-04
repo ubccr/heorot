@@ -14,6 +14,7 @@ import SearchC from "./AppBar/SearchC"
 import { ThemeContext } from "../contexts/ThemeContext"
 import { UserContext } from "../contexts/UserContext"
 import { apiConfig } from "../config"
+import favicon from "../../favicon.ico"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useContext } from "react"
 
@@ -66,7 +67,7 @@ const AppBarC = () => {
                 alignItems: "center",
               }}
             >
-              <img src="/favicon.ico" width="30" height="30" alt="" />
+              <img src={favicon} width="30" height="30" alt="" />
             </Box>
           </Typography>
 
