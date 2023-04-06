@@ -256,10 +256,10 @@ const Redfish = ({ query, setRefresh }) => {
                       <Typography variant="h2" fontSize={16} sx={{ marginBottom: "5px" }}>
                         {index + 1}: {val.model}
                       </Typography>
-                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px" }}>
+                      <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
                         Manufacturer: {val.manufacturer}
                       </Typography>
-                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px", marginBottom: "10px" }}>
+                      <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px", marginBottom: "10px" }}>
                         Status: {val.status}
                       </Typography>
                     </React.Fragment>
@@ -281,10 +281,10 @@ const Redfish = ({ query, setRefresh }) => {
                       <Typography variant="h2" fontSize={16} sx={{ marginBottom: "5px" }}>
                         {index + 1}: {val.model}
                       </Typography>
-                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px" }}>
+                      <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px" }}>
                         Manufacturer: {val.manufacturer}
                       </Typography>
-                      <Typography variant="h2" fontSize={12} sx={{ textIndent: "20px", marginBottom: "10px" }}>
+                      <Typography variant="h2" fontSize={14} sx={{ textIndent: "20px", marginBottom: "10px" }}>
                         Status: {val.status}
                       </Typography>
                     </React.Fragment>
