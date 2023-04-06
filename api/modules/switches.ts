@@ -1,5 +1,5 @@
 import { NodeSSH } from "node-ssh"
-import { Switches } from "../models/Switches.js"
+import { Nodes } from "../models/Nodes.js"
 import config from "../../config/config.js"
 import fs from "fs"
 import { grendelRequest } from "../modules/grendel.js"
@@ -647,6 +647,7 @@ export const getSw = async (node: string) => {
   // New switches DB collection
   if (res.status === "success") {
     // TODO: modify switch queries to match DB name scheme
+    let service_tag = res.result[0].output.serviceTag ?? ""
     let data = {
       node: node,
       interfaces: res.result[1].output,
@@ -656,7 +657,7 @@ export const getSw = async (node: string) => {
         uptime: res.result[0].output.uptime ?? "",
         version: res.result[0].output.version ?? "",
         vendor: res.result[0].output.vendor ?? "",
-        service_tag: res.result[0].output.serviceTag ?? "",
+        service_tag,
       },
       info: {
         total_oversubscription: res.info.totalOversubscription,
@@ -670,7 +671,7 @@ export const getSw = async (node: string) => {
       },
     }
     // TODO: error handling
-    await Switches.findOneAndUpdate({ node: node }, data, { new: true, upsert: true })
+    await Nodes.findOneAndUpdate({ node: node }, { service_tag, switch_data: data }, { new: true, upsert: true })
   }
 
   return res

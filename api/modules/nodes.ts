@@ -1,5 +1,8 @@
+import { getCache, timeComp } from "./cache.js"
+
 import { Nodes } from "../models/Nodes.js"
 import config from "../../config/config.js"
+import { getSw } from "./switches.js"
 import { grendelRequest } from "./grendel.js"
 import { redfishRequest } from "./redfish.js"
 
@@ -11,19 +14,34 @@ export const fetch_node = async (node: string, refetch: string) => {
     let grendel = await grendelRequest(`/v1/host/find/${node}`)
     if (grendel.status !== "success") return grendel
 
-    let redfish = await redfishRequest(node)
+    let redfish: any = await redfishRequest(node)
+    let service_tag = redfish.service_tag
     let old_data = await Nodes.findOneAndUpdate(
       { node: node },
-      { node: node, grendel, redfish },
+      { node: node, service_tag, grendel, redfish },
       { new: true, upsert: true }
     )
     status = [grendel.status].includes("error") ? "error" : "success"
+
+    // Switches:
+    // let switch_data = { success: false }
+    // let switch_prefix = config.settings.rack.prefix.find((val: any) => val.type === "switch").prefix
+    // if (switch_prefix.includes(node.split("-")[0])) {
+    //   let getCacheRes = await getCache(node)
+    //   if (getCacheRes !== null && refetch !== "true" && getCacheRes.cache.status !== "error") {
+    //     if (timeComp(getCacheRes.updatedAt)) getSw(node)
+    //     switch_data = getCacheRes.cache
+    //   } else {
+    //     switch_data = await getSw(node)
+    //   }
+    // }
 
     return {
       status: status,
       node: node,
       grendel,
       redfish,
+      // switch_data,
       notes: old_data.notes ?? "",
     }
   } else {
@@ -33,7 +51,9 @@ export const fetch_node = async (node: string, refetch: string) => {
       node: node,
       grendel: db_res.grendel,
       redfish: db_res.redfish,
+      switch_data: db_res.switch_data,
       notes: db_res.notes ?? "",
+      warranty: db_res.warranty,
     }
   }
 }

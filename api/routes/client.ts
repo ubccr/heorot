@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 
 app.get("/v1/floorPlan", async (req, res) => {
   let grendel_query = await grendelRequest("/v1/host/list")
-  let switch_query = await Switches.find({ node: /^swe/ })
+  let switch_query = await Nodes.find({ node: /^swe/ })
 
   if (grendel_query.status === "success" && switch_query !== null) {
     let funcRes = floorplan(grendel_query, switch_query)
@@ -108,21 +108,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
     let bmcPlugin = false
     if (config.settings.bmc.username !== "") bmcPlugin = true
 
-    if (refresh === "true") await fetch_node(node, refresh)
-
-    let dbRequest = await Nodes.findOne({ node: node })
-
-    // Switches:
-    let switch_data = { status: "error", message: "Failed to get switch data" }
-    if (node.split("-")[0] === "swe") {
-      let getCacheRes = await getCache(node)
-      if (getCacheRes !== null && refresh !== "true" && getCacheRes.cache.status !== "error") {
-        if (timeComp(getCacheRes.updatedAt)) getSw(node)
-        switch_data = getCacheRes.cache
-      } else {
-        switch_data = await getSw(node)
-      }
-    }
+    let dbRequest: any = refresh === "true" ? await fetch_node(node, refresh) : await Nodes.findOne({ node: node })
 
     res.json({
       status: "success",
@@ -131,7 +117,7 @@ app.get("/v1/node/:node/:refresh?", async (req, res) => {
       next_node: nextNode,
       result: nodeRes.result[0],
       redfish: dbRequest?.redfish,
-      switch_data: switch_data,
+      switch_data: dbRequest?.switch_data,
       warranty: dbRequest?.warranty,
       notes: dbRequest?.notes ?? "",
       firmware_options: config.settings.boot_firmware,

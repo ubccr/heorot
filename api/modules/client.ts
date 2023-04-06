@@ -109,9 +109,10 @@ export function floorplan(grendel_query: any, switch_query: any) {
     nodes.set(rack, [...tmp, val])
   })
   switch_query.forEach((val: any) => {
+    if (!val.switch_data || val.switch_data?.success === false) return
     let rack = val.node.substring(4, 7)
     let tmp = typeof switches.get(rack) === "object" ? switches.get(rack) : []
-    switches.set(rack, [...tmp, val])
+    switches.set(rack, [...tmp, val.switch_data])
   })
 
   // Main floorplan generation
