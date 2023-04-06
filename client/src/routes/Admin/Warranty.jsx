@@ -1,64 +1,96 @@
-import { Box, Button, FormGroup, LinearProgress, TextField, Typography } from "@mui/material"
-import { useContext, useState } from "react"
+import { Box, Button, Checkbox, CircularProgress, FormControlLabel, TextField, Typography } from "@mui/material"
+import { Controller, useForm } from "react-hook-form"
 
 import BgContainer from "../../components/BgContainer"
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
 import Header from "../../components/Header"
 import { UserContext } from "../../contexts/UserContext"
 import { apiConfig } from "../../config"
-import { useQuery } from "react-query"
+import { useContext } from "react"
+import { useMutation } from "react-query"
 import { useSnackbar } from "notistack"
 
-// TODO: refactor
-
 const Warranty = () => {
-  const [tags, setTags] = useState("")
   const { enqueueSnackbar } = useSnackbar()
   const [user] = useContext(UserContext)
-
-  const query = useQuery(["warranty", tags], queryFunction, {
-    enabled: !!tags,
-    cacheTime: 0,
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      tags: "",
+      refresh: false,
+    },
   })
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setTags(e.currentTarget.tags.value)
+  const onSubmit = (data) => {
+    // data.preventDefault()
+    let tags = data.tags.split(",").map((tag) => tag.trim())
+    mutation.mutate({
+      tags,
+      refresh: data.refresh,
+    })
   }
-
-  async function queryFunction({ queryKey }) {
-    let payload = {
-      headers: {
-        "x-access-token": user.accessToken,
-      },
-    }
-    const res = await (await fetch(`${apiConfig.apiUrl}/warranty/add/${queryKey[1]}`, payload)).json()
-    enqueueSnackbar(res.message, { variant: res.color })
-    return res
-  }
+  const mutation = useMutation({
+    mutationFn: (data) => {
+      let payload = {
+        method: "POST",
+        headers: {
+          "x-access-token": user.accessToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+      return fetch(`${apiConfig.apiUrl}/warranty/v1/add`, payload)
+    },
+    onError: async (error, variables, context) => {
+      let error_json = await error.json()
+      enqueueSnackbar(error_json.message, { variant: "error" })
+      console.error(error_json.error)
+    },
+    onSuccess: async (data, variables, context) => {
+      let data_json = await data.json()
+      enqueueSnackbar(data_json.message, { variant: "success" })
+    },
+  })
 
   return (
     <Box>
       <Header header="Warranty" />
       <BgContainer>
-        <Typography variant="h2" sx={{ fontSize: "20pt" }}>
-          Enter grendel tag of nodes to query Dell's Warranty API:
-        </Typography>
-        <br />
-        <form onSubmit={handleSubmit}>
-          <FormGroup>
-            <TextField name="tags" label="Tag" />
-            <br />
-            <Button type="submit" variant="outlined">
-              Submit
-            </Button>
-          </FormGroup>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid2 container spacing={2} sx={{ display: "flex", justifyContent: "center" }}>
+            <Grid2 item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Typography variant="h2" sx={{ fontSize: "20pt", margin: "10px" }}>
+                Enter grendel tag(s) of nodes to query Dell's Warranty API:
+              </Typography>
+            </Grid2>
+            <Grid2 item xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <TextField fullWidth {...field} size="small" label="Tags" placeholder="z01, gpu" />
+                )}
+              />
+            </Grid2>
+            <Grid2 item xs={12} sm={3} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Controller
+                name="refresh"
+                control={control}
+                render={({ field }) => (
+                  <FormControlLabel label="Refresh" control={<Checkbox {...field} checked={field.value} />} />
+                )}
+              />
+            </Grid2>
+            <Grid2 item xs={12} sm={3} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Button type="submit" variant="outlined">
+                {mutation.status === "loading" ? <CircularProgress size={22.75} /> : "Submit"}
+              </Button>
+            </Grid2>
+          </Grid2>
         </form>
-
-        {query.isLoading && (
-          <Box sx={{ margin: "20px" }}>
-            <LinearProgress />
-          </Box>
-        )}
       </BgContainer>
     </Box>
   )
