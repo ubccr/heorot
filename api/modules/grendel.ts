@@ -53,13 +53,19 @@ export async function grendelRequest(path: string, method = "GET", body = {}): P
     if (err.code === "ENOENT" && err.response === undefined) {
       return {
         status: "error",
-        result: { message: "Grendel API connection failed" },
+        message: "Grendel API connection failed",
         code: err.code,
       }
     } else if (err.code === "EACCES" && err.response === undefined) {
       return {
         status: "error",
-        result: { message: "Grendel API socket permission error" },
+        message: "Grendel API socket permission error",
+        code: err.code,
+      }
+    } else if (err.code === "ENOTFOUND" && err.response === undefined) {
+      return {
+        status: "error",
+        message: "Grendel API socket was not found at the specified path",
         code: err.code,
       }
     } else if (err.response !== undefined) {
