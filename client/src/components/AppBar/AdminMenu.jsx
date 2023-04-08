@@ -26,9 +26,6 @@ const AdminMenu = ({ plugins }) => {
         <MenuItem onClick={handleClose} component={Link} to={"/Admin/ManageUsers"}>
           Manage Users
         </MenuItem>
-        <MenuItem onClick={handleClose} component={Link} to={"/Admin/ManageSwitches"}>
-          Manage Switches
-        </MenuItem>
       </Menu>
     </>
   )

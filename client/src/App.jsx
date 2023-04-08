@@ -12,7 +12,6 @@ import FloorPlan from "./routes/Floorplan"
 import Grendel from "./routes/Grendel/Index"
 import Home from "./routes/Home"
 import Login from "./routes/Auth/Login"
-import ManageSwitches from "./routes/Admin/ManageSwitches"
 import ManageUsers from "./routes/Admin/ManageUsers"
 import Node from "./routes/Node"
 import { PluginContext } from "./contexts/PluginContext"
@@ -220,14 +219,6 @@ function App() {
                           element={
                             <PrivateRoute access="admin">
                               <ManageUsers />{" "}
-                            </PrivateRoute>
-                          }
-                        />
-                        <Route
-                          path="/Admin/ManageSwitches"
-                          element={
-                            <PrivateRoute access="admin">
-                              <ManageSwitches />{" "}
                             </PrivateRoute>
                           }
                         />

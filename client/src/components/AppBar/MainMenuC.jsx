@@ -61,9 +61,6 @@ const MainMenuC = ({ user, plugins }) => {
         <MenuItem component={Link} to={"/Admin/ManageUsers"}>
           Manage Users
         </MenuItem>
-        <MenuItem component={Link} to={"/Admin/ManageSwitches"}>
-          Manage Switches
-        </MenuItem>
       </Menu>
     </>
   )
