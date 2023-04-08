@@ -3,28 +3,22 @@ import { fetch_node } from "./nodes.js"
 
 export async function rackGen(grendel: any, rackArr: any, refetch: string) {
   // find all nodes with matching rack name and send redfish requests
-  let node_prefix = config.settings.rack.prefix.find((val: any) => val.type === "node")?.prefix ?? []
+  let node_prefix = config.settings?.rack.prefix.find((val: any) => val.type === "node")?.prefix ?? []
   if (node_prefix.length === 0) console.error("Could not map array: 'config.settings.rack.prefix' to a type of node")
 
-  let nodes_arr = grendel.result.filter((val: any) => node_prefix.includes(val.name.split("-")[0]))
-  let redfish_arr = await Promise.all(nodes_arr.map((val: any) => fetch_node(val.name, refetch)))
+  // let nodes_arr = grendel.result.filter((val: any) => node_prefix.includes(val.name.split("-")[0]))
+  let redfish_arr = await Promise.all(grendel.result.map((val: any) => fetch_node(val.name, refetch)))
 
   // loop through arr generated in routes/client.js
   return rackArr.map((val: any) => {
     // get all nodes matching the same u that are not pdus
-    let pdu_prefix = config.settings?.rack.prefix.find((val: any) => val.type === "pdu")?.prefix ?? []
+    let pdu_prefix = config.settings?.rack.prefix.find((val: any) => val.type === "power")?.prefix ?? []
     if (node_prefix.length === 0) console.error("Could not map array: 'config.settings.rack.prefix' to a type of pdu")
 
     let node = grendel.result.filter(
       (n: any) => parseInt(n.name.split("-")[2]) === val.u && !pdu_prefix.includes(n.name.split("-")[0])
     )
-    // interface Inode_output {
-    //   grendel: ,
-    //   latest_bios: string,
-    //   latest_bmc: string,
-    //   redfish: ,
-    //   notes: ,
-    // }
+
     let node_output: any[] = []
 
     if (node !== undefined) {
@@ -43,7 +37,7 @@ export async function rackGen(grendel: any, rackArr: any, refetch: string) {
         let latest_bios = ""
         let latest_bmc = ""
         config.settings.bmc?.firmware_versions.forEach((val: any) => {
-          if (redfish_output?.redfish.model?.match(val.model)) {
+          if (redfish_output?.redfish?.model?.match(val.model)) {
             latest_bios = val.bios
             latest_bmc = val.bmc
           }
@@ -54,6 +48,7 @@ export async function rackGen(grendel: any, rackArr: any, refetch: string) {
           latest_bios,
           latest_bmc,
           redfish: redfish_output?.redfish,
+          switch_data: redfish_output?.switch_data,
           notes: redfish_output?.notes,
         }
       })
@@ -151,8 +146,8 @@ const nodeCount = (arr: any) => {
 
   arr.forEach((val: any) => {
     let type = val.name.substring(0, 3)
-    if (!["pdu"].includes(type)) {
-      if (!["swe", "swi"].includes(type)) node_count++
+    if (!config.settings?.rack.prefix.find((val: any) => val.type === "power")?.prefix.includes(type)) {
+      if (!!config.settings?.rack.prefix.find((val: any) => val.type === "switch")?.prefix.includes(type)) node_count++
       u_count++
       // check for mult u nodes
       if (val.tags !== null) {
@@ -245,13 +240,13 @@ const swDuplicates = (duplicates: any) => {
 }
 
 const shortenName = (name: string) => {
-  if (name !== null || name !== undefined) {
+  if (name !== null && name !== undefined) {
     if (name.match("^PowerConnect")) return "PC" + name.substring(13)
     else if (name.match("-ON")) return name.replace("-ON", "")
     else return name
   } else return "undefined"
 }
 const shortenVersion = (version: string) => {
-  if (version !== null || version !== undefined) return version.replace(/ *\([^)]*\) */g, "")
+  if (version !== null && version !== undefined) return version.replace(/ *\([^)]*\) */g, "")
   else return "undefined"
 }
