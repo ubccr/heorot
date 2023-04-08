@@ -234,6 +234,11 @@ const Settings = () => {
 
   const mutation = useMutation({
     mutationFn: (data) => {
+      // quick fix for converting prefix string to arr
+      data.rack.prefix = data.rack.prefix.map((val) => {
+        if (typeof val.prefix === "string") return { type: val.type, prefix: val.prefix.split(",") }
+        else return { ...val }
+      })
       let payload = {
         method: "POST",
         headers: {
