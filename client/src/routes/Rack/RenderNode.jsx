@@ -9,7 +9,7 @@ import formatReadable from "../../components/formatReadable"
 
 const Node = ({ node }) => {
   // default display for faild queries
-  if (node.redfish.success === false || node.redfish.success === undefined)
+  if (node.redfish?.success === false || node.redfish?.success === undefined)
     return (
       <Box sx={{ width: "100%" }}>
         <Link to={`/Node/${node.grendel.name}`}>{node.grendel.name}</Link>
