@@ -65,14 +65,14 @@ const refetch_all_nodes = async (minutes = 0) => {
 
 export function schedule_node_refresh() {
   let refresh_interval = config.settings?.bmc.refresh_interval ?? 0
-  refetch_all_nodes(refresh_interval ?? 0)
+  refetch_all_nodes(refresh_interval)
     .then(function () {
       console.log(`Refreshed all Redfish data, waiting ${refresh_interval} minute(s)`)
       if (refresh_interval > 0) {
         setTimeout(function () {
           console.log("Refetching Redfish data...")
           schedule_node_refresh()
-        }, 1000 * 60 * refresh_interval ?? 60)
+        }, 1000 * 60 * refresh_interval)
       }
     })
     .catch((err) => console.error("Error refreshing Redfish data automatically", err))

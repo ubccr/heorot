@@ -117,7 +117,7 @@ export const getSwInfoV2 = async (node: string) => {
       let tmp: any = {}
       if (val.code === 0) {
         tmp = await parseOutputV2(val.stdout, parseType)
-      } else console.error(val.stderr)
+      } else console.error("Error parsing switch data", val.stderr)
       return {
         ...tmp,
       }
@@ -251,7 +251,7 @@ const parseOutputV2 = async (data: any, type: string) => {
         return { command: "show mac address-table", output: table }
       }
     } catch (err) {
-      console.error(err)
+      console.error("Error formatting switch data", err)
     }
   }
 }
@@ -635,7 +635,7 @@ const switchCalcs = (data: any, parseType: string) => {
       }
     } else return { status: "error" }
   } catch (err) {
-    console.error(err)
+    console.error("Error running calculations on switch data", err)
   }
 }
 
