@@ -125,7 +125,7 @@ const Redfish = ({ query, setRefresh }) => {
           </Grid2>
 
           <Grid2 xs={12} sm={6} lg={3}>
-            <Card variant="outlined" sx={{ height: "190px", overflowY: "scroll" }}>
+            <Card variant="outlined" sx={{ height: "190px", overflowY: "auto" }}>
               <CardContent>
                 <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                   Volumes
@@ -352,7 +352,7 @@ const Redfish = ({ query, setRefresh }) => {
 
           {query.data.warranty.entitlements.length > 0 && (
             <Grid2 xs={12} sm={6} lg={3}>
-              <Card variant="outlined" sx={{ height: "270px", overflowY: "scroll" }}>
+              <Card variant="outlined" sx={{ height: "270px", overflowY: "auto" }}>
                 <CardContent>
                   <Typography variant="h1" fontSize={22} sx={{ marginBottom: "10px" }}>
                     Warranty

@@ -71,7 +71,7 @@ const Console = ({ node, query }) => {
     }
   }, [node])
 
-  return <Box ref={termRef} sx={{ overflowX: "scroll" }} />
+  return <Box ref={termRef} sx={{ overflowX: "auto" }} />
 }
 
 export default Console
