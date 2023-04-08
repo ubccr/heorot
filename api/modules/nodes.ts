@@ -40,7 +40,11 @@ export const fetch_node = async (node: string, refetch: string) => {
     return {
       status: status,
       node: node,
-      ...db_res,
+      grendel: db_res.grendel,
+      redfish: db_res.redfish,
+      switch_data: db_res.switch_data,
+      warranty: db_res.warranty,
+      notes: db_res.notes ?? "",
     }
   }
 }
