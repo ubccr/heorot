@@ -120,6 +120,7 @@ interface Func_BMC_info_Res {
   version: string
   mac: string
   vlan: number
+  vlan_enabled: boolean
   ip: string
   type: string
   gateway: string
@@ -153,6 +154,7 @@ async function BMC_info(auth: Auth) {
         version: managers_res.data.FirmwareVersion,
         mac: managers_nic_res.data.MACAddress,
         vlan: managers_nic_res.data.VLAN.VLANId,
+        vlan_enabled: managers_nic_res.data.VLAN.VLANEnable,
         ip: managers_nic_res.data.IPv4Addresses[0].Address,
         type: managers_nic_res.data.IPv4Addresses[0].AddressOrigin,
         gateway: managers_nic_res.data.IPv4Addresses[0].Gateway,

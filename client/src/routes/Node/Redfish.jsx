@@ -114,9 +114,11 @@ const Redfish = ({ query, setRefresh }) => {
                 <Typography variant="h2" fontSize={16}>
                   Gateway: {data.bmc.gateway}
                 </Typography>
-                <Typography variant="h2" fontSize={16}>
-                  VLAN: {data.bmc.vlan}
-                </Typography>
+                {(data.bmc?.vlan_enabled ?? true) && (
+                  <Typography variant="h2" fontSize={16}>
+                    VLAN: {data.bmc.vlan}
+                  </Typography>
+                )}
                 <Typography variant="h2" fontSize={16}>
                   DNS: {data.bmc.dns.join(", ")}
                 </Typography>
@@ -350,7 +352,7 @@ const Redfish = ({ query, setRefresh }) => {
             </Grid2>
           ))}
 
-          {query.data.warranty.entitlements.length > 0 && (
+          {query.data?.warranty?.entitlements.length > 0 && (
             <Grid2 xs={12} sm={6} lg={3}>
               <Card variant="outlined" sx={{ height: "270px", overflowY: "auto" }}>
                 <CardContent>

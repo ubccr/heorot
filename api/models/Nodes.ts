@@ -47,6 +47,7 @@ const nodesSchema = new Schema(
         version: { type: String },
         mac: { type: String },
         vlan: { type: String },
+        vlan_enabled: { type: Boolean },
         ip: { type: String },
         type: { type: String },
         gateway: { type: String },
