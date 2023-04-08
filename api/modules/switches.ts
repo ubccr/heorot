@@ -3,7 +3,6 @@ import { Nodes } from "../models/Nodes.js"
 import config from "../../config/config.js"
 import fs from "fs"
 import { grendelRequest } from "../modules/grendel.js"
-import { setCache } from "./cache.js"
 import xml2js from "xml2js"
 
 export const getSwInfoV2 = async (node: string) => {
@@ -642,37 +641,30 @@ const switchCalcs = (data: any, parseType: string) => {
 
 export const getSw = async (node: string) => {
   let res: any = await getSwInfoV2(node)
-  let setCacheRes = await setCache(node, res)
+  if (res.status !== "success") return res
 
-  // New switches DB collection
-  if (res.status === "success") {
-    // TODO: modify switch queries to match DB name scheme
-    let service_tag = res.result[0].output.serviceTag ?? ""
-    let data = {
-      node: node,
-      interfaces: res.result[1].output,
-      mac_address_table: res.result[2].output,
-      system: {
-        model: res.result[0].output.model ?? "",
-        uptime: res.result[0].output.uptime ?? "",
-        version: res.result[0].output.version ?? "",
-        vendor: res.result[0].output.vendor ?? "",
-        service_tag,
-      },
-      info: {
-        total_oversubscription: res.info.totalOversubscription,
-        active_oversubscription: res.info.activeOversubscription,
-        total_ports: res.info.totalPorts,
-        active_ports: res.info.activePorts,
-        fastest_port: res.info.fastestPort,
-        uplink_count: res.info.uplinkCount,
-        uplink_speed: res.info.uplinkSpeed,
-        uplinks: res.info.uplinks,
-      },
-    }
-    // TODO: error handling
-    await Nodes.findOneAndUpdate({ node: node }, { service_tag, switch_data: data }, { new: true, upsert: true })
+  let service_tag = res.result[0].output.serviceTag ?? ""
+  return {
+    success: true,
+    // node: node,
+    interfaces: res.result[1].output,
+    mac_address_table: res.result[2].output,
+    system: {
+      model: res.result[0].output.model ?? "",
+      uptime: res.result[0].output.uptime ?? "",
+      version: res.result[0].output.version ?? "",
+      vendor: res.result[0].output.vendor ?? "",
+      service_tag,
+    },
+    info: {
+      total_oversubscription: res.info.totalOversubscription,
+      active_oversubscription: res.info.activeOversubscription,
+      total_ports: res.info.totalPorts,
+      active_ports: res.info.activePorts,
+      fastest_port: res.info.fastestPort,
+      uplink_count: res.info.uplinkCount,
+      uplink_speed: res.info.uplinkSpeed,
+      uplinks: res.info.uplinks,
+    },
   }
-
-  return res
 }

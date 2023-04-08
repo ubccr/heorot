@@ -1,5 +1,4 @@
 import { Nodes } from "../models/Nodes.js"
-import { Switches } from "../models/Switches.js"
 import config from "../../config/config.js"
 import express from "express"
 import { fetch_node } from "../modules/nodes.js"
@@ -51,43 +50,23 @@ app.post("/v1/add", async (req, res) => {
     return
   }
 
-  // generate string of service tags
-  let switch_prefix = config.settings.rack.prefix.find((val: any) => val.type === "switch")?.prefix
-  let node_prefix = config.settings.rack.prefix.find((val: any) => val.type === "node")?.prefix
-
-  let nodes_db_res = await Nodes.find({}, { node: 1, service_tag: 1, warranty: 1 })
-
+  let nodes_db_res = await Nodes.find({})
   let service_tag_arr: string[] = []
 
   for (const host of grendel_res.result) {
     let node_match = nodes_db_res.find((db_val) => db_val.node === host.name)
-    if (!node_match && switch_prefix.includes(host.name)) await getSwInfoV2(host.name)
-    else if (!node_match && node_prefix.includes(host.name)) await fetch_node(host.name, "true")
+    if (!node_match) {
+      // if no match is found, attempt to query the node
+      let tmp_match = await fetch_node(host.name, "true")
+      if (refresh || tmp_match?.warranty.entitlements.length === 0)
+        // push ST if entitlements is empty
+        service_tag_arr.push(tmp_match.service_tag)
+    } else if (refresh || node_match.warranty?.entitlements.length === 0) service_tag_arr.push(node_match.service_tag)
   }
-  // grendel_res.result.forEach(async (node) => {
-  //   let node_match = nodes_db_res.find((db_val) => db_val.node === node.name)
-  //   if (!node_match && switch_prefix.includes(node.name)) await getSwInfoV2(node.name)
-  //   else if (!node_match && node_prefix.includes(node.name)) await fetch_node(node.name, "true")
-  // })
 
-  // let service_tag_promise_arr = grendel_res.result.map(async (grendel_val) => {
-  //   // find node in db query
-  //   let match = nodes_db_res.find((db_val) => db_val.node === grendel_val.name)
-
-  //   // if no ST is found attempt to query node
-  //   if (match && match.redfish?.service_tag === undefined) {
-  //     match = await fetch_node(grendel_val.name, "true")
-  //     if (match && match.redfish?.service_tag === undefined) return // if still no ST is found, return
-  //   }
-  //   if (refresh && match) {
-  //     return match.redfish.service_tag // return ST if found && refresh === true
-  //   } else if (!refresh && match && match.warranty?.entitlements.length === 0) {
-  //     return match.redfish.service_tag // return ST if found, refresh === false, and db entry has no warranty entitlements
-  //   }
-  // })
-  // let service_tag_arr: string[] = await Promise.all(service_tag_promise_arr)
-
+  // if st array is empty, return
   let filtered_service_tag_arr = service_tag_arr.filter(Boolean)
+
   if (filtered_service_tag_arr.length === 0) {
     let response =
       refresh === true

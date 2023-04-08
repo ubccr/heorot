@@ -1,14 +1,11 @@
 import { floorplan, rackGen } from "../modules/client.js"
-import { getCache, timeComp } from "../modules/cache.js"
 
 import { Nodes } from "../models/Nodes.js"
 import { Settings } from "../models/Settings.js"
-import { Switches } from "../models/Switches.js"
 import config from "../../config/config.js"
 import { encrypt } from "../modules/encryption.js"
 import express from "express"
 import { fetch_node } from "../modules/nodes.js"
-import { getSw } from "../modules/switches.js"
 import { grendelRequest } from "../modules/grendel.js"
 import { syncDBSettings } from "../modules/db.js"
 
@@ -46,7 +43,11 @@ app.get("/v1/rack/:rack/:refetch?", async (req, res) => {
   const refetch = req.params.refetch ?? "false"
 
   let grendel_res = await grendelRequest(`/v1/host/tags/${rack}`)
-  if (grendel_res.status === "error") res.json(grendel_res)
+
+  if (grendel_res.status === "error") {
+    res.json(grendel_res)
+    return
+  }
 
   let rackArr = []
   for (let x = config.settings.rack.min; x <= config.settings.rack.max; x++) {
