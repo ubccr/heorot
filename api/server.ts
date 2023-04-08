@@ -75,6 +75,14 @@ app.get("/plugins", async function (req, res) {
       "cpn",
       "srv",
     ],
+    switch_prefixes: config.settings.rack.prefix.find((val: { type: string }) => val.type === "switch")?.prefix ?? [
+      "swe",
+      "swi",
+    ],
+    power_prefixes: config.settings.rack.prefix.find((val: { type: string }) => val.type === "power")?.prefix ?? [
+      "pdu",
+      "ups",
+    ],
     version: process.env.npm_package_version ?? "1.4.1",
   })
 })
