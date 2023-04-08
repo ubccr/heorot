@@ -3,8 +3,8 @@ import { Divider, Grid, Typography } from "@mui/material"
 import React from "react"
 
 const TooltipGen = ({ port, query, nodeQuery = null }) => {
-  if (query.isFetched && query.data.status === "success") {
-    let portInfo = query.data.result[2].output.filter((val) => val.port === port.port)
+  if (query.isFetched && query.data?.success === true) {
+    let portInfo = query.data.mac_address_table.filter((val) => val.port === port.port)
     let portMacs = portInfo.map((val) => {
       return val.mac
     })
@@ -115,7 +115,7 @@ const TooltipGen = ({ port, query, nodeQuery = null }) => {
       </>
     )
   }
-  return <>{query.isFetched && query.data.status === "success" && query.data.client}</>
+  return <>{query.isFetched && query.data.success === true && query.data.client}</>
 }
 
 export default TooltipGen

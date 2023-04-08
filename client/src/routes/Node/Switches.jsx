@@ -3,31 +3,52 @@ import { Box, Card, CardContent, Typography } from "@mui/material"
 import Grid2 from "@mui/material/Unstable_Grid2/Grid2"
 
 const Switches = ({ query, setRefresh }) => {
-  if (query.data.switch_data.status === "error")
+  if (!query.data.switch_data || query.data.switch_data.success === false)
     return (
       <Typography variant="h2" fontSize={22}>
-        Error: {query.data.switch_data.message}
+        Error: {query.data.switch_data.message ?? "Switch data is undefined"}
       </Typography>
     )
   let data = query.data.switch_data
+  let warranty_entitlements = []
+  query.data?.warranty?.entitlements.forEach((entitlement) => {
+    warranty_entitlements.push(
+      {
+        text: `Type: ${entitlement.entitlementType}`,
+        options: { variant: "h2", fontSize: 18 },
+      },
+      {
+        text: `Start Date: ${new Date(entitlement.startDate).toLocaleString()}`,
+        options: { variant: "h2", fontSize: 16, sx: { textIndent: "10px" } },
+      },
+      {
+        text: `End Date: ${new Date(entitlement.endDate).toLocaleString()}`,
+        options: { variant: "h2", fontSize: 16, sx: { textIndent: "10px" } },
+      },
+      {
+        text: `Code: ${entitlement.serviceLevelCode}`,
+        options: { variant: "h2", fontSize: 16, sx: { textIndent: "10px", marginBottom: "10px" } },
+      }
+    )
+  })
   const cards = [
     {
       data: [
         {
-          text: `Model: ${data.result[0].output.model}`,
+          text: `Model: ${data.system.model}`,
           options: { variant: "h1", fontSize: 22, sx: { marginBottom: "10px" } },
         },
-        { text: `OS Version: ${data.result[0].output.version}`, options: { variant: "h2", fontSize: 16 } },
+        { text: `OS Version: ${data.system.version}`, options: { variant: "h2", fontSize: 16 } },
         {
-          text: `Service Tag: ${data.result[0].output.serviceTag}`,
+          text: `Service Tag: ${data.system.service_tag}`,
           options: { variant: "h2", fontSize: 16, sx: { marginBottom: "5px" } },
         },
         {
-          text: `Active Oversubscription: ${data.info.activeOversubscription}`,
+          text: `Active Oversubscription: ${data.info.active_oversubscription}`,
           options: { variant: "h1", fontSize: 14 },
         },
         {
-          text: `Total Oversubscription: ${data.info.totalOversubscription}`,
+          text: `Total Oversubscription: ${data.info.total_oversubscription}`,
           options: { variant: "h1", fontSize: 14 },
         },
       ],
@@ -38,14 +59,14 @@ const Switches = ({ query, setRefresh }) => {
           text: `Port Info:`,
           options: { variant: "h1", fontSize: 22, sx: { marginBottom: "10px" } },
         },
-        { text: `Active Ports: ${data.info.activePorts}`, options: { variant: "h2", fontSize: 16 } },
-        { text: `Total Ports: ${data.info.totalPorts}`, options: { variant: "h2", fontSize: 16 } },
+        { text: `Active Ports: ${data.info.active_ports}`, options: { variant: "h2", fontSize: 16 } },
+        { text: `Total Ports: ${data.info.total_ports}`, options: { variant: "h2", fontSize: 16 } },
         {
-          text: `Fastest Port: ${data.info.fastestPort}G`,
+          text: `Fastest Port: ${data.info.fastest_port}G`,
           options: { variant: "h2", fontSize: 16, sx: { marginBottom: "5px" } },
         },
-        { text: `Uplink Count ${data.info.uplinkCount}`, options: { variant: "h2", fontSize: 14 } },
-        { text: `Uplink Speed: ${data.info.uplinkSpeed}G`, options: { variant: "h2", fontSize: 14 } },
+        { text: `Uplink Count ${data.info.uplink_count}`, options: { variant: "h2", fontSize: 14 } },
+        { text: `Uplink Speed: ${data.info.uplink_speed}G`, options: { variant: "h2", fontSize: 14 } },
       ],
     },
     ...data.info.uplinks.map((uplink, index) => {
@@ -82,13 +103,26 @@ const Switches = ({ query, setRefresh }) => {
         ],
       }
     }),
+    {
+      data: [
+        {
+          text: `Warranty Info:`,
+          options: { variant: "h2", fontSize: 22 },
+        },
+        {
+          text: `Ship Date: ${new Date(query.data?.warranty?.shipDate).toLocaleString()}`,
+          options: { variant: "h2", fontSize: 18, sx: { marginBottom: "10px" } },
+        },
+        ...warranty_entitlements,
+      ],
+    },
   ]
   return (
     <Box sx={{ width: "100%" }}>
       <Grid2 container spacing={1}>
         {cards.map((card, index) => (
           <Grid2 xs={12} sm={6} lg={3} key={index}>
-            <Card variant="outlined" sx={{ height: "190px" }}>
+            <Card variant="outlined" sx={{ height: "190px", overflowY: "auto" }}>
               <CardContent>
                 {card.data.map((data, index2) => (
                   <Typography {...data.options} key={index2}>

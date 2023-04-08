@@ -39,12 +39,12 @@ const SwitchGen = ({ data }) => {
         },
         signal,
       }
-      const res = await (await fetch(`${apiConfig.apiUrl}/switches/v1/query/${node}/${refreshCache}`, payload)).json()
+      const res = await (await fetch(`${apiConfig.apiUrl}/client/v1/node/${node}/${refreshCache}`, payload)).json()
       if (res.status === "error" && !res.hasOwnProperty("silent")) enqueueSnackbar(res.message, { variant: "error" })
       else if (res.status === "error" && res.hasOwnProperty("silent"))
         console.error(`Switch rack query failed: ${res.message}`)
 
-      return res
+      return res.switch_data
     },
     { staleTime: 120000, cacheTime: 120000 }
   )
@@ -60,36 +60,32 @@ const SwitchGen = ({ data }) => {
     if (res.status === "error") enqueueSnackbar(res.message, { variant: "error" })
     return res
   })
-
   const refetchQuery = () => {
     setRefreshCache("true")
     switchQuery.refetch()
   }
-
-  if (switchQuery.isFetched && switchQuery.data.status === "success") {
+  if (switchQuery.isFetched && switchQuery.data && switchQuery.data.success === true) {
     if (
-      switchQuery.data.result[1].output.length > 0 &&
-      switchQuery.data.result[1].output[0].port.match(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]/g)
+      switchQuery.data.interfaces.length > 0 &&
+      switchQuery.data.interfaces[0].port.match(/[0-9]{1,2}\/[0-9]{1,2}\/[0-9]/g)
     ) {
       // core switch only
-      let firstBlade = parseInt(switchQuery.data.result[1].output[0].port.split("/")[0])
-      let lastBlade = parseInt(
-        switchQuery.data.result[1].output[switchQuery.data.result[1].output.length - 1].port.split("/")[0]
-      )
+      let firstBlade = parseInt(switchQuery.data.interfaces[0].port.split("/")[0])
+      let lastBlade = parseInt(switchQuery.data.interfaces[switchQuery.data.interfaces.length - 1].port.split("/")[0])
       let bladeArr = []
       for (let x = firstBlade; x <= lastBlade; x++) {
         // separate the port array into blades
         bladeArr.push(
-          switchQuery.data.result[1].output
+          switchQuery.data.interfaces
             .map((val, index) => {
               let portArr = val.port.split("/")
               if (parseInt(portArr[0]) === x) {
                 if (val.speed === "10G" && portArr[2] === "1")
                   return [
                     val,
-                    switchQuery.data.result[1].output[index + 1],
-                    switchQuery.data.result[1].output[index + 2],
-                    switchQuery.data.result[1].output[index + 3],
+                    switchQuery.data.interfaces[index + 1],
+                    switchQuery.data.interfaces[index + 2],
+                    switchQuery.data.interfaces[index + 3],
                   ]
                 else if (val.speed !== "10G" && portArr[2] === "1") return val
               }
@@ -455,7 +451,7 @@ const SwitchGen = ({ data }) => {
       })
     } else {
       // leaf switches
-      switchQuery.data.client = switchQuery.data.result[1].output.map((val, index) => {
+      switchQuery.data.client = switchQuery.data.interfaces.map((val, index) => {
         let color = "secondary"
         if (val.speed === "100M" || val.speed === "10M") color = "warning"
         else if (val.speed === "1G") color = "success"
@@ -519,7 +515,8 @@ const SwitchGen = ({ data }) => {
             <TableBody>
               <TableRow>
                 {switchQuery.isFetched &&
-                  switchQuery.data.status === "success" &&
+                  switchQuery.data &&
+                  switchQuery.data.success === true &&
                   switchQuery.data.client.map((val, index) => {
                     if (!(index % 2)) return <React.Fragment key={index}>{val}</React.Fragment>
                     else return undefined
@@ -527,7 +524,8 @@ const SwitchGen = ({ data }) => {
               </TableRow>
               <TableRow>
                 {switchQuery.isFetched &&
-                  switchQuery.data.status === "success" &&
+                  switchQuery.data &&
+                  switchQuery.data.success === true &&
                   switchQuery.data.client.map((val, index) => {
                     if (index % 2) return <React.Fragment key={index}>{val}</React.Fragment>
                     else return undefined
@@ -538,7 +536,8 @@ const SwitchGen = ({ data }) => {
           {tags.includes("core-switch") && (
             <TableBody>
               {switchQuery.isFetched &&
-                switchQuery.data.status === "success" &&
+                switchQuery.data &&
+                switchQuery.data.success === true &&
                 switchQuery.data.client.map((val, index) => {
                   return <React.Fragment key={index}>{val}</React.Fragment>
                 })}
