@@ -15,7 +15,7 @@ export const grendel_host_find = async (input: string) => {
         cause: input,
       });
 
-    return [...res];
+    return res;
   } catch (error) {
     if (error instanceof TRPCError) throw error;
     throw new TRPCError({

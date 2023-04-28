@@ -38,7 +38,7 @@ export const grendelRouter = createTRPCRouter({
       }),
     list: privateProcedure.query(async () => {
       try {
-        const res: IGrendelHost = await got(
+        const res: IGrendelHost[0] = await got(
           `${GRENDEL_SOCKET_PATH}:/v1/host/list`
         ).json();
 
@@ -56,7 +56,7 @@ export const grendelRouter = createTRPCRouter({
     }),
     tags: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
-        const res: IGrendelHost = await got(
+        const res: IGrendelHost[0] = await got(
           `${GRENDEL_SOCKET_PATH}:/v1/host/tags/${input}`
         ).json();
 
