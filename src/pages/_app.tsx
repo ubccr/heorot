@@ -16,7 +16,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <div className="min-h-screen bg-large-triangles-ub dark:bg-large-triangles-dark">
           <Navbar />
           <div className="flex justify-center dark:text-white">
-            <div className="mt-4 rounded-lg border border-white bg-white p-3 text-center shadow-xl dark:bg-neutral-700">
+            <div className="mt-4 rounded-lg border border-white bg-white p-3 text-center shadow-xl dark:bg-neutral-800">
               <Component {...pageProps} />
             </div>
           </div>
