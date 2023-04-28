@@ -1,113 +1,142 @@
-import "react-toastify/dist/ReactToastify.css";
-
-import { ToastContainer, toast } from "react-toastify";
-
 import Link from "next/link";
 import type { NextPage } from "next";
+import ProgressSpinner from "~/components/progressSpinner";
 import { api } from "~/utils/api";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 
 type FormData = {
   username: string;
   password: string;
+  verify_password: string;
 };
 
 const Register: NextPage = ({}) => {
-  const register_req = api.auth.register.useMutation();
-  const { register, handleSubmit } = useForm<FormData>();
-  const onSubmit = handleSubmit(async (data) => {
-    await register_req.mutateAsync(data);
+  const router = useRouter();
 
-    toast(register_req.data?.message, {
-      position: "bottom-left",
-      type: register_req.isSuccess ? "success" : "error",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-    console.log(register_req);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    setError,
+  } = useForm<FormData>();
+  const register_req = api.auth.register.useMutation({
+    onSuccess: async (data) => {
+      toast.success(data?.message);
+      await router.push("/auth/login");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const onSubmit = handleSubmit((data) => {
+    register_req.mutate(data);
   });
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img
-          className="mx-auto h-10 w-auto"
-          src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-          alt="Your Company"
-        />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight ">
-          Register for an Account
-        </h2>
-      </div>
+    <div className="flex min-h-full flex-1 flex-col justify-center px-8 py-12">
+      <h2 className="text-center text-2xl font-bold">Register for Heorot</h2>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-10">
         {/*eslint-disable-next-line @typescript-eslint/no-misused-promises*/}
         <form className="space-y-6" onSubmit={onSubmit}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium leading-6 "
-            >
+          <div className="mt-2">
+            <label htmlFor="username" className="block">
               Username
             </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                type="text"
-                required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                {...register("username")}
-              />
-            </div>
+            {!!errors.username && (
+              <p role="alert" className="text-sm text-red-500">
+                {errors.username?.message}
+              </p>
+            )}
+            <input
+              id="username"
+              autoComplete="username"
+              type="text"
+              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              {...register("username", {
+                required: "Please enter a Username.",
+              })}
+            />
           </div>
 
           <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium leading-6 "
-              >
+            <div className="mt-2">
+              <label htmlFor="password" className="block">
                 Password
               </label>
+              {!!errors.password && (
+                <p role="alert" className="text-sm text-red-500">
+                  {errors.password?.message}
+                </p>
+              )}
             </div>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              {...register("password", {
+                required: "Please enter a Password.",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters long.",
+                },
+              })}
+              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+            />
+          </div>
+          <div>
             <div className="mt-2">
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                {...register("password")}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900  shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
+              <label htmlFor="verify_password" className="block">
+                Re-enter Password
+              </label>
+              {!!errors.verify_password && (
+                <p role="alert" className="text-sm text-red-500">
+                  {errors.verify_password?.message}
+                </p>
+              )}
             </div>
+            <input
+              id="verify_password"
+              type="password"
+              autoComplete="new-password"
+              {...register("verify_password", {
+                required: "Please enter a Password.",
+                validate: (val: string) => {
+                  if (watch("password") !== val)
+                    return "Passwords do not match.";
+                },
+              })}
+              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+            />
           </div>
 
-          <div>
+          <div className="flex justify-center pt-3">
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-white shadow-lg hover:bg-blue-500"
             >
-              Register
+              {register_req.isLoading ? (
+                <ProgressSpinner classes="fill-white w-5 h-5" />
+              ) : (
+                "Register"
+              )}
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-5 text-center text-sm text-gray-300">
           Already have an Account?{" "}
           <Link
             href="/auth/login"
-            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+            className="text-blue-500 hover:text-indigo-400"
           >
             Login
           </Link>
         </p>
       </div>
-      <ToastContainer />
     </div>
   );
 };
