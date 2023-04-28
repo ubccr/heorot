@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    username  String   @id @unique
+    password  String
+    role      String   @default("disabled")
+    theme     String   @default("light")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Nodes {
+    node        String  @id @unique
+    service_tag String  @unique
+    type        String
+    //   redfish     Redfish?
+    switch      Switch?
+}
+
+model Switch {
+    id           String @id @default(uuid())
+    node         String @unique
+    manufacturer String
+    serial       String
+    model        String
+    version      String
+
+    Nodes                    Nodes?                   @relation(fields: [node], references: [node])
+    interfaces               InterfaceStatus[]
+    interface_config_backups InterfaceConfigBackups[]
+    config_backups           ConfigBackups[]
+}
+
+// *** Switches***
+model InterfaceStatus {
+    id                   String   @id @default(uuid())
+    port                 String
+    port_mode            String?
+    vlan_id              Int?
+    vlan_info            String?
+    speed                BigInt
+    type                 String
+    description          String
+    auto_negotiation     Boolean?
+    duplex               String
+    link_status          String
+    line_protocol_status String?
+
+    node   String
+    Switch Switch? @relation(fields: [node], references: [node])
+
+    @@unique([node, port])
+}
+
+model InterfaceConfigBackups {
+    id          String   @id @default(uuid())
+    node        String
+    description String
+    created_at  DateTime @default(now())
+    config      Bytes
+    switch      Switch?  @relation(fields: [node], references: [node])
+}
+
+model ConfigBackups {
+    id         String   @id @default(uuid())
+    node       String
+    created_at DateTime @default(now())
+    config     Bytes
+    switch     Switch?  @relation(fields: [node], references: [node])
+}
