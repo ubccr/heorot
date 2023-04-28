@@ -1,6 +1,6 @@
-import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import type { NextPage } from "next";
 import { useUserContext } from "~/provider";
 
 const Home: NextPage = () => {
@@ -22,8 +22,7 @@ const Home: NextPage = () => {
           <span>
             New users can register{" "}
             <Link
-              as="p"
-              href="/auth/login"
+              href="/auth/register"
               className="text-blue-500 hover:text-blue-400"
             >
               here
