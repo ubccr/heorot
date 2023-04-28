@@ -1,5 +1,9 @@
 import { compareSync, hashSync } from "bcryptjs";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  errorHandler,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 import { TRPCError } from "@trpc/server";
 import { env } from "~/env.mjs";
@@ -25,11 +29,10 @@ export const authRouter = createTRPCRouter({
           message: "User created successfully",
         };
       } catch (error) {
-        throw new TRPCError({
-          code: "UNPROCESSABLE_CONTENT",
-          message: "Error creating user",
-          cause: error,
-        });
+        const responses = [
+          { code: "P2002", message: "Username already exists" },
+        ];
+        errorHandler(error, responses, "api/routes/auth.ts");
       }
     }),
   login: publicProcedure

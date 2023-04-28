@@ -24,6 +24,8 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { env } from "~/env.mjs";
+import { Prisma } from "@prisma/client";
+import SuperJSON from "superjson";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -38,6 +40,39 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
     };
   },
 });
+
+interface IErrorHandlerOptions {
+  code: string;
+  message: string;
+}
+
+export const errorHandler = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error: any,
+  responses: IErrorHandlerOptions[],
+  defaultMessage?: string
+) => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    responses.forEach((response) => {
+      if (error.code === response.code) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: response.message,
+        });
+      }
+    });
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: error.message,
+    });
+  } else
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `A general error occurred. ${
+        defaultMessage ?? SuperJSON.stringify(error)
+      }`,
+    });
+};
 
 export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
