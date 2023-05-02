@@ -12,6 +12,9 @@ const server = z.object({
 
   SWITCH_USERNAME: z.string(),
   SWITCH_PASSWORD: z.string(),
+
+  MAAS_API_URL: z.string().url().optional(),
+  MAAS_API_KEY: z.string().optional(),
 });
 
 /**
@@ -35,6 +38,8 @@ const processEnv = {
   GRENDEL_SOCKET_PATH: process.env.GRENDEL_SOCKET_PATH,
   SWITCH_USERNAME: process.env.SWITCH_USERNAME,
   SWITCH_PASSWORD: process.env.SWITCH_PASSWORD,
+  MAAS_API_URL: process.env.MAAS_API_URL,
+  MAAS_API_KEY: process.env.MAAS_API_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 

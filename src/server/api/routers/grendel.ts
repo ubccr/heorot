@@ -1,10 +1,13 @@
 import type { IGrendelHost, IGrendelImage } from "~/types/grendel";
 import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
+import {
+  grendel_host_find,
+  grendel_host_list,
+} from "~/server/functions/grendel";
 import { grendel_host_schema, grendel_image_schema } from "~/types/grendel";
 
 import { TRPCError } from "@trpc/server";
 import got from "got";
-import { grendel_host_find } from "~/server/functions/grendel";
 import { z } from "zod";
 
 export const GRENDEL_SOCKET_PATH = process.env.GRENDEL_SOCKET_PATH ?? "";
@@ -37,26 +40,14 @@ export const grendelRouter = createTRPCRouter({
         }
       }),
     list: privateProcedure.query(async () => {
-      try {
-        const res: IGrendelHost[0] = await got(
-          `${GRENDEL_SOCKET_PATH}:/v1/host/list`
-        ).json();
-
-        return [...res];
-      } catch (error) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to receive grendel request.",
-          cause: error,
-        });
-      }
+      return grendel_host_list();
     }),
     find: privateProcedure.input(z.string()).query(async ({ input }) => {
       return grendel_host_find(input);
     }),
     tags: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
-        const res: IGrendelHost[0] = await got(
+        const res: IGrendelHost[] = await got(
           `${GRENDEL_SOCKET_PATH}:/v1/host/tags/${input}`
         ).json();
 
