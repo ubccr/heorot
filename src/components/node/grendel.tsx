@@ -1,12 +1,12 @@
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useFieldArray, useForm } from "react-hook-form";
 
-// import Backups from "~/components/node/backups";
+// import Backups from "~/components/host/backups";
 import type { IGrendelHost } from "~/types/grendel";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 
-const Grendel = ({ node }: { node: string }) => {
+const Grendel = ({ host }: { host: string }) => {
   const { control, register, reset, handleSubmit } = useForm<IGrendelHost>();
 
   const { fields, append, remove } = useFieldArray({
@@ -14,8 +14,8 @@ const Grendel = ({ node }: { node: string }) => {
     name: "interfaces",
   });
 
-  const node_res = api.grendel.host.find.useQuery(node, {
-    enabled: !!node,
+  const host_res = api.grendel.host.find.useQuery(host, {
+    enabled: !!host,
     retry: 2,
     onError: (error) => {
       toast.error(error.message);
@@ -38,20 +38,20 @@ const Grendel = ({ node }: { node: string }) => {
           <tr>
             <td>Provision:</td>
             <td>
-              {node_res.isSuccess && node_res.data[0]?.provision.toString()}
+              {host_res.isSuccess && host_res.data[0]?.provision.toString()}
             </td>
           </tr>
           <tr>
             <td>Tags:</td>
-            <td>{node_res.isSuccess && node_res.data[0]?.tags.join(", ")}</td>
+            <td>{host_res.isSuccess && host_res.data[0]?.tags.join(", ")}</td>
           </tr>
           <tr>
             <td>Boot Image:</td>
-            <td>{node_res.isSuccess && node_res.data[0]?.boot_image}</td>
+            <td>{host_res.isSuccess && host_res.data[0]?.boot_image}</td>
           </tr>
           <tr>
             <td>Firmware:</td>
-            <td>{node_res.isSuccess && node_res.data[0]?.firmware}</td>
+            <td>{host_res.isSuccess && host_res.data[0]?.firmware}</td>
           </tr>
           <tr>
             <td>Interfaces:</td>

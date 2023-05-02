@@ -6,10 +6,10 @@
 // import { toast } from "react-toastify";
 // import { useForm } from "react-hook-form";
 
-// const Backups = ({ node }: { node: string }) => {
+// const Backups = ({ host }: { host: string }) => {
 //   const [open, setOpen] = useState(false);
 
-//   const backups = api.switches.backups.useQuery(node);
+//   const backups = api.switches.backups.useQuery(host);
 //   const create_backup = api.switches.interface.backup.useMutation({
 //     onSuccess: async (data) => {
 //       toast.success("Successfully created backup");
@@ -21,7 +21,7 @@
 //     },
 //   });
 //   type FormData = {
-//     node: string;
+//     host: string;
 //     description: string;
 //   };
 
@@ -35,14 +35,14 @@
 
 //   const onSubmit = async (data: FormData) => {
 //     await create_backup.mutateAsync({
-//       node: node,
+//       host: host,
 //       description: data.description,
 //     });
 //     backups.refetch();
 //   };
 //   const restore = (backup_id: string) => {
 //     restore_backup.mutate({
-//       node,
+//       host,
 //       id: backup_id,
 //     });
 //   };

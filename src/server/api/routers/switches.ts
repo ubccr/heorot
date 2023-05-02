@@ -13,7 +13,7 @@ export const switchesRouter = createTRPCRouter({
     list: privateProcedure.input(z.string()).query(async ({ input }) => {
       // get interfaces from DB
       const interfaces = await prisma.interfaceStatus.findMany({
-        where: { node: input },
+        where: { host: input },
       });
 
       // sort the interfaces by port
@@ -85,7 +85,7 @@ export const switchesRouter = createTRPCRouter({
         });
 
       // delete all interfaces already in the DB
-      await prisma.interfaceStatus.deleteMany({ where: { node: input } });
+      await prisma.interfaceStatus.deleteMany({ where: { host: input } });
 
       // loop through interfaceStatuses object and add each interface to the DB
       // Arista switch res has each interface name as a key
@@ -95,7 +95,7 @@ export const switchesRouter = createTRPCRouter({
 
         await prisma.interfaceStatus.create({
           data: {
-            node: input,
+            host: input,
             port: key,
             port_mode: iface.vlanInformation.interfaceMode,
             vlan_id: iface.vlanInformation.vlanId,
@@ -114,7 +114,7 @@ export const switchesRouter = createTRPCRouter({
     configure: privateProcedure
       .input(
         z.object({
-          node: z.string(),
+          host: z.string(),
           type: z.string(), //enum(["native", "lag"])
           interfaces: z.string().array(),
           description: z.string(),
@@ -181,7 +181,7 @@ export const switchesRouter = createTRPCRouter({
             break;
         }
         // get switch info for query
-        const { switch_os } = await get_switch_info(input.node);
+        const { switch_os } = await get_switch_info(input.host);
         if (switch_os === "Arista_EOS") {
           // send the commands to the switch
           return command_arr.join("\n");
@@ -201,9 +201,9 @@ export const switchesRouter = createTRPCRouter({
         }
       }),
     // backup: privateProcedure
-    //   .input(z.object({ node: z.string(), description: z.string() }))
+    //   .input(z.object({ host: z.string(), description: z.string() }))
     //   .mutation(async ({ input }) => {
-    //     let { switch_address, switch_os } = await get_switch_info(input.node);
+    //     let { switch_address, switch_os } = await get_switch_info(input.host);
     //     if (switch_os === "Arista_EOS") {
     //       let switch_res =
     //         await arista_switch_query<arista_show_running_config>(
@@ -221,7 +221,7 @@ export const switchesRouter = createTRPCRouter({
 
     //       await prisma.interfaceConfigBackups.create({
     //         data: {
-    //           node: input.node,
+    //           host: input.host,
     //           description: input.description,
     //           config: Buffer.from(switch_res.result[0].output, "utf8"),
     //         },
@@ -229,7 +229,7 @@ export const switchesRouter = createTRPCRouter({
     //     }
     //   }),
     // restore: privateProcedure
-    //   .input(z.object({ node: z.string(), id: z.string() }))
+    //   .input(z.object({ host: z.string(), id: z.string() }))
     //   .mutation(async ({ input }) => {
     //     // get config from DB
     //     let config_res = await prisma.interfaceConfigBackups.findUnique({
@@ -241,15 +241,15 @@ export const switchesRouter = createTRPCRouter({
     //         message: "Backup not found.",
     //         cause: config_res,
     //       });
-    //     if (config_res.node !== input.node)
+    //     if (config_res.host !== input.host)
     //       throw new TRPCError({
     //         code: "BAD_REQUEST",
-    //         message: "Backup does not belong to this node.",
+    //         message: "Backup does not belong to this host.",
     //         cause: config_res,
     //       });
 
     //     // get switch info for query
-    //     let { switch_address, switch_os } = await get_switch_info(input.node);
+    //     let { switch_address, switch_os } = await get_switch_info(input.host);
     //     if (switch_os === "Arista_EOS") {
     //       // send the commands to the switch
     //       let switch_res = await arista_switch_query<{}[]>(switch_address, [
@@ -268,7 +268,7 @@ export const switchesRouter = createTRPCRouter({
   }),
   // backups: privateProcedure.input(z.string()).query(async ({ input }) => {
   //   let backups = await prisma.interfaceConfigBackups.findMany({
-  //     where: { node: input },
+  //     where: { host: input },
   //     orderBy: { created_at: "desc" },
   //   });
 

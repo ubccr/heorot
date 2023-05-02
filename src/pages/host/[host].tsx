@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 
 const Node: NextPage = () => {
   const router = useRouter();
-  const node = router.query.node as string;
+  const host = router.query.host as string;
 
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
@@ -15,7 +15,7 @@ const Node: NextPage = () => {
 
   return (
     <>
-      <h1>{node}</h1>
+      <h1>{host}</h1>
       <br />
       <Tab.Group>
         <Tab.List className="flex justify-center gap-3 ">
@@ -63,11 +63,11 @@ const Node: NextPage = () => {
         <br />
         <Tab.Panels>
           <Tab.Panel>
-            <Grendel node={node} />
+            <Grendel host={host} />
           </Tab.Panel>
           <Tab.Panel></Tab.Panel>
-          <Tab.Panel>{!!node && <PortManagement node={node} />}</Tab.Panel>
-          {/* <Tab.Panel>{!!node && <Backups node={node} />}</Tab.Panel> */}
+          <Tab.Panel>{!!host && <PortManagement host={host} />}</Tab.Panel>
+          {/* <Tab.Panel>{!!host && <Backups host={host} />}</Tab.Panel> */}
         </Tab.Panels>
       </Tab.Group>
     </>

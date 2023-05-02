@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { grendel_host_find } from "../grendel";
 
-export async function get_switch_info(node: string) {
-  const grendel_res = await grendel_host_find(node);
+export async function get_switch_info(host: string) {
+  const grendel_res = await grendel_host_find(host);
   if (!grendel_res[0] || grendel_res.length === 0)
     throw new TRPCError({
       code: "NOT_FOUND",

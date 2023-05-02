@@ -1,5 +1,6 @@
 import { authRouter } from "./routers/auth";
 import { createTRPCRouter } from "~/server/api/trpc";
+import { frontendRouter } from "./routers/frontend";
 import { grendelRouter } from "./routers/grendel";
 import { switchesRouter } from "./routers/switches";
 
@@ -10,6 +11,7 @@ import { switchesRouter } from "./routers/switches";
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
+  frontend: frontendRouter,
   grendel: grendelRouter,
   switches: switchesRouter,
 });

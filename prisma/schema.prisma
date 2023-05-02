@@ -19,29 +19,29 @@ model User {
     updatedAt DateTime @updatedAt
 }
 
-model Nodes {
-    node        String  @id @unique
-    service_tag String  @unique
-    type        String
+model Hosts {
+    host        String  @id @unique
+    host_type        String
+    source        String
     //   redfish     Redfish?
     switch      Switch?
 }
 
 model Switch {
     id           String @id @default(uuid())
-    node         String @unique
+    host         String @unique
     manufacturer String
     serial       String
     model        String
     version      String
 
-    Nodes                    Nodes?                   @relation(fields: [node], references: [node])
+    Hosts                    Hosts?                   @relation(fields: [host], references: [host])
     interfaces               InterfaceStatus[]
     interface_config_backups InterfaceConfigBackups[]
     config_backups           ConfigBackups[]
 }
 
-// *** Switches***
+// *** Switches ***
 model InterfaceStatus {
     id                   String   @id @default(uuid())
     port                 String
@@ -56,25 +56,25 @@ model InterfaceStatus {
     link_status          String
     line_protocol_status String?
 
-    node   String
-    Switch Switch? @relation(fields: [node], references: [node])
+    host   String
+    Switch Switch? @relation(fields: [host], references: [host])
 
-    @@unique([node, port])
+    @@unique([host, port])
 }
 
 model InterfaceConfigBackups {
     id          String   @id @default(uuid())
-    node        String
+    host        String
     description String
     created_at  DateTime @default(now())
     config      Bytes
-    switch      Switch?  @relation(fields: [node], references: [node])
+    switch      Switch?  @relation(fields: [host], references: [host])
 }
 
 model ConfigBackups {
     id         String   @id @default(uuid())
-    node       String
+    host       String
     created_at DateTime @default(now())
     config     Bytes
-    switch     Switch?  @relation(fields: [node], references: [node])
+    switch     Switch?  @relation(fields: [host], references: [host])
 }

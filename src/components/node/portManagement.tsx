@@ -8,8 +8,8 @@ import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 
-const PortManagement = ({ node }: { node: string }) => {
-  const interfaces = api.switches.interface.list.useQuery(node);
+const PortManagement = ({ host }: { host: string }) => {
+  const interfaces = api.switches.interface.list.useQuery(host);
   const interface_mutation = api.switches.interface.refresh.useMutation();
   const config_interface_mutation =
     api.switches.interface.configure.useMutation({
@@ -26,7 +26,7 @@ const PortManagement = ({ node }: { node: string }) => {
   const [open, setOpen] = useState(false);
 
   async function refresh() {
-    await interface_mutation.mutateAsync(node);
+    await interface_mutation.mutateAsync(host);
     await interfaces.refetch();
   }
 
@@ -48,7 +48,7 @@ const PortManagement = ({ node }: { node: string }) => {
 
   const onSubmit = (data: FormData) => {
     config_interface_mutation.mutate({
-      node,
+      host: host,
       type: data.type,
       interfaces: updatePortArr,
       description: data.description,
@@ -61,7 +61,7 @@ const PortManagement = ({ node }: { node: string }) => {
   return (
     <div>
       <div className="flex flex-col justify-center gap-3">
-        <button type="button" onClick={() => refresh}>
+        <button type="button" onClick={() => refresh()}>
           Refresh
         </button>
         {interfaces.isLoading ||
