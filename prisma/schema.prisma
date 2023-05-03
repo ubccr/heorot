@@ -20,11 +20,11 @@ model User {
 }
 
 model Hosts {
-    host        String  @id @unique
-    host_type        String
-    source        String
+    host      String  @id @unique
+    host_type String
+    source    String
     //   redfish     Redfish?
-    switch      Switch?
+    switch    Switch?
 }
 
 model Switch {
@@ -35,10 +35,10 @@ model Switch {
     model        String
     version      String
 
-    Hosts                    Hosts?                   @relation(fields: [host], references: [host])
-    interfaces               InterfaceStatus[]
-    interface_config_backups InterfaceConfigBackups[]
-    config_backups           ConfigBackups[]
+    Hosts      Hosts?            @relation(fields: [host], references: [host], onDelete: Cascade)
+    interfaces InterfaceStatus[]
+    // interface_config_backups InterfaceConfigBackups[]
+    // config_backups           ConfigBackups[]
 }
 
 // *** Switches ***
@@ -57,24 +57,24 @@ model InterfaceStatus {
     line_protocol_status String?
 
     host   String
-    Switch Switch? @relation(fields: [host], references: [host])
+    Switch Switch? @relation(fields: [host], references: [host], onDelete: Cascade)
 
     @@unique([host, port])
 }
 
-model InterfaceConfigBackups {
-    id          String   @id @default(uuid())
-    host        String
-    description String
-    created_at  DateTime @default(now())
-    config      Bytes
-    switch      Switch?  @relation(fields: [host], references: [host])
-}
+// model InterfaceConfigBackups {
+//     id          String   @id @default(uuid())
+//     host        String
+//     description String
+//     created_at  DateTime @default(now())
+//     config      Bytes
+//     switch      Switch?  @relation(fields: [host], references: [host])
+// }
 
-model ConfigBackups {
-    id         String   @id @default(uuid())
-    host       String
-    created_at DateTime @default(now())
-    config     Bytes
-    switch     Switch?  @relation(fields: [host], references: [host])
-}
+// model ConfigBackups {
+//     id         String   @id @default(uuid())
+//     host       String
+//     created_at DateTime @default(now())
+//     config     Bytes
+//     switch     Switch?  @relation(fields: [host], references: [host])
+// }
