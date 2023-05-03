@@ -7,6 +7,7 @@ import {
 import { grendel_host_schema, grendel_image_schema } from "~/types/grendel";
 
 import { TRPCError } from "@trpc/server";
+import { env } from "~/env.mjs";
 import got from "got";
 import { z } from "zod";
 
@@ -162,6 +163,9 @@ export const grendelRouter = createTRPCRouter({
           });
         }
       }),
+    firmware: privateProcedure.query(() => {
+      return env.GRENDEL_FIRMWARE_LIST.split(",");
+    }),
   }),
   image: createTRPCRouter({
     image: privateProcedure
@@ -184,13 +188,13 @@ export const grendelRouter = createTRPCRouter({
           });
         }
       }),
-    list: privateProcedure.mutation(async () => {
+    list: privateProcedure.query(async () => {
       try {
         const res: IGrendelImage[] = await got(
           `${GRENDEL_SOCKET_PATH}:/v1/bootimage/list`
         ).json();
 
-        return [...res];
+        return res;
       } catch (error) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -199,7 +203,7 @@ export const grendelRouter = createTRPCRouter({
         });
       }
     }),
-    find: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+    find: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
         const res: IGrendelImage[] = await got(
           `${GRENDEL_SOCKET_PATH}:/v1/bootimage/find/${input}`
@@ -214,7 +218,7 @@ export const grendelRouter = createTRPCRouter({
         });
       }
     }),
-    delete: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+    delete: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
         // TODO: add response type definitions
         const res = await got
