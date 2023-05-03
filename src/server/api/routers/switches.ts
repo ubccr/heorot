@@ -1,8 +1,11 @@
+import type {
+  arista_show_interfaces_status,
+  arista_show_version,
+} from "~/types/arista";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 
 import type { InterfaceStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import type { arista_show_interfaces_status } from "~/types/arista";
 import { arista_switch_query } from "~/server/functions/switches/fetch";
 import { get_switch_info } from "~/server/functions/switches/info";
 import { prisma } from "~/server/db";
@@ -71,18 +74,38 @@ export const switchesRouter = createTRPCRouter({
       // get switch address for query
       const { switch_address } = await get_switch_info(input);
 
+      // check to make sure switch has been added to the DB
+      const switch_count = await prisma.switch.count({
+        where: { host: input },
+      });
+
       // get switch interfaces
-      const switch_res =
-        await arista_switch_query<arista_show_interfaces_status>(
-          switch_address,
-          ["show interfaces status"]
-        );
+      const switch_res = await arista_switch_query<
+        arista_show_interfaces_status,
+        arista_show_version
+      >(switch_address, [
+        "show interfaces status",
+        switch_count === 0 ? "show version" : "",
+      ]);
       if (!switch_res.result)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Switch returned an error response.",
           cause: switch_res,
         });
+
+      // if switch is not in the "Switch" table, add it
+      if (switch_count === 0 && switch_res.result[1]) {
+        await prisma.switch.create({
+          data: {
+            host: input,
+            manufacturer: switch_res.result[1].mfgName,
+            serial: switch_res.result[1].serialNumber,
+            model: switch_res.result[1].modelName,
+            version: switch_res.result[1].version,
+          },
+        });
+      }
 
       // delete all interfaces already in the DB
       await prisma.interfaceStatus.deleteMany({ where: { host: input } });
