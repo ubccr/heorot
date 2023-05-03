@@ -15,6 +15,8 @@ const server = z.object({
 
   MAAS_API_URL: z.string().url().optional(),
   MAAS_API_KEY: z.string().optional(),
+
+  GRENDEL_FIRMWARE_LIST: z.string(),
 });
 
 /**
@@ -40,6 +42,7 @@ const processEnv = {
   SWITCH_PASSWORD: process.env.SWITCH_PASSWORD,
   MAAS_API_URL: process.env.MAAS_API_URL,
   MAAS_API_KEY: process.env.MAAS_API_KEY,
+  GRENDEL_FIRMWARE_LIST: process.env.GRENDEL_FIRMWARE_LIST,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
