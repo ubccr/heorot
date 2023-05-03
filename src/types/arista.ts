@@ -6,10 +6,10 @@ import { z } from "zod";
 //   jsonrpc: z.string(),
 //   result: z.custom(),
 // })
-export type arista_response<T> = {
+export type arista_response<T, U = void, V = void> = {
   id: string;
   jsonrpc: string;
-  result?: T[];
+  result?: [T, U, V];
   error?: {
     data: {
       errors?: string[];

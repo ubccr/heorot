@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import type { arista_response } from "~/types/arista";
 import got from "got";
 
-export async function arista_switch_query<T>(
+export async function arista_switch_query<T, U = void, V = void>(
   switch_address: string,
   commands: string[],
   format = "json",
@@ -38,7 +38,7 @@ export async function arista_switch_query<T>(
     };
 
     // query switch
-    const switch_res: arista_response<T> = await got
+    const switch_res: arista_response<T, U, V> = await got
       .post(url, {
         headers: { Cookie },
         json: body,
