@@ -5,30 +5,6 @@ import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 
 const Floorplan: NextPage = () => {
-  const floorplan_x = [..."defghijklmnopqrstuv"];
-  const floorplan_y = [
-    "28",
-    "27",
-    "26",
-    "25",
-    "24",
-    "23",
-    "22",
-    "21",
-    "17",
-    "16",
-    "15",
-    "14",
-    "13",
-    "12",
-    "11",
-    "10",
-    "09",
-    "08",
-    "07",
-    "06",
-    "05",
-  ];
   const floorplan_res = api.frontend.floorplan.list.useQuery();
   const floorplan_refresh = api.frontend.floorplan.refresh.useMutation({
     onSuccess: async () => {
@@ -44,6 +20,7 @@ const Floorplan: NextPage = () => {
       <table className="table-fixed">
         <thead>
           <tr>
+            {/* refresh button */}
             <th className="border border-gray-400 px-4 py-2">
               <ArrowPathIcon
                 className={`h-5 w-5 ${
@@ -52,17 +29,22 @@ const Floorplan: NextPage = () => {
                 onClick={() => floorplan_refresh.mutate()}
               />
             </th>
-            {floorplan_y.map((y, index) => (
-              <th key={index} className="border border-gray-400 px-4 py-2">
-                {y}
-              </th>
-            ))}
+            {/* map column numbers to header */}
+            {floorplan_res.isSuccess &&
+              !!floorplan_res.data &&
+              floorplan_res.data[0]?.map((y, index) => (
+                <th key={index} className="border border-gray-400 px-4 py-2">
+                  {y.rack.replace(/[a-zA-Z]/g, "")}
+                </th>
+              ))}
           </tr>
         </thead>
         <tbody>
+          {/* map floorplan res */}
           {floorplan_res.isSuccess &&
             floorplan_res.data?.map((x, index_x) => (
               <tr key={index_x}>
+                {/* set first td to row name */}
                 <td className="border border-gray-400 px-4 py-2">
                   {x[0]?.rack[0]}
                 </td>

@@ -4,40 +4,20 @@ import {
   privateProcedure,
 } from "~/server/api/trpc";
 
+import { env } from "~/env.mjs";
 import { grendel_host_list } from "~/server/functions/grendel";
 import { maas_machines } from "~/server/functions/maas";
 import { prisma } from "~/server/db";
 import { z } from "zod";
 
-const floorplan_x = [..."defghijklmnopqrstuv"];
-const floorplan_y = [
-  "28",
-  "27",
-  "26",
-  "25",
-  "24",
-  "23",
-  "22",
-  "21",
-  "17",
-  "16",
-  "15",
-  "14",
-  "13",
-  "12",
-  "11",
-  "10",
-  "09",
-  "08",
-  "07",
-  "06",
-  "05",
-];
+const floorplan_x = env.FLOORPLAN_X.split(",");
+const floorplan_y = env.FLOORPLAN_Y.split(",");
+
 export const frontendRouter = createTRPCRouter({
   floorplan: createTRPCRouter({
     list: privateProcedure.query(async () => {
       try {
-        const test = await Promise.all(
+        const floorplan_arr = await Promise.all(
           floorplan_x.map(async (x) => {
             return await Promise.all(
               floorplan_y.map(async (y) => {
@@ -55,7 +35,7 @@ export const frontendRouter = createTRPCRouter({
           })
         );
 
-        return test;
+        return floorplan_arr;
       } catch (error) {
         console.error(error);
         const responses = [{ code: "P2002", message: "" }];
