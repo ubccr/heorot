@@ -48,8 +48,7 @@ const Grendel = ({ host }: { host: string }) => {
     console.log(data);
   };
   return (
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={void handleSubmit(onSubmit)}>
       <table>
         <tbody>
           <tr>

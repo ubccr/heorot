@@ -61,7 +61,7 @@ const PortManagement = ({ host }: { host: string }) => {
   return (
     <div>
       <div className="flex flex-col justify-center gap-3">
-        <button type="button" onClick={() => refresh()}>
+        <button type="button" onClick={() => void refresh()}>
           Refresh
         </button>
         {interfaces.isLoading ||
@@ -108,8 +108,7 @@ const PortManagement = ({ host }: { host: string }) => {
         </pre>
       </Modal>
       <form
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={void handleSubmit(onSubmit)}
         className="grid grid-cols-2 gap-3 max-md:grid-cols-1"
       >
         <div className="col-auto flex gap-3">

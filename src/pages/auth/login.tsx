@@ -50,8 +50,7 @@ const Login: NextPage = () => {
       <h2 className="text-center text-2xl font-bold">Login to Heorot</h2>
 
       <div className="mt-10">
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises*/}
-        <form className="space-y-6" onSubmit={onSubmit}>
+        <form className="space-y-6" onSubmit={void onSubmit}>
           <div className="mt-2">
             <label htmlFor="username" className="block">
               Username

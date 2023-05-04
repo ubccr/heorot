@@ -20,7 +20,6 @@ const Register: NextPage = ({}) => {
     handleSubmit,
     watch,
     formState: { errors },
-    setError,
   } = useForm<FormData>();
   const register_req = api.auth.register.useMutation({
     onSuccess: async (data) => {
@@ -40,8 +39,7 @@ const Register: NextPage = ({}) => {
       <h2 className="text-center text-2xl font-bold">Register for Heorot</h2>
 
       <div className="mt-10">
-        {/*eslint-disable-next-line @typescript-eslint/no-misused-promises*/}
-        <form className="space-y-6" onSubmit={onSubmit}>
+        <form className="space-y-6" onSubmit={void onSubmit}>
           <div className="mt-2">
             <label htmlFor="username" className="block">
               Username
