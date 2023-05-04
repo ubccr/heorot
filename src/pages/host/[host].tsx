@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 
 const Node: NextPage = () => {
   const router = useRouter();
-  const host = router.query.host as string;
+  const host = (router.query.host as string) ?? "";
   const rack = host.split("-")[1] ?? "";
 
   function classNames(...classes: string[]) {
@@ -31,7 +31,8 @@ const Node: NextPage = () => {
           className={`h-5 w-5 hover:text-neutral-200 ${
             host_res.isLoading ? "animate-spin" : ""
           }`}
-          onClick={() => void host_res.refetch()}
+          /* eslint-disable-next-line @typescript-eslint/no-misused-promises*/
+          onClick={() => host_res.refetch()}
         />
       </div>
       <br />
