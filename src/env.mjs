@@ -19,6 +19,10 @@ const server = z.object({
   GRENDEL_FIRMWARE_LIST: z.string(),
   FLOORPLAN_X: z.string(),
   FLOORPLAN_Y: z.string(),
+
+  PREFIX_NODES: z.string(),
+  PREFIX_SWITCHES: z.string(),
+  PREFIX_POWER: z.string(),
 });
 
 /**
@@ -47,6 +51,9 @@ const processEnv = {
   GRENDEL_FIRMWARE_LIST: process.env.GRENDEL_FIRMWARE_LIST,
   FLOORPLAN_X: process.env.FLOORPLAN_X,
   FLOORPLAN_Y: process.env.FLOORPLAN_Y,
+  PREFIX_NODES: process.env.PREFIX_NODES,
+  PREFIX_SWITCHES: process.env.PREFIX_SWITCHES,
+  PREFIX_POWER: process.env.PREFIX_POWER,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 

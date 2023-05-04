@@ -5,8 +5,7 @@ import type { maas_machines } from "~/types/maas";
 
 export async function maas_machines() {
   type IApiKey = [string, string, string];
-  if (!env.MAAS_API_KEY || !env.MAAS_API_URL)
-    throw new Error("MAAS env variables not set");
+  if (!env.MAAS_API_KEY || !env.MAAS_API_URL) return [];
   const url = `${env.MAAS_API_URL}/2.0/machines/`;
   const api_key = env.MAAS_API_KEY.split(":") as IApiKey;
 
