@@ -6,6 +6,7 @@ import {
 
 import { env } from "~/env.mjs";
 import { grendel_host_list } from "~/server/functions/grendel";
+import { host_type } from "~/server/functions/host_type";
 import { maas_machines } from "~/server/functions/maas";
 import { prisma } from "~/server/db";
 import { z } from "zod";
@@ -58,9 +59,9 @@ export const frontendRouter = createTRPCRouter({
       });
       const old_hosts = old_hosts_res.map((val) => val.host);
 
-      const difference = old_hosts
-        .filter((host) => !combined_res.includes(host))
-        .concat(combined_res.filter((host) => !old_hosts.includes(host)));
+      const difference = old_hosts.filter(
+        (host) => !combined_res.includes(host)
+      );
 
       for (const host of difference) {
         await prisma.hosts.delete({
@@ -74,7 +75,7 @@ export const frontendRouter = createTRPCRouter({
       for (const grendel_host of grendel_res) {
         const update = {
           host: grendel_host.name,
-          host_type: "",
+          host_type: host_type(grendel_host.name),
           source: "grendel",
         };
         await prisma.hosts.upsert({
@@ -87,7 +88,7 @@ export const frontendRouter = createTRPCRouter({
       for (const maas_host of maas_res) {
         const update = {
           host: maas_host.hostname,
-          host_type: "",
+          host_type: host_type(maas_host.hostname),
           source: "maas",
         };
         await prisma.hosts.upsert({
