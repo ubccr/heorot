@@ -44,7 +44,8 @@ model Switch {
 // *** Switches ***
 model InterfaceStatus {
     id                   String   @id @default(uuid())
-    port                 String
+    port                 String? // heorot standard: blade / port / breakout | can be undefined for ports you don't want to render IE: vlan, portchannels, etc
+    port_name            String
     port_mode            String?
     vlan_id              Int?
     vlan_info            String?
@@ -59,7 +60,7 @@ model InterfaceStatus {
     host   String
     Switch Switch? @relation(fields: [host], references: [host], onDelete: Cascade)
 
-    @@unique([host, port])
+    @@unique([host, port_name])
 }
 
 // model InterfaceConfigBackups {

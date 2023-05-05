@@ -28,13 +28,27 @@ export const get_dell_os10_show_interfaces_status = async (
     ).json();
 
     for (const iface of interface_status_res["ietf-interfaces:interface"]) {
-      const port_arr = iface.name.split("/");
+      // ensure port matches naming convention:
+      let port = "";
+      if (
+        iface.name.match(/ethernet/gi) &&
+        iface.name.match(/[0-9]\/[0-9]\/[0-9]{1,2}/g)
+      ) {
+        // OS10 port: 1/1/32 | OS10 breakout port: 1/1/32:1
+
+        const port_arr = iface.name.replace(/ethernet/gi, "").split("/") as [
+          string,
+          string,
+          string
+        ];
+        const breakout = port_arr[2].split(":") as [string, string | undefined];
+
+        port = `${port_arr[1]}/${breakout[0]}/${breakout[1] ?? "1"}`;
+      }
       const update = {
         host: host,
-        // weird way of conforming port naming scheme to Arista style, makes the current rendering on /host/portManagement work
-        port: iface.name.match(/ethernet/gi)
-          ? `${port_arr[0] ?? ""}/${port_arr[2] ?? ""}/${port_arr[1] ?? ""}`
-          : iface.name,
+        port,
+        port_name: iface.name,
         port_mode: iface["dell-ethernet:mode"],
         vlan_id: parseInt(
           iface["dell-ethernet:untagged-vlan"]?.replace("vlan", "") ?? "0"
@@ -51,7 +65,7 @@ export const get_dell_os10_show_interfaces_status = async (
         line_protocol_status: iface["oper-status"],
       };
       await prisma.interfaceStatus.upsert({
-        where: { host_port: { host: host, port: iface.name } },
+        where: { host_port_name: { host: host, port_name: iface.name } },
         update,
         create: update,
       });

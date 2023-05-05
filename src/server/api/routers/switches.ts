@@ -20,21 +20,19 @@ export const switchesRouter = createTRPCRouter({
     list: privateProcedure.input(z.string()).query(async ({ input }) => {
       // get interfaces from DB
       const interfaces = await prisma.interfaceStatus.findMany({
-        where: { host: input },
+        where: { host: input, port: { not: null } },
       });
 
       // sort the interfaces by port
       const sorted_interfaces = interfaces.sort((a, b) => {
-        const a_interface = a.port.replace(/Ethernet/gi, "");
-        const b_interface = b.port.replace(/Ethernet/gi, "");
-
+        if (!a.port || !b.port) return 0;
         return (
-          parseInt(a_interface.split("/")[0] ?? "") -
-            parseInt(b_interface.split("/")[0] ?? "") ||
-          parseInt(a_interface.split("/")[1] ?? "") -
-            parseInt(b_interface.split("/")[1] ?? "") ||
-          parseInt(a_interface.split("/")[2] ?? "") -
-            parseInt(b_interface.split("/")[2] ?? "")
+          parseInt(a.port.split("/")[0] ?? "") -
+            parseInt(b.port.split("/")[0] ?? "") ||
+          parseInt(a.port.split("/")[1] ?? "") -
+            parseInt(b.port.split("/")[1] ?? "") ||
+          parseInt(a.port.split("/")[2] ?? "") -
+            parseInt(b.port.split("/")[2] ?? "")
         );
       });
       const ports: Map<
@@ -45,9 +43,8 @@ export const switchesRouter = createTRPCRouter({
       // Loop through all interfaces and add them to the ports map
       //? is a Map the best way to store this data?
       sorted_interfaces.forEach((iface) => {
-        if (!iface.port.match(/Ethernet/gi)) return;
-        const raw_port = iface.port.replace(/Ethernet/gi, "");
-        const port_arr = raw_port.split("/");
+        if (!iface.port) return;
+        const port_arr = iface.port.split("/");
         const blade = parseInt(port_arr[0] ?? "");
         const port = parseInt(port_arr[1] ?? "");
         const breakout = parseInt(port_arr[2] ?? "");
@@ -120,11 +117,15 @@ export const switchesRouter = createTRPCRouter({
         for (const key in switch_res.result[0]?.interfaceStatuses) {
           const iface = switch_res.result[0].interfaceStatuses[key];
           if (!iface) continue;
+          const port = !!key.match(/Ethernet/gi)
+            ? key.replace(/Ethernet/gi, "")
+            : undefined;
 
           await prisma.interfaceStatus.create({
             data: {
               host: input,
-              port: key,
+              port,
+              port_name: key,
               port_mode: iface.vlanInformation.interfaceMode,
               vlan_id: iface.vlanInformation.vlanId,
               vlan_info: iface.vlanInformation.vlanExplanation,
