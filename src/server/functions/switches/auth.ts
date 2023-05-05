@@ -20,6 +20,7 @@ export async function switch_login(switch_os: string, switch_address: string) {
           rejectUnauthorized: false,
         },
       });
+
       if (!login.ok)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -45,6 +46,7 @@ export async function switch_login(switch_os: string, switch_address: string) {
         cause: switch_os,
       });
   } catch (error: any) {
+    // TODO: look into auth error handling
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "Failed to login to switch.",

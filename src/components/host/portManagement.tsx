@@ -191,7 +191,7 @@ export const PortGen = ({
     <React.Fragment key={`port-${index}`}>
       {index === 0 && display === "even" && (
         <td rowSpan={2} className="border border-white">
-          {iface.port.replace("Ethernet", "").split("/")[0]}
+          {iface.port.replace(/Ethernet/gi, "").split("/")[0]}
         </td>
       )}
       {display === "even" && index % 2 === 0 && (

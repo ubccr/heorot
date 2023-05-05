@@ -3,6 +3,10 @@ import type {
   arista_show_version,
 } from "~/types/arista";
 import { createTRPCRouter, privateProcedure } from "../trpc";
+import {
+  get_dell_os10_show_interfaces_status,
+  get_dell_os10_show_inventory,
+} from "~/server/functions/switches/dell";
 
 import type { InterfaceStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
@@ -21,8 +25,8 @@ export const switchesRouter = createTRPCRouter({
 
       // sort the interfaces by port
       const sorted_interfaces = interfaces.sort((a, b) => {
-        const a_interface = a.port.replace("Ethernet", "");
-        const b_interface = b.port.replace("Ethernet", "");
+        const a_interface = a.port.replace(/Ethernet/gi, "");
+        const b_interface = b.port.replace(/Ethernet/gi, "");
 
         return (
           parseInt(a_interface.split("/")[0] ?? "") -
@@ -41,8 +45,8 @@ export const switchesRouter = createTRPCRouter({
       // Loop through all interfaces and add them to the ports map
       //? is a Map the best way to store this data?
       sorted_interfaces.forEach((iface) => {
-        if (!iface.port.match("Ethernet")) return;
-        const raw_port = iface.port.replace("Ethernet", "");
+        if (!iface.port.match(/Ethernet/gi)) return;
+        const raw_port = iface.port.replace(/Ethernet/gi, "");
         const port_arr = raw_port.split("/");
         const blade = parseInt(port_arr[0] ?? "");
         const port = parseInt(port_arr[1] ?? "");
@@ -72,67 +76,81 @@ export const switchesRouter = createTRPCRouter({
     refresh: privateProcedure.input(z.string()).mutation(async ({ input }) => {
       // TODO: add switch version handling
       // get switch address for query
-      const { switch_address } = await get_switch_info(input);
+      const { switch_address, switch_os } = await get_switch_info(input);
 
       // check to make sure switch has been added to the DB
       const switch_count = await prisma.switch.count({
         where: { host: input },
       });
 
-      // get switch interfaces
-      const switch_res = await arista_switch_query<
-        arista_show_interfaces_status,
-        arista_show_version
-      >(switch_address, [
-        "show interfaces status",
-        switch_count === 0 ? "show version" : "",
-      ]);
-      if (!switch_res.result)
+      if (switch_os === "Arista_EOS") {
+        // get switch interfaces
+        const switch_res = await arista_switch_query<
+          arista_show_interfaces_status,
+          arista_show_version
+        >(switch_address, [
+          "show interfaces status",
+          switch_count === 0 ? "show version" : "",
+        ]);
+        if (!switch_res.result)
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Switch returned an error response.",
+            cause: switch_res,
+          });
+
+        // if switch is not in the "Switch" table, add it
+        if (switch_count === 0 && switch_res.result[1]) {
+          await prisma.switch.create({
+            data: {
+              host: input,
+              manufacturer: switch_res.result[1].mfgName,
+              serial: switch_res.result[1].serialNumber,
+              model: switch_res.result[1].modelName,
+              version: switch_res.result[1].version,
+            },
+          });
+        }
+
+        // delete all interfaces already in the DB
+        await prisma.interfaceStatus.deleteMany({ where: { host: input } });
+
+        // loop through interfaceStatuses object and add each interface to the DB
+        // Arista switch res has each interface name as a key
+        for (const key in switch_res.result[0]?.interfaceStatuses) {
+          const iface = switch_res.result[0].interfaceStatuses[key];
+          if (!iface) continue;
+
+          await prisma.interfaceStatus.create({
+            data: {
+              host: input,
+              port: key,
+              port_mode: iface.vlanInformation.interfaceMode,
+              vlan_id: iface.vlanInformation.vlanId,
+              vlan_info: iface.vlanInformation.vlanExplanation,
+              speed: iface.bandwidth,
+              type: iface.interfaceType,
+              description: iface.description,
+              auto_negotiation: iface.autoNegotiateActive,
+              duplex: iface.duplex,
+              link_status: iface.linkStatus,
+              line_protocol_status: iface.lineProtocolStatus,
+            },
+          });
+        }
+      } else if (switch_os === "Dell_OS10") {
+        const switch_count = await prisma.switch.count({
+          where: { host: input },
+        });
+        if (switch_count === 0) {
+          await get_dell_os10_show_inventory(switch_address, input);
+        }
+        await get_dell_os10_show_interfaces_status(switch_address, input);
+      } else
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Switch returned an error response.",
-          cause: switch_res,
-        });
-
-      // if switch is not in the "Switch" table, add it
-      if (switch_count === 0 && switch_res.result[1]) {
-        await prisma.switch.create({
-          data: {
-            host: input,
-            manufacturer: switch_res.result[1].mfgName,
-            serial: switch_res.result[1].serialNumber,
-            model: switch_res.result[1].modelName,
-            version: switch_res.result[1].version,
-          },
-        });
-      }
-
-      // delete all interfaces already in the DB
-      await prisma.interfaceStatus.deleteMany({ where: { host: input } });
-
-      // loop through interfaceStatuses object and add each interface to the DB
-      // Arista switch res has each interface name as a key
-      for (const key in switch_res.result[0]?.interfaceStatuses) {
-        const iface = switch_res.result[0].interfaceStatuses[key];
-        if (!iface) continue;
-
-        await prisma.interfaceStatus.create({
-          data: {
-            host: input,
-            port: key,
-            port_mode: iface.vlanInformation.interfaceMode,
-            vlan_id: iface.vlanInformation.vlanId,
-            vlan_info: iface.vlanInformation.vlanExplanation,
-            speed: iface.bandwidth,
-            type: iface.interfaceType,
-            description: iface.description,
-            auto_negotiation: iface.autoNegotiateActive,
-            duplex: iface.duplex,
-            link_status: iface.linkStatus,
-            line_protocol_status: iface.lineProtocolStatus,
-          },
-        });
-      }
+          message: "Switch OS not supported.",
+        }); // not needed?
     }),
     configure: privateProcedure
       .input(
@@ -181,7 +199,7 @@ export const switchesRouter = createTRPCRouter({
             const port_channel =
               input.port_channel === 0
                 ? `${port_arr[0]}${port_arr[1]}`
-                : `${input.port_channel}`;
+                : `${input.port_channel ?? ""}`;
             // commands required for adding a port channel interface
             command_arr.push(
               `interface Port-Channel${port_channel}`,
@@ -288,6 +306,17 @@ export const switchesRouter = createTRPCRouter({
     //         });
     //     }
     //   }),
+  }),
+  inventory: createTRPCRouter({
+    list: privateProcedure.input(z.string()).query(async ({ input }) => {
+      return await prisma.switch.findUnique({ where: { host: input } });
+    }),
+    refresh: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      const { switch_address, switch_os } = await get_switch_info(input);
+      if (switch_os === "Dell_OS10") {
+        return await get_dell_os10_show_inventory(switch_address, input);
+      }
+    }),
   }),
   // backups: privateProcedure.input(z.string()).query(async ({ input }) => {
   //   let backups = await prisma.interfaceConfigBackups.findMany({

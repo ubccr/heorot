@@ -1,10 +1,10 @@
 import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
-import Grendel from "~/components/node/grendel";
+import Grendel from "~/components/host/grendel";
 import Link from "next/link";
 // import Backups from "~/components/node/backups";
 import type { NextPage } from "next";
-import PortManagement from "~/components/node/portManagement";
+import PortManagement from "~/components/host/portManagement";
 import { Tab } from "@headlessui/react";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
