@@ -29,7 +29,9 @@ export async function get_switch_info(host: string) {
     });
   // Use FQDN if available, otherwise fallback to IP
   const switch_address =
-    switch_bmc.fqdn !== "" ? switch_bmc.fqdn : switch_bmc.ip;
+    switch_bmc.fqdn !== ""
+      ? switch_bmc.fqdn
+      : switch_bmc.ip.replace(/\/[0-9]{1,2}/g, "");
 
   return { switch_address, switch_os };
 }
