@@ -15,6 +15,10 @@ const PortManagement = ({ host }: { host: string }) => {
     onSuccess: () => {
       toast.success("Successfully refreshed interfaces");
     },
+    onError: (error) => {
+      console.error(error);
+      toast.error(error.message);
+    },
   });
   const config_interface_mutation =
     api.switches.interface.configure.useMutation({
@@ -279,11 +283,11 @@ const Ports = ({
       data-tooltip-id={iface.id}
       width={40}
       height={20}
-      className={`border ${border_color} rounded-sm hover:bg-neutral-700 ${
+      className={`rounded-sm border ${border_color} hover:bg-neutral-700 ${
         updatePortArr.find((port) => port === iface.port_name)
-          ? "border-blue-500 bg-neutral-500"
+          ? "border-blue-600 bg-neutral-500"
           : ""
-      }`}
+      } `}
       onClick={() => addUpdatePort(iface.port_name)}
     >
       <Tooltip id={iface.id}>

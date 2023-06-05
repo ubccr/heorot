@@ -8,6 +8,10 @@ import { env } from "~/env.mjs";
 import got from "got";
 import { prisma } from "~/server/db";
 
+const Authorization = `Basic ${Buffer.from(
+  `${env.SWITCH_USERNAME}:${env.SWITCH_PASSWORD}`
+).toString(`base64`)}`;
+
 export const get_dell_os10_show_interfaces_status = async (
   switch_address: string,
   host: string
@@ -19,9 +23,7 @@ export const get_dell_os10_show_interfaces_status = async (
       url,
       {
         headers: {
-          Authorization: `Basic ${Buffer.from(
-            `${env.SWITCH_USERNAME}:${env.SWITCH_PASSWORD}`
-          ).toString(`base64`)}`,
+          Authorization,
         },
         https: { rejectUnauthorized: false },
       }
@@ -88,9 +90,7 @@ export const get_dell_os10_show_inventory = async (
   const url = `https://${switch_address}/restconf/data/dell-equipment:system`;
   const inventory_res: dell_os10_show_inventory = await got(url, {
     headers: {
-      Authorization: `Basic ${Buffer.from(
-        `${env.SWITCH_USERNAME}:${env.SWITCH_PASSWORD}`
-      ).toString(`base64`)}`,
+      Authorization,
     },
     https: { rejectUnauthorized: false },
   }).json();
@@ -110,3 +110,38 @@ export const get_dell_os10_show_inventory = async (
     create: update,
   });
 };
+
+// export const update_dell_os10_description = async (
+//   switch_address: string,
+//   ports: string[],
+//   descriptions: string[]
+// ) => {
+//   const remove_description = description === "" ? true : false;
+
+//   const url = `https://${switch_address}/restconf/data/ietf-interfaces:interfaces`;
+//   const remove_url = `${url}/interface=${port}/description`;
+
+//   if (!remove_description) {
+//     const edit_res = await got.patch(url, {
+//       headers: { Authorization },
+//       https: { rejectUnauthorized: false },
+//     });
+//     if (!edit_res.ok)
+//       throw new TRPCError({
+//         code: "INTERNAL_SERVER_ERROR",
+//         message: "Error editing port description",
+//         cause: edit_res,
+//       });
+//   } else {
+//     const remove_res = await got.delete(remove_url, {
+//       headers: { Authorization },
+//       https: { rejectUnauthorized: false },
+//     });
+//     if (!remove_res.ok)
+//       throw new TRPCError({
+//         code: "INTERNAL_SERVER_ERROR",
+//         message: "Error removing port description",
+//         cause: remove_res,
+//       });
+//   }
+// };

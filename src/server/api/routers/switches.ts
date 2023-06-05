@@ -242,6 +242,17 @@ export const switchesRouter = createTRPCRouter({
           // return SuperJSON.stringify(switch_res.result);
         }
       }),
+    // description: privateProcedure
+    //   .input(
+    //     z
+    //       .object({
+    //         host: z.string(),
+    //         port: z.string(),
+    //         description: z.string(),
+    //       })
+    //       .array()
+    //   )
+    //   .mutation(async ({ input }) => {}),
     // backup: privateProcedure
     //   .input(z.object({ host: z.string(), description: z.string() }))
     //   .mutation(async ({ input }) => {
