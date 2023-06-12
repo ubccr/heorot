@@ -283,11 +283,11 @@ const Ports = ({
       data-tooltip-id={iface.id}
       width={40}
       height={20}
-      className={`rounded-sm border ${border_color} hover:bg-neutral-700 ${
+      className={`rounded-sm border ${border_color} hover:bg-neutral-200 dark:hover:bg-neutral-700 ${
         updatePortArr.find((port) => port === iface.port_name)
-          ? "border-blue-600 bg-neutral-500"
+          ? "bg-neutral-100 text-blue-600 border-2 font-medium dark:bg-neutral-500"
           : ""
-      } `}
+      }`}
       onClick={() => addUpdatePort(iface.port_name)}
     >
       <Tooltip id={iface.id}>
