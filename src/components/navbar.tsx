@@ -10,6 +10,8 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { api } from "~/utils/api";
+import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useUserContext } from "~/provider";
 
@@ -35,15 +37,34 @@ export default function Navbar() {
       current: router.pathname === "/grendel",
     },
   ];
+  const profile_menu = [
+    { name: "Your Profile", href: "/profile" },
+    { name: "Settings", href: "/settings" },
+  ];
+
+  const logout_req = api.auth.logout.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const { setUser } = useUserContext();
+
+  const handleLogout = () => {
+    logout_req.mutate();
+    setUser(null);
+  }
   return (
-    <Disclosure as="nav" className="bg-neutral-800">
+    <Disclosure as="nav" className="bg-white dark:bg-neutral-800">
       {({ open }) => (
         <>
           <div className="px-8 sm:max-lg:px-4">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-neutral-400 hover:bg-neutral-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-neutral-400 hover:bg-neutral-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white dark:hover:bg-neutral-700">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -69,8 +90,8 @@ export default function Navbar() {
                         href={item.href}
                         className={classNames(
                           item.current
-                            ? "bg-neutral-900 text-white"
-                            : "text-neutral-300 hover:bg-neutral-700 hover:text-white",
+                            ? "bg-neutral-100 dark:bg-neutral-900 dark:text-white"
+                            : "text-neutral-600 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white",
                           "rounded-md px-3 py-2 text-sm font-medium"
                         )}
                         aria-current={item.current ? "page" : undefined}
@@ -82,28 +103,28 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <button
+                {/* <button
                   type="button"
                   className="rounded-full bg-neutral-800 p-1 text-neutral-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-800"
                 >
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                </button> */}
 
                 {/* Profile dropdown */}
                 {!user && (
-                  <div className="flex rounded-full bg-neutral-800 text-sm text-neutral-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-800">
+                  <div className="flex rounded-full text-sm text-neutral-400 hover:bg-neutral-200 hover:text-black dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:hover:text-white">
                     <Link href={"/auth/login"}>
-                      <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+                      <ArrowLeftOnRectangleIcon className="m-1 h-6 w-6" />
                     </Link>
                   </div>
                 )}
                 {!!user && (
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-neutral-800 text-sm text-neutral-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-neutral-800">
+                      <Menu.Button className="flex rounded-full text-sm text-neutral-400 hover:bg-neutral-200 hover:text-black dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:hover:text-white">
                         <span className="sr-only">Open user menu</span>
-                        <UserCircleIcon className="h-6 w-6" />
+                        <UserCircleIcon className="m-1 h-6 w-6" />
                       </Menu.Button>
                     </div>
                     <Transition
@@ -115,46 +136,40 @@ export default function Navbar() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              href="#"
-                              className={classNames(
-                                active ? "bg-neutral-100" : "",
-                                "block px-4 py-2 text-sm text-neutral-700"
-                              )}
-                            >
-                              Your Profile
-                            </Link>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              href="/settings"
-                              className={classNames(
-                                active ? "bg-neutral-100" : "",
-                                "block px-4 py-2 text-sm text-neutral-700"
-                              )}
-                            >
-                              Settings
-                            </Link>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              href="/auth/logout"
-                              className={classNames(
-                                active ? "bg-neutral-100" : "",
-                                "block px-4 py-2 text-sm text-neutral-700"
-                              )}
-                            >
-                              Logout
-                            </Link>
-                          )}
-                        </Menu.Item>
+                      <Menu.Items className="dark:bg-netural-800 absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-neutral-800">
+                        {profile_menu.map((item, index) => (
+                          <Menu.Item key={index}>
+                            {({ active }) => (
+                              <Link
+                                href={item.href}
+                                className={classNames(
+                                  active
+                                    ? "bg-neutral-100 dark:bg-neutral-700"
+                                    : "",
+                                  "block px-4 py-2 text-sm text-neutral-700 dark:text-white"
+                                )}
+                              >
+                                {item.name}
+                              </Link>
+                            )}
+                          </Menu.Item>
+                        ))}
+                            <Menu.Item>
+                            {({ active }) => (
+                              <Link
+                              href="/"
+                                onClick={() => handleLogout()}
+                                className={classNames(
+                                  active
+                                    ? "bg-neutral-100 dark:bg-neutral-700"
+                                    : "",
+                                  "block px-4 py-2 text-sm text-neutral-700 dark:text-white"
+                                )}
+                              >
+                                Logout
+                              </Link>
+                            )}
+                            </Menu.Item>
                       </Menu.Items>
                     </Transition>
                   </Menu>
