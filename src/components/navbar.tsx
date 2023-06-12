@@ -1,7 +1,8 @@
 import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
-  BellIcon,
+  MoonIcon,
+  SunIcon,
   UserCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -13,6 +14,7 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { useTheme } from 'next-themes'
 import { useUserContext } from "~/provider";
 
 function classNames(...classes: string[]) {
@@ -22,6 +24,9 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const { user } = useUserContext();
   const router = useRouter();
+  const { theme, setTheme } = useTheme()
+
+  const iconColors = " text-neutral-400 hover:bg-neutral-200 hover:text-black dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:hover:text-white"
 
   const navigation = [
     { name: "Home", href: "/", current: router.pathname === "/" },
@@ -110,10 +115,17 @@ export default function Navbar() {
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
                 </button> */}
+                <button type="button" onClick={() => { setTheme(theme === "dark" ? "light" : "dark")}}>
+                  {theme === "dark" ? (
+                    <SunIcon className={"h-6 w-6 rounded-lg m-1" + iconColors} />
+                  ) : (
+                    <MoonIcon className={"h-6 w-6 rounded-lg m-1" + iconColors} />
+                  )}
+                </button>
 
                 {/* Profile dropdown */}
                 {!user && (
-                  <div className="flex rounded-full text-sm text-neutral-400 hover:bg-neutral-200 hover:text-black dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:hover:text-white">
+                  <div className={"flex rounded-full text-sm" + iconColors}>
                     <Link href={"/auth/login"}>
                       <ArrowLeftOnRectangleIcon className="m-1 h-6 w-6" />
                     </Link>
@@ -122,7 +134,7 @@ export default function Navbar() {
                 {!!user && (
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full text-sm text-neutral-400 hover:bg-neutral-200 hover:text-black dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:hover:text-white">
+                      <Menu.Button className={"flex rounded-full text-sm" + iconColors}>
                         <span className="sr-only">Open user menu</span>
                         <UserCircleIcon className="m-1 h-6 w-6" />
                       </Menu.Button>

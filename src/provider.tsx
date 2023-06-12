@@ -1,6 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 import { createContext, useContext, useState } from "react";
 
+import { ThemeProvider } from 'next-themes'
+
 interface IUser {
   username: string;
   theme: string;
@@ -18,7 +20,9 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<null | IUser>(null);
   return (
     <UserContext.Provider value={{ user, setUser }}>
-      {children}
+      <ThemeProvider attribute="class">
+        {children}
+      </ThemeProvider>
     </UserContext.Provider>
   );
 }
