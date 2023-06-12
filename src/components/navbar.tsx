@@ -7,6 +7,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { signOut, useSession } from "next-auth/react";
 
 import { Fragment } from "react";
 import Image from "next/image";
@@ -15,14 +16,16 @@ import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useTheme } from 'next-themes'
-import { useUserContext } from "~/provider";
+
+// import { useUserContext } from "~/provider";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
-  const { user } = useUserContext();
+  // const { user } = useUserContext();
+  const { data } = useSession();
   const router = useRouter();
   const { theme, setTheme } = useTheme()
 
@@ -47,19 +50,24 @@ export default function Navbar() {
     { name: "Settings", href: "/settings" },
   ];
 
-  const logout_req = api.auth.logout.useMutation({
-    onSuccess: (data) => {
-      toast.success(data.message);
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-  const { setUser } = useUserContext();
+  // const logout_req = api.auth.logout.useMutation({
+  //   onSuccess: (data) => {
+  //     toast.success(data.message);
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message);
+  //   },
+  // });
+  // const { setUser } = useUserContext();
 
   const handleLogout = () => {
-    logout_req.mutate();
-    setUser(null);
+    signOut().then(() => {
+      toast.success("Successfully logged out");
+      // router.push("/auth/login");
+    }).catch((error) => {
+      console.error(error)
+    })
+    // setUser(null);
   }
   return (
     <Disclosure as="nav" className="bg-white dark:bg-neutral-800">
@@ -124,14 +132,14 @@ export default function Navbar() {
                 </button>
 
                 {/* Profile dropdown */}
-                {!user && (
+                {!data && (
                   <div className={"flex rounded-full text-sm" + iconColors}>
-                    <Link href={"/auth/login"}>
+                    <Link href={"/api/auth/signin"}>
                       <ArrowLeftOnRectangleIcon className="m-1 h-6 w-6" />
                     </Link>
                   </div>
                 )}
-                {!!user && (
+                {!!data && (
                   <Menu as="div" className="relative ml-3">
                     <div>
                       <Menu.Button className={"flex rounded-full text-sm" + iconColors}>
@@ -170,7 +178,7 @@ export default function Navbar() {
                             {({ active }) => (
                               <Link
                               href="/"
-                                onClick={() => handleLogout()}
+                                onClick={handleLogout}
                                 className={classNames(
                                   active
                                     ? "bg-neutral-100 dark:bg-neutral-700"

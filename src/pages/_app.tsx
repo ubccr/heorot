@@ -8,11 +8,15 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Provider from "~/provider";
 import "react-tooltip/dist/react-tooltip.css";
+import { type Session } from "next-auth";
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp: AppType<{ session: Session | null }> = ({ 
+  Component,
+  pageProps: { session, ...pageProps },
+ }) => {
   return (
     <>
-      <Provider>
+      <Provider session={session}>
         <div className="min-h-screen bg-large-triangles-ub dark:bg-large-triangles-dark">
           <Navbar />
           <div className="flex justify-center dark:text-white">

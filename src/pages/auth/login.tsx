@@ -2,11 +2,12 @@ import Link from "next/link";
 import type { NextPage } from "next";
 import ProgressSpinner from "~/components/progressSpinner";
 import { api } from "~/utils/api";
+// import { useUserContext } from "~/provider";
+import { getCsrfToken } from "next-auth/react"
+import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { useUserContext } from "~/provider";
-
 type FormData = {
   username: string;
   password: string;
@@ -14,7 +15,7 @@ type FormData = {
 
 const Login: NextPage = () => {
   const router = useRouter();
-  const { setUser } = useUserContext();
+  // const { setUser } = useUserContext();
 
   const {
     register,
@@ -23,24 +24,42 @@ const Login: NextPage = () => {
     setError,
   } = useForm<FormData>();
 
-  const login_req = api.auth.login.useMutation({
-    onSuccess: async (data) => {
-      toast.success(data.message);
-      setUser({
-        username: data.username,
-        role: data.role,
-        theme: data.theme,
-        message: data.message,
-      });
-      await router.push("/");
-    },
-    onError: (error) => {
-      setError("password", { message: error.message });
-    },
-  });
+  // const login_req = api.auth.login.useMutation({
+  //   onSuccess: async (data) => {
+  //     toast.success(data.message);
+  //     setUser({
+  //       username: data.username,
+  //       role: data.role,
+  //       theme: data.theme,
+  //       message: data.message,
+  //     });
+  //     await router.push("/");
+  //   },
+  //   onError: (error) => {
+  //     setError("password", { message: error.message });
+  //   },
+  // });
+
 
   const onSubmit = handleSubmit((data) => {
-    login_req.mutate(data);
+    signIn("credentials", {
+      redirect: false,
+      username: data.username,
+      password: data.password,
+    }).then((response) => {
+      console.log(response);
+      if (response && !response.ok) {
+        if (response.error === "CredentialsSignin") toast.error("Invalid credentials or account does not exist.")
+        if (response.error === "Default") toast.error("Unknown error occured") && console.error(response)
+      } else if (response && response.ok){
+         toast.success("Successfully logged in")
+         const url = new URL(response.url as string)        
+          void router.push(url.searchParams.get("callbackUrl") ?? "/")
+        }
+    }).catch((error) => {
+      console.error(error)
+    })
+    // login_req.mutate(data);
   });
 
   return (
@@ -59,6 +78,7 @@ const Login: NextPage = () => {
                 {errors.username?.message}
               </p>
             )}
+            {/* <input name="csrfToken" type="hidden" defaultValue={csrfToken} /> */}
             <input
               id="username"
               autoComplete="username"
@@ -94,11 +114,12 @@ const Login: NextPage = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-white shadow-lg hover:bg-blue-500"
             >
-              {login_req.isLoading ? (
+              {/* {login_req.isLoading ? (
                 <ProgressSpinner classes="fill-white w-5 h-5" />
               ) : (
                 "Login"
-              )}
+              )} */}
+              login
             </button>
           </div>
         </form>
