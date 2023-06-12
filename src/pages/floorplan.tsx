@@ -12,10 +12,11 @@ const Floorplan: NextPage = () => {
       toast.success("Successfully refreshed floorplan");
     },
   });
-
+  floorplan_res.isError && toast.error(floorplan_res.error.message);
+  
   return (
     <div>
-      <h1 className="text-2xl text-white">Floorplan</h1>
+      <h1 className="text-2xl dark:text-white">Floorplan</h1>
       <br />
       <table className="table-fixed">
         <thead>

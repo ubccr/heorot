@@ -76,7 +76,7 @@ const PortManagement = ({ host }: { host: string }) => {
             type="button"
             /* eslint-disable-next-line @typescript-eslint/no-misused-promises*/
             onClick={() => refresh()}
-            className="rounded-md border px-2 hover:bg-neutral-700 dark:border-white"
+            className="rounded-md border px-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 dark:border-white"
           >
             Refresh
           </button>
@@ -86,7 +86,7 @@ const PortManagement = ({ host }: { host: string }) => {
               setUpdatePortArr([]);
               toast.success("Successfully cleared port selection");
             }}
-            className="rounded-md border px-2 hover:bg-neutral-700 dark:border-white"
+            className="rounded-md border px-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 dark:border-white"
           >
             Clear Selection
           </button>

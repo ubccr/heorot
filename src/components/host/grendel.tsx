@@ -64,13 +64,13 @@ const Grendel = ({ host }: { host: string }) => {
               {tags.map((tag, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-center rounded-full border bg-neutral-700 px-2 py-1 dark:border-white"
+                  className="flex items-center justify-center rounded-full border dark:bg-neutral-700 px-2 py-1 dark:border-white"
                 >
                   <div className="max-w-full flex-initial text-xs font-normal leading-none">
                     {tag}
                   </div>
                   <XMarkIcon
-                    className="ml-1 h-3 w-3 hover:text-neutral-200"
+                    className="ml-1 h-3 w-3 hover:text-neutral-600 dark:hover:text-neutral-200"
                     onClick={() => setTags(tags.filter((val) => val !== tag))}
                   />
                 </div>
@@ -113,7 +113,7 @@ const Grendel = ({ host }: { host: string }) => {
             <td>Interfaces:</td>
             <td>
               <PlusIcon
-                className="h-6 w-6 rounded-lg hover:bg-neutral-600"
+                className="h-6 w-6 rounded-lg hover:text-neutral-600 hover:bg-neutral-100 dark:hover:text-neutral-200 dark:hover:bg-neutral-700"
                 onClick={() =>
                   append({
                     fqdn: "",
@@ -172,7 +172,7 @@ const Grendel = ({ host }: { host: string }) => {
                           {...register(`interfaces.${index}.bmc`)}
                         />
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex">
                         {watch(`interfaces.${index}.bmc`) && (
                           <a
                             href={`https://${watch(
@@ -180,12 +180,12 @@ const Grendel = ({ host }: { host: string }) => {
                             )}`}
                             target="_blank"
                           >
-                            <ArrowTopRightOnSquareIcon className="h-6 w-6" />
+                            <ArrowTopRightOnSquareIcon className="h-5 w-5 m-1 rounded-lg hover:text-neutral-600 hover:bg-neutral-100 dark:hover:text-neutral-200 dark:hover:bg-neutral-700" />
                           </a>
                         )}
                         <XMarkIcon
                           onClick={() => remove(index)}
-                          className="h-6 w-6 rounded-lg  hover:bg-neutral-600"
+                          className="h-6 w-6 rounded-lg m-1 hover:text-neutral-600 hover:bg-neutral-100 dark:hover:text-neutral-200 dark:hover:bg-neutral-700"
                         />
                       </div>
                     </div>

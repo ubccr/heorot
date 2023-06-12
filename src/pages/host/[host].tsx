@@ -24,11 +24,11 @@ const Node: NextPage = () => {
     <>
       <div className="flex items-center justify-center gap-2">
         <Link href={`/rack/${rack}`}>
-          <ArrowUturnLeftIcon className="h-5 w-5 hover:text-neutral-200" />
+          <ArrowUturnLeftIcon className="h-5 w-5 hover:text-neutral-500 dark:hover:text-neutral-200" />
         </Link>
         <h1 className="text-xl">{host}</h1>
         <ArrowPathIcon
-          className={`h-5 w-5 hover:text-neutral-200 ${
+          className={`h-5 w-5 hover:text-neutral-500 dark:hover:text-neutral-200 ${
             host_res.isLoading ? "animate-spin" : ""
           }`}
           /* eslint-disable-next-line @typescript-eslint/no-misused-promises*/
@@ -41,8 +41,8 @@ const Node: NextPage = () => {
           <Tab
             className={({ selected }) =>
               classNames(
-                " border-b border-white px-2 py-1 selection:bg-neutral-600 hover:bg-neutral-600",
-                selected ? "bg-neutral-600 shadow" : ""
+                " border-b border-white px-2 py-1 selection:bg-neutral-200 hover:bg-neutral-200 dark:selection:bg-neutral-600 dark:hover:bg-neutral-600",
+                selected ? "bg-neutral-100 dark:bg-neutral-600 shadow" : ""
               )
             }
           >
@@ -51,8 +51,8 @@ const Node: NextPage = () => {
           <Tab
             className={({ selected }) =>
               classNames(
-                " border-b border-white px-2 py-1 selection:bg-neutral-600 hover:bg-neutral-600",
-                selected ? "bg-neutral-600 shadow" : ""
+                " border-b border-white px-2 py-1 selection:bg-neutral-200 hover:bg-neutral-200 dark:selection:bg-neutral-600 dark:hover:bg-neutral-600",
+                selected ? "bg-neutral-100 dark:bg-neutral-600 shadow" : ""
               )
             }
           >
@@ -61,8 +61,8 @@ const Node: NextPage = () => {
           <Tab
             className={({ selected }) =>
               classNames(
-                " border-b border-white px-2 py-1 selection:bg-neutral-600 hover:bg-neutral-600",
-                selected ? "bg-neutral-600 shadow" : ""
+                " border-b border-white px-2 py-1 selection:bg-neutral-200 hover:bg-neutral-200 dark:selection:bg-neutral-600 dark:hover:bg-neutral-600",
+                selected ? "bg-neutral-100 dark:bg-neutral-600 shadow" : ""
               )
             }
           >

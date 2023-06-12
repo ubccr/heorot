@@ -1,5 +1,3 @@
-// import "react-toastify/dist/ReactToastify.css";
-
 import Link from "next/link";
 import type { NextPage } from "next";
 import ProgressSpinner from "~/components/progressSpinner";
@@ -65,7 +63,7 @@ const Login: NextPage = () => {
               id="username"
               autoComplete="username"
               type="text"
-              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-500 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
               {...register("username", {
                 required: "Please enter a Username.",
               })}
@@ -84,7 +82,7 @@ const Login: NextPage = () => {
               id="password"
               autoComplete="current-password"
               type="password"
-              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-500 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
               {...register("password", {
                 required: "Please enter a Password.",
               })}
@@ -105,7 +103,7 @@ const Login: NextPage = () => {
           </div>
         </form>
 
-        <p className="mt-5 text-center text-sm text-gray-300">
+        <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-300">
           Need an Account?{" "}
           <Link
             href="/auth/register"

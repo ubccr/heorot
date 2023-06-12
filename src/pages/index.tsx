@@ -15,8 +15,8 @@ const Home: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className="mb-3 text-7xl text-white">Heorot</h1>
-      <h2 className="text-sm text-white ">
+      <h1 className="mb-3 text-7xl dark:text-white">Heorot</h1>
+      <h2 className="text-sm dark:text-white ">
         {!!user && user.message}
         {!user && (
           <span>

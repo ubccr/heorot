@@ -54,7 +54,7 @@ const Register: NextPage = ({}) => {
               id="username"
               autoComplete="username"
               type="text"
-              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-600 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
               {...register("username", {
                 required: "Please enter a Username.",
               })}
@@ -83,7 +83,7 @@ const Register: NextPage = ({}) => {
                   message: "Password must be at least 8 characters long.",
                 },
               })}
-              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-600 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
             />
           </div>
           <div>
@@ -108,7 +108,7 @@ const Register: NextPage = ({}) => {
                     return "Passwords do not match.";
                 },
               })}
-              className="block w-full rounded-md border-0 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-600 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
             />
           </div>
 
@@ -126,7 +126,7 @@ const Register: NextPage = ({}) => {
           </div>
         </form>
 
-        <p className="mt-5 text-center text-sm text-gray-300">
+        <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-300">
           Already have an Account?{" "}
           <Link
             href="/auth/login"
