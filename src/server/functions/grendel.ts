@@ -54,6 +54,7 @@ export const load_grendel = async () => {
         data: {
           host: hosts.name,
           host_type: "",
+          source: "grendel",
         },
       });
     }
