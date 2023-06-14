@@ -59,7 +59,7 @@ const Floorplan: NextPage = () => {
                     {y.populated && (
                       <Link
                         href={`/rack/${y.rack}`}
-                        className="rounded-md border px-2 py-1 dark:border-white hover:dark:bg-neutral-700"
+                        className="rounded-md border px-2 py-1 border-neutral-300 hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-700"
                       >
                         {y.rack}
                       </Link>
