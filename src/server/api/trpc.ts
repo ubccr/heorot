@@ -7,9 +7,11 @@
  * need to use are documented accordingly near the end.
  */
 
+import { Prisma } from "@prisma/client";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
+import SuperJSON from "superjson";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { getServerAuthSession } from "~/server/auth";
@@ -124,6 +126,23 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  } else if (ctx.session.user.role !== "admin") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Admin privileges are required to perform this action.",
+    });
+  } 
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
 /**
  * Protected (authenticated) procedure
  *
@@ -133,7 +152,41 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
+export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
 
+
+interface IErrorHandlerOptions {
+  code: string;
+  message: string;
+}
+
+export const errorHandler = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error: any,
+  responses: IErrorHandlerOptions[],
+  defaultMessage?: string
+) => {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    responses.forEach((response) => {
+      if (error.code === response.code) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: response.message,
+        });
+      }
+    });
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: error.message,
+    });
+  } else
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `A general error occurred. ${
+        defaultMessage ?? SuperJSON.stringify(error)
+      }`,
+    });
+};
 
 
 
