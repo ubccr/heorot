@@ -1,13 +1,12 @@
 import Link from "next/link";
 import type { NextPage } from "next";
-import ProgressSpinner from "~/components/progressSpinner";
-import { api } from "~/utils/api";
-// import { useUserContext } from "~/provider";
-import { getCsrfToken } from "next-auth/react"
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+
 type FormData = {
   username: string;
   password: string;
@@ -15,7 +14,7 @@ type FormData = {
 
 const Login: NextPage = () => {
   const router = useRouter();
-  // const { setUser } = useUserContext();
+  const { data: auth } = useSession()
 
   const {
     register,
@@ -24,42 +23,30 @@ const Login: NextPage = () => {
     setError,
   } = useForm<FormData>();
 
-  // const login_req = api.auth.login.useMutation({
-  //   onSuccess: async (data) => {
-  //     toast.success(data.message);
-  //     setUser({
-  //       username: data.username,
-  //       role: data.role,
-  //       theme: data.theme,
-  //       message: data.message,
-  //     });
-  //     await router.push("/");
-  //   },
-  //   onError: (error) => {
-  //     setError("password", { message: error.message });
-  //   },
-  // });
+  useEffect(() => {
+    if (auth?.user.role === "disabled") {
+      toast.info("Account is disabled. This is normal if you are a new user. Please ask an administrator to enable your account.", 
+      { delay: 300, autoClose: false })
+    }
+  }, [auth])
+  
 
-
-  const onSubmit = handleSubmit((data) => {
-    signIn("credentials", {
+  const onSubmit = handleSubmit( async data => {
+    const signin_res = await signIn("credentials", {
       redirect: false,
       username: data.username,
       password: data.password,
-    }).then((response) => {
-      console.log(response);
-      if (response && !response.ok) {
-        if (response.error === "CredentialsSignin") toast.error("Invalid credentials or account does not exist.")
-        if (response.error === "Default") toast.error("Unknown error occured") && console.error(response)
-      } else if (response && response.ok){
-         toast.success("Successfully logged in")
-         const url = new URL(response.url as string)        
-          void router.push(url.searchParams.get("callbackUrl") ?? "/")
-        }
-    }).catch((error) => {
-      console.error(error)
     })
-    // login_req.mutate(data);
+    if (!signin_res) return
+
+    if (signin_res.ok) {
+       toast.success("Successfully logged in")       
+       const url = new URL(signin_res.url as string)        
+       void router.push(url.searchParams.get("callbackUrl") ?? "/")
+    } else {
+      if (signin_res.error === "CredentialsSignin") toast.error("Invalid credentials or account does not exist.")
+      if (signin_res.error === "Default") toast.error("Unknown error occured") && console.error(signin_res)
+    }
   });
 
   return (
@@ -67,7 +54,6 @@ const Login: NextPage = () => {
       <h2 className="text-center text-2xl font-bold">Login to Heorot</h2>
 
       <div className="mt-10">
-        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises*/}
         <form className="space-y-6" onSubmit={onSubmit}>
           <div className="mt-2">
             <label htmlFor="username" className="block">
@@ -78,7 +64,6 @@ const Login: NextPage = () => {
                 {errors.username?.message}
               </p>
             )}
-            {/* <input name="csrfToken" type="hidden" defaultValue={csrfToken} /> */}
             <input
               id="username"
               autoComplete="username"
@@ -114,11 +99,6 @@ const Login: NextPage = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-white shadow-lg hover:bg-blue-500"
             >
-              {/* {login_req.isLoading ? (
-                <ProgressSpinner classes="fill-white w-5 h-5" />
-              ) : (
-                "Login"
-              )} */}
               login
             </button>
           </div>

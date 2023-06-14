@@ -2,10 +2,8 @@ import Head from "next/head";
 import Link from "next/link";
 import type { NextPage } from "next";
 import { useSession } from "next-auth/react";
-// import { useUserContext } from "~/provider";
 
 const Home: NextPage = () => {
-  // const { user } = useUserContext();
   const { data, status } = useSession()
   console.log(status, data);
   
