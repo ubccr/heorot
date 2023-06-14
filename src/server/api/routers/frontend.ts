@@ -47,22 +47,25 @@ export const frontendRouter = createTRPCRouter({
       const grendel_res = await grendel_host_list();
       const maas_res = await maas_machines();
 
-      // Delete removed hosts from DB
+      // combine grendel and maas results
       const combined_res = [
         ...grendel_res.map((val) => val.name),
         ...maas_res.map((val) => val.hostname),
       ];
+      // get old hosts from DB
       const old_hosts_res = await prisma.hosts.findMany({
         select: {
           host: true,
         },
       });
       const old_hosts = old_hosts_res.map((val) => val.host);
-
+      
+      // find difference between old and new hosts
       const difference = old_hosts.filter(
         (host) => !combined_res.includes(host)
-      );
-
+        );
+        
+      // delete removed hosts from DB
       for (const host of difference) {
         await prisma.hosts.delete({
           where: {
@@ -139,6 +142,63 @@ export const frontendRouter = createTRPCRouter({
         console.error(error);
         const responses = [{ code: "P2002", message: "" }];
         errorHandler(error, responses, "api/routes/rack.ts");
+      }
+    }),
+    refresh: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      const grendel_res = (await grendel_host_list()).filter((host) => host.name.includes(input));
+      const maas_res = (await maas_machines()).filter((host) => host.hostname.includes(input));
+      
+      // combine grendel and maas results
+      const combined_res = [
+        ...grendel_res.map((val) => val.name),
+        ...maas_res.map((val) => val.hostname),
+      ];
+      // get old hosts from DB
+      const old_hosts_res = await prisma.hosts.findMany({
+        select: { host: true },
+        where: { host: { contains: input } }
+      });
+      const old_hosts = old_hosts_res.map((val) => val.host);
+
+      // find difference between old and new hosts
+      const difference = old_hosts.filter(
+        (host) => !combined_res.includes(host)
+      );
+
+      // delete removed hosts from DB
+      for (const host of difference) {
+        await prisma.hosts.delete({
+          where: {
+            host: host,
+          },
+        });
+      }
+
+      // Add Grendel entries to DB
+      for (const grendel_host of grendel_res) {
+        const update = {
+          host: grendel_host.name,
+          host_type: host_type(grendel_host.name),
+          source: "grendel",
+        };
+        await prisma.hosts.upsert({
+          where: { host: grendel_host.name },
+          update: update,
+          create: update,
+        });
+      }
+      // Add MAAS entries to DB
+      for (const maas_host of maas_res) {
+        const update = {
+          host: maas_host.hostname,
+          host_type: host_type(maas_host.hostname),
+          source: "maas",
+        };
+        await prisma.hosts.upsert({
+          where: { host: maas_host.hostname },
+          update: update,
+          create: update,
+        });
       }
     }),
   }),
