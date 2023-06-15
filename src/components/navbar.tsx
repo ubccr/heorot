@@ -114,14 +114,14 @@ export default function Navbar() {
                   )}
                 </button>
 
-                {/* Profile dropdown */}
                 {!auth && (
                   <div className={"flex rounded-full text-sm" + iconColors}>
-                    <Link href={"/api/auth/signin"}>
+                    <Link href={{pathname: "/auth/login", query: { callbackUrl: router.pathname }}}>
                       <ArrowLeftOnRectangleIcon className="m-1 h-6 w-6" />
                     </Link>
                   </div>
                 )}
+                {/* Profile dropdown */}
                 {!!auth && (
                   <Menu as="div" className="relative ml-3">
                     <div>
