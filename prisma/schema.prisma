@@ -55,10 +55,10 @@ model User {
 }
 
 model Hosts {
-    host      String  @id @unique
+    host      String   @id @unique
     host_type String
     source    String
-    //   redfish     Redfish?
+    redfish   Redfish?
     switch    Switch?
 }
 
@@ -72,8 +72,6 @@ model Switch {
 
     Hosts      Hosts?            @relation(fields: [host], references: [host], onDelete: Cascade)
     interfaces InterfaceStatus[]
-    // interface_config_backups InterfaceConfigBackups[]
-    // config_backups           ConfigBackups[]
 }
 
 // *** Switches ***
@@ -98,19 +96,14 @@ model InterfaceStatus {
     @@unique([host, port_name])
 }
 
-// model InterfaceConfigBackups {
-//     id          String   @id @default(uuid())
-//     host        String
-//     description String
-//     created_at  DateTime @default(now())
-//     config      Bytes
-//     switch      Switch?  @relation(fields: [host], references: [host])
-// }
+// *** Redfish ***
+model Redfish {
+    host         String @id @unique
+    manufacturer String
+    service_tag  String
+    model        String
+    bios_version String
+    bmc_version  String
 
-// model ConfigBackups {
-//     id         String   @id @default(uuid())
-//     host       String
-//     created_at DateTime @default(now())
-//     config     Bytes
-//     switch     Switch?  @relation(fields: [host], references: [host])
-// }
+    Hosts Hosts? @relation(fields: [host], references: [host], onDelete: Cascade)
+}
