@@ -1,8 +1,4 @@
-import {
-  createTRPCRouter,
-  errorHandler,
-  privateProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, errorHandler, privateProcedure } from "~/server/api/trpc";
 
 import { env } from "~/env.mjs";
 import { grendel_host_list } from "~/server/functions/grendel";
@@ -48,10 +44,7 @@ export const frontendRouter = createTRPCRouter({
       const maas_res = await maas_machines();
 
       // combine grendel and maas results
-      const combined_res = [
-        ...grendel_res.map((val) => val.name),
-        ...maas_res.map((val) => val.hostname),
-      ];
+      const combined_res = [...grendel_res.map((val) => val.name), ...maas_res.map((val) => val.hostname)];
       // get old hosts from DB
       const old_hosts_res = await prisma.hosts.findMany({
         select: {
@@ -59,12 +52,101 @@ export const frontendRouter = createTRPCRouter({
         },
       });
       const old_hosts = old_hosts_res.map((val) => val.host);
-      
+
       // find difference between old and new hosts
-      const difference = old_hosts.filter(
-        (host) => !combined_res.includes(host)
-        );
-        
+      const difference = old_hosts.filter((host) => !combined_res.includes(host));
+
+      // delete removed hosts from DB
+      for (const host of difference) {
+        await prisma.hosts.delete({
+          where: {
+            host: host,
+          },
+        });
+      }
+
+      // Add Grendel entries to DB
+      for (const grendel_host of grendel_res) {
+        const update = {
+          host: grendel_host.name,
+          host_type: host_type(grendel_host.name),
+          source: "grendel",
+          bmc_address: grendel_host.interfaces.find((iface) => iface.bmc === true)?.ip.split("/")[0] ?? null,
+        };
+        await prisma.hosts.upsert({
+          where: { host: grendel_host.name },
+          update: update,
+          create: update,
+        });
+      }
+      // Add MAAS entries to DB
+      for (const maas_host of maas_res) {
+        const update = {
+          host: maas_host.hostname,
+          host_type: host_type(maas_host.hostname),
+          source: "maas",
+          // TODO: add bmc_address for redfish queries
+        };
+        await prisma.hosts.upsert({
+          where: { host: maas_host.hostname },
+          update: update,
+          create: update,
+        });
+      }
+    }),
+  }),
+  rack: createTRPCRouter({
+    list: privateProcedure.input(z.string()).query(async ({ input }) => {
+      try {
+        const hosts = await prisma.hosts.findMany({
+          where: {
+            host: {
+              contains: input,
+            },
+          },
+        });
+        const min = 3;
+        const max = 42;
+
+        const rack = [];
+
+        for (let u = max; u >= min; u--) {
+          const fixed_u = fix_u(u);
+          rack.push({
+            u: fixed_u,
+            host: hosts.find((host) => host.host.split("-")[2] === `${fixed_u}`),
+          });
+        }
+
+        // get the adjacent racks for navigation buttons
+        const rack_number = input.replace(/[a-zA-Z]/g, "");
+        const rack_letter = input.replace(/[0-9]/g, "");
+        const right_rack = `${rack_letter}${floorplan_y[floorplan_y.indexOf(rack_number) + 1] ?? "0"}`;
+        const left_rack = `${rack_letter}${floorplan_y[floorplan_y.indexOf(rack_number) - 1] ?? "0"}`;
+
+        return { left_rack, right_rack, rack };
+      } catch (error) {
+        console.error(error);
+        const responses = [{ code: "P2002", message: "" }];
+        errorHandler(error, responses, "api/routes/rack.ts");
+      }
+    }),
+    refresh: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      const grendel_res = (await grendel_host_list()).filter((host) => host.name.includes(input));
+      const maas_res = (await maas_machines()).filter((host) => host.hostname.includes(input));
+
+      // combine grendel and maas results
+      const combined_res = [...grendel_res.map((val) => val.name), ...maas_res.map((val) => val.hostname)];
+      // get old hosts from DB
+      const old_hosts_res = await prisma.hosts.findMany({
+        select: { host: true },
+        where: { host: { contains: input } },
+      });
+      const old_hosts = old_hosts_res.map((val) => val.host);
+
+      // find difference between old and new hosts
+      const difference = old_hosts.filter((host) => !combined_res.includes(host));
+
       // delete removed hosts from DB
       for (const host of difference) {
         await prisma.hosts.delete({
@@ -102,104 +184,9 @@ export const frontendRouter = createTRPCRouter({
       }
     }),
   }),
-  rack: createTRPCRouter({
-    list: privateProcedure.input(z.string()).query(async ({ input }) => {
-      try {
-        const hosts = await prisma.hosts.findMany({
-          where: {
-            host: {
-              contains: input,
-            },
-          },
-        });
-        const min = 3;
-        const max = 42;
-
-        const rack = [];
-
-        for (let u = max; u >= min; u--) {
-          const fixed_u = fix_u(u);
-          rack.push({
-            u: fixed_u,
-            host: hosts.find(
-              (host) => host.host.split("-")[2] === `${fixed_u}`
-            ),
-          });
-        }
-
-        // get the adjacent racks for navigation buttons
-        const rack_number = input.replace(/[a-zA-Z]/g, "");
-        const rack_letter = input.replace(/[0-9]/g, "");
-        const right_rack = `${rack_letter}${
-          floorplan_y[floorplan_y.indexOf(rack_number) + 1] ?? "0"
-        }`;
-        const left_rack = `${rack_letter}${
-          floorplan_y[floorplan_y.indexOf(rack_number) - 1] ?? "0"
-        }`;
-
-        return { left_rack, right_rack, rack };
-      } catch (error) {
-        console.error(error);
-        const responses = [{ code: "P2002", message: "" }];
-        errorHandler(error, responses, "api/routes/rack.ts");
-      }
-    }),
-    refresh: privateProcedure.input(z.string()).mutation(async ({ input }) => {
-      const grendel_res = (await grendel_host_list()).filter((host) => host.name.includes(input));
-      const maas_res = (await maas_machines()).filter((host) => host.hostname.includes(input));
-      
-      // combine grendel and maas results
-      const combined_res = [
-        ...grendel_res.map((val) => val.name),
-        ...maas_res.map((val) => val.hostname),
-      ];
-      // get old hosts from DB
-      const old_hosts_res = await prisma.hosts.findMany({
-        select: { host: true },
-        where: { host: { contains: input } }
-      });
-      const old_hosts = old_hosts_res.map((val) => val.host);
-
-      // find difference between old and new hosts
-      const difference = old_hosts.filter(
-        (host) => !combined_res.includes(host)
-      );
-
-      // delete removed hosts from DB
-      for (const host of difference) {
-        await prisma.hosts.delete({
-          where: {
-            host: host,
-          },
-        });
-      }
-
-      // Add Grendel entries to DB
-      for (const grendel_host of grendel_res) {
-        const update = {
-          host: grendel_host.name,
-          host_type: host_type(grendel_host.name),
-          source: "grendel",
-        };
-        await prisma.hosts.upsert({
-          where: { host: grendel_host.name },
-          update: update,
-          create: update,
-        });
-      }
-      // Add MAAS entries to DB
-      for (const maas_host of maas_res) {
-        const update = {
-          host: maas_host.hostname,
-          host_type: host_type(maas_host.hostname),
-          source: "maas",
-        };
-        await prisma.hosts.upsert({
-          where: { host: maas_host.hostname },
-          update: update,
-          create: update,
-        });
-      }
+  host: createTRPCRouter({
+    get: privateProcedure.input(z.string()).query(async ({ input }) => {
+      return await prisma.hosts.findUnique({ where: { host: input } });
     }),
   }),
 });

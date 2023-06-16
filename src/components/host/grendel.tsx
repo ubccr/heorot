@@ -1,8 +1,4 @@
-import {
-  ArrowTopRightOnSquareIcon,
-  PlusIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowTopRightOnSquareIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useFieldArray, useForm } from "react-hook-form";
 
 // import Backups from "~/components/host/backups";
@@ -15,8 +11,7 @@ const Grendel = ({ host }: { host: string }) => {
   const [tags, setTags] = useState<string[]>([]);
 
   // initialize form
-  const { control, register, reset, handleSubmit, watch } =
-    useForm<IGrendelHost>();
+  const { control, register, reset, handleSubmit, watch } = useForm<IGrendelHost>();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -34,7 +29,9 @@ const Grendel = ({ host }: { host: string }) => {
     onSuccess: (data) => {
       // TODO: fix initial form values
       if (!!data[0]) {
-        reset(data[0], { keepDirtyValues: true });
+        reset(data[0], {
+          keepDirtyValues: true,
+        });
         setTags(data[0].tags);
       }
     },
@@ -64,11 +61,9 @@ const Grendel = ({ host }: { host: string }) => {
               {tags.map((tag, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-center rounded-full border dark:bg-neutral-700 px-2 py-1 dark:border-white"
+                  className="flex items-center justify-center rounded-full border px-2 py-1 dark:border-white dark:bg-neutral-700"
                 >
-                  <div className="max-w-full flex-initial text-xs font-normal leading-none">
-                    {tag}
-                  </div>
+                  <div className="max-w-full flex-initial text-xs font-normal leading-none">{tag}</div>
                   <XMarkIcon
                     className="ml-1 h-3 w-3 hover:text-neutral-600 dark:hover:text-neutral-200"
                     onClick={() => setTags(tags.filter((val) => val !== tag))}
@@ -113,7 +108,7 @@ const Grendel = ({ host }: { host: string }) => {
             <td>Interfaces:</td>
             <td>
               <PlusIcon
-                className="h-6 w-6 rounded-lg hover:text-neutral-600 hover:bg-neutral-100 dark:hover:text-neutral-200 dark:hover:bg-neutral-700"
+                className="h-6 w-6 rounded-lg hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
                 onClick={() =>
                   append({
                     fqdn: "",
@@ -161,31 +156,23 @@ const Grendel = ({ host }: { host: string }) => {
                 ];
                 return (
                   <div
-                    className="my-2 grid gap-3 rounded-lg border p-2 dark:border-white sm:grid-cols-1 md:grid-cols-2"
+                    className="my-2 grid gap-3 rounded-lg border border-neutral-400 p-2 dark:border-white sm:grid-cols-1 md:grid-cols-2"
                     key={field.id}
                   >
                     <div className="col-span-2 flex justify-between px-2">
                       <div className="flex gap-2">
                         <label>BMC:</label>
-                        <input
-                          type="checkbox"
-                          {...register(`interfaces.${index}.bmc`)}
-                        />
+                        <input type="checkbox" {...register(`interfaces.${index}.bmc`)} />
                       </div>
                       <div className="flex">
                         {watch(`interfaces.${index}.bmc`) && (
-                          <a
-                            href={`https://${watch(
-                              `interfaces.${index}.fqdn`
-                            )}`}
-                            target="_blank"
-                          >
-                            <ArrowTopRightOnSquareIcon className="h-5 w-5 m-1 rounded-lg hover:text-neutral-600 hover:bg-neutral-100 dark:hover:text-neutral-200 dark:hover:bg-neutral-700" />
+                          <a href={`https://${watch(`interfaces.${index}.fqdn`)}`} target="_blank">
+                            <ArrowTopRightOnSquareIcon className="m-1 h-5 w-5 rounded-lg hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200" />
                           </a>
                         )}
                         <XMarkIcon
                           onClick={() => remove(index)}
-                          className="h-6 w-6 rounded-lg m-1 hover:text-neutral-600 hover:bg-neutral-100 dark:hover:text-neutral-200 dark:hover:bg-neutral-700"
+                          className="m-1 h-6 w-6 rounded-lg hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
                         />
                       </div>
                     </div>
@@ -193,7 +180,7 @@ const Grendel = ({ host }: { host: string }) => {
                       <div className="flex gap-2" key={input_index}>
                         {/* <label>{input.label}</label> */}
                         <input
-                          className="w-full rounded-md border border-black px-1 text-black"
+                          className="w-full rounded-md border px-1 dark:border-neutral-400"
                           placeholder={input.label}
                           autoComplete="off"
                           autoCorrect="off"
@@ -209,7 +196,7 @@ const Grendel = ({ host }: { host: string }) => {
           </tr>
         </tbody>
       </table>
-      <button type="submit" className="border border-white p-2">
+      <button type="submit" className="rounded-lg border border-neutral-400 px-2 dark:border-white">
         Submit
       </button>
     </form>

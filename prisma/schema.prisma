@@ -55,11 +55,12 @@ model User {
 }
 
 model Hosts {
-    host      String   @id @unique
-    host_type String
-    source    String
-    redfish   Redfish?
-    switch    Switch?
+    host        String   @id @unique
+    host_type   String
+    source      String
+    bmc_address String?
+    redfish     Redfish?
+    switch      Switch?
 }
 
 model Switch {
@@ -98,12 +99,17 @@ model InterfaceStatus {
 
 // *** Redfish ***
 model Redfish {
-    host         String @id @unique
-    manufacturer String
-    service_tag  String
-    model        String
-    bios_version String
-    bmc_version  String
+    host                      String    @id @unique
+    host_name                 String
+    manufacturer              String
+    model                     String
+    service_tag               String
+    bios_version              String
+    boot_progress_last_state  String?
+    last_reset_time           DateTime?
+    location_indicator_active Boolean?
+    asset_tag                 String
+    system_type               String
 
     Hosts Hosts? @relation(fields: [host], references: [host], onDelete: Cascade)
 }

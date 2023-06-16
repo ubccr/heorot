@@ -24,6 +24,9 @@ const server = z.object({
   SWITCH_USERNAME: z.string(),
   SWITCH_PASSWORD: z.string(),
 
+  REDFISH_USERNAME: z.string(),
+  REDFISH_PASSWORD: z.string(),
+
   MAAS_API_URL: z.string().url().optional(),
   MAAS_API_KEY: z.string().optional(),
 
@@ -59,6 +62,8 @@ const processEnv = {
   GRENDEL_SOCKET_PATH: process.env.GRENDEL_SOCKET_PATH,
   SWITCH_USERNAME: process.env.SWITCH_USERNAME,
   SWITCH_PASSWORD: process.env.SWITCH_PASSWORD,
+  REDFISH_USERNAME: process.env.REDFISH_USERNAME,
+  REDFISH_PASSWORD: process.env.REDFISH_PASSWORD,
   MAAS_API_URL: process.env.MAAS_API_URL,
   MAAS_API_KEY: process.env.MAAS_API_KEY,
   GRENDEL_FIRMWARE_LIST: process.env.GRENDEL_FIRMWARE_LIST,
