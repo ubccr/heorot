@@ -78,8 +78,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -134,7 +133,7 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
       code: "FORBIDDEN",
       message: "Admin privileges are required to perform this action.",
     });
-  } 
+  }
   return next({
     ctx: {
       // infers the `session` as non-nullable
@@ -153,7 +152,6 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
  */
 export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
 export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
-
 
 interface IErrorHandlerOptions {
   code: string;
@@ -182,25 +180,9 @@ export const errorHandler = (
   } else
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
-      message: `A general error occurred. ${
-        defaultMessage ?? SuperJSON.stringify(error)
-      }`,
+      message: `A general error occurred. ${defaultMessage ?? SuperJSON.stringify(error)}`,
     });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // PRE auth.js integration
 

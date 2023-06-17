@@ -1,7 +1,8 @@
 import { api } from "~/utils/api";
 
 const Redfish = ({ host }: { host: string }) => {
-  const redfish = api.redfish.get.useQuery(host);
+  const redfish = api.redfish.get.host.useQuery(host);
+
   return (
     <>
       <table>
@@ -40,7 +41,7 @@ const Redfish = ({ host }: { host: string }) => {
             {!!redfish.data.last_reset_time && (
               <tr>
                 <td>Last Reset Time</td>
-                <td>{new Date(redfish.data.last_reset_time).toLocaleString()}</td>
+                <td>{redfish.data.last_reset_time.toLocaleString()}</td>
               </tr>
             )}
             {!!redfish.data.location_indicator_active && (

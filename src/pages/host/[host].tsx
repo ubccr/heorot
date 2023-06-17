@@ -1,5 +1,6 @@
 import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
+import { Actions } from "~/components/host/actions";
 import Grendel from "~/components/host/grendel";
 import Link from "next/link";
 // import Backups from "~/components/node/backups";
@@ -18,8 +19,8 @@ const Node: NextPage = () => {
 
   const grendel_res = api.grendel.host.find.useQuery(host);
   const host_res = api.frontend.host.get.useQuery(host);
-  const redfish = api.redfish.get.useQuery(host);
-  const refresh_redfish = api.redfish.refresh.useMutation({
+  const redfish = api.redfish.get.host.useQuery(host);
+  const refresh_redfish = api.redfish.refresh.host.useMutation({
     onSuccess: () => {
       void grendel_res.refetch();
       void host_res.refetch();
@@ -73,6 +74,15 @@ const Node: NextPage = () => {
           <Tab
             className={({ selected }) =>
               `${tab_classes} ${selected ? "bg-neutral-100 shadow dark:bg-neutral-600" : ""} ${
+                host_res.isSuccess && host_res.data?.host_type === "node" ? "" : "hidden"
+              }`
+            }
+          >
+            Actions
+          </Tab>
+          <Tab
+            className={({ selected }) =>
+              `${tab_classes} ${selected ? "bg-neutral-100 shadow dark:bg-neutral-600" : ""} ${
                 host_res.isSuccess && host_res.data?.host_type === "switch" ? "" : "hidden"
               }`
             }
@@ -97,6 +107,9 @@ const Node: NextPage = () => {
           </Tab.Panel>
           <Tab.Panel>
             <Redfish host={host} />
+          </Tab.Panel>
+          <Tab.Panel>
+            <Actions host={host} />
           </Tab.Panel>
           <Tab.Panel>
             <PortManagement host={host} />

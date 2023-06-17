@@ -1,114 +1,136 @@
 import { z } from "zod";
 
 export const dell_redfish_systems_schema = z.object({
-    "AssetTag": z.string(),
-    "BiosVersion": z.string(),
-    "BootProgress": z.object({
-      "LastState": z.string(),
+  AssetTag: z.string(),
+  BiosVersion: z.string(),
+  BootProgress: z.object({
+    LastState: z.string(),
+  }),
+  Boot: z.object({
+    BootOrder: z.string().array(),
+    "BootOrder@odata.count": z.number(),
+    BootSourceOverrideEnabled: z.string(),
+    BootSourceOverrideMode: z.string(),
+    BootSourceOverrideTarget: z.string(),
+    // "UefiTargetBootSourceOverride": null,
+    "BootSourceOverrideTarget@Redfish.AllowableValues": z.string().array(),
+    StopBootOnFault: z.string(),
+  }),
+  Description: z.string(),
+  HostName: z.string(),
+  Id: z.string(),
+  LastResetTime: z.string(),
+  LocationIndicatorActive: z.boolean(),
+  Manufacturer: z.string(),
+  MemorySummary: z.object({
+    MemoryMirroring: z.string(),
+    TotalSystemMemoryGiB: z.number(),
+  }),
+  Model: z.string(),
+  Name: z.string(),
+  Oem: z.object({
+    Dell: z.object({
+      "@odata.type": z.string(),
+      DellSystem: z.object({
+        BIOSReleaseDate: z.string(),
+        BaseBoardChassisSlot: z.string(),
+        BatteryRollupStatus: z.string(),
+        BladeGeometry: z.string(),
+        // "CMCIP": null,
+        CPURollupStatus: z.string(),
+        // "ChassisModel": null,
+        ChassisName: z.string(),
+        ChassisServiceTag: z.string(),
+        ChassisSystemHeightUnit: z.number(),
+        CurrentRollupStatus: z.string(),
+        EstimatedExhaustTemperatureCelsius: z.number(),
+        EstimatedSystemAirflowCFM: z.number(),
+        ExpressServiceCode: z.string(),
+        FanRollupStatus: z.string(),
+        Id: z.string(),
+        // "IDSDMRollupStatus": null,
+        IntrusionRollupStatus: z.string(),
+        IsOEMBranded: z.string(),
+        LastSystemInventoryTime: z.string(),
+        LastUpdateTime: z.string(),
+        LicensingRollupStatus: z.string(),
+        ManagedSystemSize: z.string(),
+        MaxCPUSockets: z.number(),
+        MaxDIMMSlots: z.number(),
+        MaxPCIeSlots: z.number(),
+        MemoryOperationMode: z.string(),
+        Name: z.string(),
+        NodeID: z.string(),
+        PSRollupStatus: z.string(),
+        PlatformGUID: z.string(),
+        PopulatedDIMMSlots: z.number(),
+        PopulatedPCIeSlots: z.number(),
+        PowerCapEnabledState: z.string(),
+        // "SDCardRollupStatus": null,
+        SELRollupStatus: z.string(),
+        // "ServerAllocationWatts": null,
+        StorageRollupStatus: z.string(),
+        SysMemErrorMethodology: z.string(),
+        SysMemFailOverState: z.string(),
+        SysMemLocation: z.string(),
+        SysMemPrimaryStatus: z.string(),
+        SystemGeneration: z.string(),
+        SystemID: z.number(),
+        SystemRevision: z.string(),
+        TempRollupStatus: z.string(),
+        TempStatisticsRollupStatus: z.string(),
+        UUID: z.string(),
+        VoltRollupStatus: z.string(),
+        smbiosGUID: z.string(),
+        "@odata.context": z.string(),
+        "@odata.type": z.string(),
+        "@odata.id": z.string(),
+      }),
     }),
-    "Boot": z.object({
-      "BootOrder": z.string().array(),
-      "BootOrder@odata.count": z.number(),
-      "BootSourceOverrideEnabled": z.string(),
-      "BootSourceOverrideMode": z.string(),
-      "BootSourceOverrideTarget": z.string(),
-      // "UefiTargetBootSourceOverride": null,
-      "BootSourceOverrideTarget@Redfish.AllowableValues": z.string().array(),
-      "StopBootOnFault": z.string(),
-    }),
-    "Description": z.string(),
-    "HostName": z.string(),
-    "Id": z.string(),
-    "LastResetTime": z.string(),
-    "LocationIndicatorActive": z.boolean(),
-    "Manufacturer": z.string(),
-    "MemorySummary": z.object({
-        "MemoryMirroring": z.string(),
-        "TotalSystemMemoryGiB": z.number()
-    }),
-    "Model": z.string(),
-    "Name": z.string(),
-    "Oem": z.object({
-        "Dell": z.object({
-            "@odata.type": z.string(),
-            "DellSystem": z.object({
-                "BIOSReleaseDate": z.string(),
-                "BaseBoardChassisSlot": z.string(),
-                "BatteryRollupStatus": z.string(),
-                "BladeGeometry": z.string(),
-                // "CMCIP": null,
-                "CPURollupStatus": z.string(),
-                // "ChassisModel": null,
-                "ChassisName": z.string(),
-                "ChassisServiceTag": z.string(),
-                "ChassisSystemHeightUnit": z.number(),
-                "CurrentRollupStatus": z.string(),
-                "EstimatedExhaustTemperatureCelsius": z.number(),
-                "EstimatedSystemAirflowCFM": z.number(),
-                "ExpressServiceCode": z.string(),
-                "FanRollupStatus": z.string(),
-                "Id": z.string(),
-                // "IDSDMRollupStatus": null,
-                "IntrusionRollupStatus": z.string(),
-                "IsOEMBranded": z.string(),
-                "LastSystemInventoryTime": z.string(),
-                "LastUpdateTime": z.string(),
-                "LicensingRollupStatus": z.string(),
-                "ManagedSystemSize": z.string(),
-                "MaxCPUSockets": z.number(),
-                "MaxDIMMSlots": z.number(),
-                "MaxPCIeSlots": z.number(),
-                "MemoryOperationMode": z.string(),
-                "Name": z.string(),
-                "NodeID": z.string(),
-                "PSRollupStatus": z.string(),
-                "PlatformGUID": z.string(),
-                "PopulatedDIMMSlots": z.number(),
-                "PopulatedPCIeSlots": z.number(),
-                "PowerCapEnabledState": z.string(),
-                // "SDCardRollupStatus": null,
-                "SELRollupStatus": z.string(),
-                // "ServerAllocationWatts": null,
-                "StorageRollupStatus": z.string(),
-                "SysMemErrorMethodology": z.string(),
-                "SysMemFailOverState": z.string(),
-                "SysMemLocation": z.string(),
-                "SysMemPrimaryStatus": z.string(),
-                "SystemGeneration": z.string(),
-                "SystemID": z.number(),
-                "SystemRevision": z.string(),
-                "TempRollupStatus": z.string(),
-                "TempStatisticsRollupStatus": z.string(),
-                "UUID": z.string(),
-                "VoltRollupStatus": z.string(),
-                "smbiosGUID": z.string(),
-                "@odata.context": z.string(),
-                "@odata.type": z.string(),
-                "@odata.id": z.string(),
-            })
-        })
-    }),
-    "PartNumber": z.string(),
-    "PowerState": z.string(),
-    "ProcessorSummary": z.object({
-        "Count": z.number(),
-        "CoreCount": z.number(),
-        "LogicalProcessorCount": z.number(),
-        "Model": z.string(),
-        "ThreadingEnabled": z.boolean()
-    }),
-    "SKU": z.string(),
-    "SerialNumber": z.string(),
-    "Status": z.object({
-        "Health": z.string(),
-        "HealthRollup": z.string(),
-        "State": z.string(),
-    }),
-    "SystemType": z.string(),
-    "UUID": z.string(),
-})
+  }),
+  PartNumber: z.string(),
+  PowerState: z.string(),
+  ProcessorSummary: z.object({
+    Count: z.number(),
+    CoreCount: z.number(),
+    LogicalProcessorCount: z.number(),
+    Model: z.string(),
+    ThreadingEnabled: z.boolean(),
+  }),
+  SKU: z.string(),
+  SerialNumber: z.string(),
+  Status: z.object({
+    Health: z.string(),
+    HealthRollup: z.string(),
+    State: z.string(),
+  }),
+  SystemType: z.string(),
+  UUID: z.string(),
+});
+export type dell_redfish_systems = z.infer<typeof dell_redfish_systems_schema>;
 
-export type dell_redfish_systems = z.infer<typeof dell_redfish_systems_schema>
+export const dell_redfish_manager_job_status_schema = z.object({
+  "@odata.context": z.string(),
+  "@odata.id": z.string(),
+  "@odata.type": z.string(),
+  // "ActualRunningStartTime": null,
+  // "ActualRunningStopTime": null,
+  CompletionTime: z.string().nullable(),
+  Description: z.string(),
+  // "EndTime": null,
+  Id: z.string(),
+  JobState: z.string(),
+  JobType: z.string(),
+  Message: z.string(),
+  // "MessageArgs": [],
+  // "MessageArgs@odata.count": 0,
+  MessageId: z.string(),
+  Name: z.string(),
+  PercentComplete: z.number(),
+  StartTime: z.string(),
+  // "TargetSettingsURI": null
+});
+export type dell_redfish_manager_job_status = z.infer<typeof dell_redfish_manager_job_status_schema>;
 
 export const dell_os10_show_inventory_schema = z.object({
   "dell-equipment:system": z.object({
@@ -238,9 +260,7 @@ export const dell_os10_show_inventory_schema = z.object({
   }),
 });
 
-export type dell_os10_show_inventory = z.infer<
-  typeof dell_os10_show_inventory_schema
->;
+export type dell_os10_show_inventory = z.infer<typeof dell_os10_show_inventory_schema>;
 
 export const dell_os10_show_interfaces_status_schema = z.object({
   "ietf-interfaces:interface": z.array(
@@ -1071,6 +1091,4 @@ export const dell_os10_show_interfaces_status_schema = z.object({
   ),
 });
 
-export type dell_os10_show_interfaces_status = z.infer<
-  typeof dell_os10_show_interfaces_status_schema
->;
+export type dell_os10_show_interfaces_status = z.infer<typeof dell_os10_show_interfaces_status_schema>;
