@@ -28,54 +28,56 @@ declare module "next-auth" {
   }
 
   interface User {
-   username: string;
-   role: string;
+    username: string;
+    role: string;
     theme: string;
   }
 }
 
 export const authOptions: NextAuthOptions = {
-callbacks: {
-  jwt({token, user}){
-   if (!user) return token 
-   token.username = user.username
-   token.role = user.role
-   token.theme = user.theme
-   return token
+  callbacks: {
+    jwt({ token, user }) {
+      if (!user) return token;
+      token.username = user.username;
+      token.role = user.role;
+      token.theme = user.theme;
+      return token;
+    },
+    session({ session, token }) {
+      if (!token) return session;
+      session.user.username = token.username;
+      session.user.role = token.role;
+      session.user.theme = token.theme;
+      return session;
+    },
   },
-   session({session, token}){
-    if (!token) return session
-    session.user.username = token.username
-    session.user.role = token.role
-    session.user.theme = token.theme
-    return session
-  }
-},
   session: {
     strategy: "jwt",
+    maxAge: 12 * 60 * 60, // 12hrs
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
-        name: "Credentials",
-        credentials: {
-            username: { label: "Username", type: "text", placeholder: "jsmith" },
-            password: { label: "Password", type: "password" }
-        },
-        async authorize(credentials, req) {          
-            if (credentials === undefined) return null
-           const user = await prisma.user.findUnique({
-            where: { username: credentials.username }})
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        if (credentials === undefined) return null;
+        const user = await prisma.user.findUnique({
+          where: { username: credentials.username },
+        });
 
-           if (user && compareSync(credentials.password, user.password)) return user
-           return null
-          }
-    })
+        if (user && compareSync(credentials.password, user.password)) return user;
+        return null;
+      },
+    }),
   ],
   pages: {
     signIn: "/auth/login",
-  }
+  },
 };
 
 /**
