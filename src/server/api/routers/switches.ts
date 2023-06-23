@@ -1,12 +1,6 @@
-import type {
-  arista_show_interfaces_status,
-  arista_show_version,
-} from "~/types/arista";
+import type { arista_show_interfaces_status, arista_show_version } from "~/types/arista";
 import { createTRPCRouter, privateProcedure } from "../trpc";
-import {
-  get_dell_os10_show_interfaces_status,
-  get_dell_os10_show_inventory,
-} from "~/server/functions/switches/dell";
+import { get_dell_os10_show_interfaces_status, get_dell_os10_show_inventory } from "~/server/functions/switches/dell";
 
 import type { InterfaceStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
@@ -27,18 +21,12 @@ export const switchesRouter = createTRPCRouter({
       const sorted_interfaces = interfaces.sort((a, b) => {
         if (!a.port || !b.port) return 0;
         return (
-          parseInt(a.port.split("/")[0] ?? "") -
-            parseInt(b.port.split("/")[0] ?? "") ||
-          parseInt(a.port.split("/")[1] ?? "") -
-            parseInt(b.port.split("/")[1] ?? "") ||
-          parseInt(a.port.split("/")[2] ?? "") -
-            parseInt(b.port.split("/")[2] ?? "")
+          parseInt(a.port.split("/")[0] ?? "") - parseInt(b.port.split("/")[0] ?? "") ||
+          parseInt(a.port.split("/")[1] ?? "") - parseInt(b.port.split("/")[1] ?? "") ||
+          parseInt(a.port.split("/")[2] ?? "") - parseInt(b.port.split("/")[2] ?? "")
         );
       });
-      const ports: Map<
-        number,
-        Map<number, Map<number, InterfaceStatus>>
-      > = new Map();
+      const ports: Map<number, Map<number, Map<number, InterfaceStatus>>> = new Map();
 
       // Loop through all interfaces and add them to the ports map
       //? is a Map the best way to store this data?
@@ -63,9 +51,7 @@ export const switchesRouter = createTRPCRouter({
 
       // convert the Map to an array for easy mapping on the frontend
       const interface_arr = Array.from(ports, ([blade, port_map]) =>
-        Array.from(port_map, ([port, breakout_map]) =>
-          Array.from(breakout_map, ([breakout, iface]) => iface)
-        )
+        Array.from(port_map, ([port, breakout_map]) => Array.from(breakout_map, ([breakout, iface]) => iface))
       );
 
       return interface_arr;
@@ -80,15 +66,12 @@ export const switchesRouter = createTRPCRouter({
         where: { host: input },
       });
 
-      if (switch_os === "Arista_EOS") {
+      if (switch_os === "arista") {
         // get switch interfaces
-        const switch_res = await arista_switch_query<
-          arista_show_interfaces_status,
-          arista_show_version
-        >(switch_address, [
-          "show interfaces status",
-          switch_count === 0 ? "show version" : "",
-        ]);
+        const switch_res = await arista_switch_query<arista_show_interfaces_status, arista_show_version>(
+          switch_address,
+          ["show interfaces status", switch_count === 0 ? "show version" : ""]
+        );
         if (!switch_res.result)
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -117,9 +100,7 @@ export const switchesRouter = createTRPCRouter({
         for (const key in switch_res.result[0]?.interfaceStatuses) {
           const iface = switch_res.result[0].interfaceStatuses[key];
           if (!iface) continue;
-          const port = !!key.match(/Ethernet/gi)
-            ? key.replace(/Ethernet/gi, "")
-            : undefined;
+          const port = !!key.match(/Ethernet/gi) ? key.replace(/Ethernet/gi, "") : undefined;
 
           await prisma.interfaceStatus.create({
             data: {
@@ -139,7 +120,7 @@ export const switchesRouter = createTRPCRouter({
             },
           });
         }
-      } else if (switch_os === "Dell_OS10") {
+      } else if (switch_os === "dellztd") {
         const switch_count = await prisma.switch.count({
           where: { host: input },
         });
@@ -187,9 +168,7 @@ export const switchesRouter = createTRPCRouter({
             break;
           case "lag":
             // remove the "Ethernet" from the interface name and split the port into an array
-            const port_arr = input.interfaces[0]
-              ?.replace("Ethernet", "")
-              .split("/");
+            const port_arr = input.interfaces[0]?.replace("Ethernet", "").split("/");
             if (!port_arr || !port_arr[0] || !port_arr[1])
               throw new TRPCError({
                 code: "NOT_FOUND",
@@ -198,9 +177,7 @@ export const switchesRouter = createTRPCRouter({
               });
             // if the port channel is 0, automatically determine the port channel using the first two numbers of the port
             const port_channel =
-              input.port_channel === 0
-                ? `${port_arr[0]}${port_arr[1]}`
-                : `${input.port_channel ?? ""}`;
+              input.port_channel === 0 ? `${port_arr[0]}${port_arr[1]}` : `${input.port_channel ?? ""}`;
             // commands required for adding a port channel interface
             command_arr.push(
               `interface Port-Channel${port_channel}`,
@@ -224,7 +201,7 @@ export const switchesRouter = createTRPCRouter({
         }
         // get switch info for query
         const { switch_os } = await get_switch_info(input.host);
-        if (switch_os === "Arista_EOS") {
+        if (switch_os === "arista") {
           // send the commands to the switch
           return command_arr.join("\n");
           // Automatic config:
@@ -257,7 +234,7 @@ export const switchesRouter = createTRPCRouter({
     //   .input(z.object({ host: z.string(), description: z.string() }))
     //   .mutation(async ({ input }) => {
     //     let { switch_address, switch_os } = await get_switch_info(input.host);
-    //     if (switch_os === "Arista_EOS") {
+    //     if (switch_os === "arista") {
     //       let switch_res =
     //         await arista_switch_query<arista_show_running_config>(
     //           switch_address,
@@ -303,7 +280,7 @@ export const switchesRouter = createTRPCRouter({
 
     //     // get switch info for query
     //     let { switch_address, switch_os } = await get_switch_info(input.host);
-    //     if (switch_os === "Arista_EOS") {
+    //     if (switch_os === "arista") {
     //       // send the commands to the switch
     //       let switch_res = await arista_switch_query<{}[]>(switch_address, [
     //         "configure terminal",
@@ -325,7 +302,7 @@ export const switchesRouter = createTRPCRouter({
     }),
     refresh: privateProcedure.input(z.string()).mutation(async ({ input }) => {
       const { switch_address, switch_os } = await get_switch_info(input);
-      if (switch_os === "Dell_OS10") {
+      if (switch_os === "dellztd") {
         return await get_dell_os10_show_inventory(switch_address, input);
       }
     }),

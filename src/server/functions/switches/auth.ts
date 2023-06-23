@@ -9,7 +9,7 @@ export async function switch_login(switch_os: string, switch_address: string) {
       username: env.SWITCH_USERNAME,
       password: env.SWITCH_PASSWORD,
     };
-    if (switch_os === "Arista_EOS") {
+    if (switch_os === "arista") {
       // set environment for Arista EOS
       url = `https://${switch_address}/login`;
 
@@ -55,14 +55,10 @@ export async function switch_login(switch_os: string, switch_address: string) {
   }
 }
 
-export async function switch_logout(
-  switch_os: string,
-  switch_address: string,
-  Cookie: string
-) {
+export async function switch_logout(switch_os: string, switch_address: string, Cookie: string) {
   let url = "";
   try {
-    if (switch_os === "Arista_EOS") {
+    if (switch_os === "arista") {
       url = `https://${switch_address}/logout`;
 
       const logout = await got.post(url, {

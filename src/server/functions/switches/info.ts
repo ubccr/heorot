@@ -10,9 +10,7 @@ export async function get_switch_info(host: string) {
       cause: grendel_res,
     });
   // Find switch OS version from grendel tags
-  const switch_os = grendel_res[0].tags.find((tag: string) =>
-    ["Arista_EOS", "Dell_OS10"].includes(tag)
-  );
+  const switch_os = grendel_res[0].tags.find((tag: string) => ["arista", "dellztd"].includes(tag));
   if (!switch_os)
     throw new TRPCError({
       code: "NOT_FOUND",
@@ -28,10 +26,7 @@ export async function get_switch_info(host: string) {
       cause: grendel_res[0].interfaces,
     });
   // Use FQDN if available, otherwise fallback to IP
-  const switch_address =
-    switch_bmc.fqdn !== ""
-      ? switch_bmc.fqdn
-      : switch_bmc.ip.replace(/\/[0-9]{1,2}/g, "");
+  const switch_address = switch_bmc.fqdn !== "" ? switch_bmc.fqdn : switch_bmc.ip.replace(/\/[0-9]{1,2}/g, "");
 
   return { switch_address, switch_os };
 }

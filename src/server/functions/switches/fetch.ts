@@ -15,7 +15,7 @@ export async function arista_switch_query<T, U = void, V = void>(
     const login_required = Cookie === "" ? true : false;
     if (login_required) {
       // login to switch if no cookie is provided
-      const login_res = await switch_login("Arista_EOS", switch_address);
+      const login_res = await switch_login("arista", switch_address);
       Cookie = login_res.Cookie;
     }
 
@@ -47,8 +47,7 @@ export async function arista_switch_query<T, U = void, V = void>(
       .json();
 
     // logout of switch if Cookie is not provided
-    if (login_required)
-      await switch_logout("Arista_EOS", switch_address, Cookie);
+    if (login_required) await switch_logout("arista", switch_address, Cookie);
 
     return switch_res;
   } catch (error: any) {
