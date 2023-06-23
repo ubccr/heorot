@@ -1,9 +1,6 @@
 import type { IGrendelHost, IGrendelImage } from "~/types/grendel";
 import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
-import {
-  grendel_host_find,
-  grendel_host_list,
-} from "~/server/functions/grendel";
+import { grendel_host_find, grendel_host_list } from "~/server/functions/grendel";
 import { grendel_host_schema, grendel_image_schema } from "~/types/grendel";
 
 import { TRPCError } from "@trpc/server";
@@ -20,26 +17,25 @@ if (GRENDEL_SOCKET_PATH === "")
 
 export const grendelRouter = createTRPCRouter({
   host: createTRPCRouter({
-    host: privateProcedure
-      .input(grendel_host_schema)
-      .mutation(async ({ input }) => {
-        try {
-          // TODO: add response type definitions
-          const res: any = await got
-            .post(`${GRENDEL_SOCKET_PATH}:/v1/host`, {
-              json: input,
-            })
-            .json();
+    host: privateProcedure.input(grendel_host_schema.array()).mutation(async ({ input }) => {
+      try {
+        // TODO: add response type definitions
+        const res: any = await got
+          .post(`${GRENDEL_SOCKET_PATH}:/v1/host`, {
+            json: input,
+          })
+          .json();
 
-          return [...res];
-        } catch (error) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to receive grendel request.",
-            cause: error,
-          });
-        }
-      }),
+        return res.hosts;
+      } catch (error) {
+        console.error(error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to receive grendel request.",
+          cause: error,
+        });
+      }
+    }),
     list: privateProcedure.query(async () => {
       return grendel_host_list();
     }),
@@ -48,9 +44,7 @@ export const grendelRouter = createTRPCRouter({
     }),
     tags: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
-        const res: IGrendelHost[] = await got(
-          `${GRENDEL_SOCKET_PATH}:/v1/host/tags/${input}`
-        ).json();
+        const res: IGrendelHost[] = await got(`${GRENDEL_SOCKET_PATH}:/v1/host/tags/${input}`).json();
 
         return [...res];
       } catch (error) {
@@ -64,9 +58,7 @@ export const grendelRouter = createTRPCRouter({
     delete: privateProcedure.input(z.string()).mutation(async ({ input }) => {
       try {
         // TODO: add response type definitions
-        const res = await got
-          .delete(`${GRENDEL_SOCKET_PATH}:/v1/host/find/${input}`)
-          .json();
+        const res = await got.delete(`${GRENDEL_SOCKET_PATH}:/v1/host/find/${input}`).json();
 
         return [...res];
       } catch (error) {
@@ -77,42 +69,34 @@ export const grendelRouter = createTRPCRouter({
         });
       }
     }),
-    provision: privateProcedure
-      .input(z.string())
-      .mutation(async ({ input }) => {
-        try {
-          // TODO: add response type definitions
-          const res = await got
-            .put(`${GRENDEL_SOCKET_PATH}:/v1/host/provision/${input}`)
-            .json();
+    provision: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      try {
+        // TODO: add response type definitions
+        const res = await got.put(`${GRENDEL_SOCKET_PATH}:/v1/host/provision/${input}`).json();
 
-          return [...res];
-        } catch (error) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to receive grendel request.",
-            cause: error,
-          });
-        }
-      }),
-    unprovision: privateProcedure
-      .input(z.string())
-      .mutation(async ({ input }) => {
-        try {
-          // TODO: add response type definitions
-          const res = await got
-            .put(`${GRENDEL_SOCKET_PATH}:/v1/host/unprovision/${input}`)
-            .json();
+        return [...res];
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to receive grendel request.",
+          cause: error,
+        });
+      }
+    }),
+    unprovision: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      try {
+        // TODO: add response type definitions
+        const res = await got.put(`${GRENDEL_SOCKET_PATH}:/v1/host/unprovision/${input}`).json();
 
-          return [...res];
-        } catch (error) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to receive grendel request.",
-            cause: error,
-          });
-        }
-      }),
+        return [...res];
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to receive grendel request.",
+          cause: error,
+        });
+      }
+    }),
     tag: privateProcedure
       .input(
         z.object({
@@ -123,11 +107,7 @@ export const grendelRouter = createTRPCRouter({
       .mutation(async ({ input }) => {
         try {
           // TODO: add response type definitions
-          const res = await got
-            .put(
-              `${GRENDEL_SOCKET_PATH}:/v1/host/tag/${input.name}?tags=${input.tags}`
-            )
-            .json();
+          const res = await got.put(`${GRENDEL_SOCKET_PATH}:/v1/host/tag/${input.name}?tags=${input.tags}`).json();
 
           return [...res];
         } catch (error) {
@@ -148,11 +128,7 @@ export const grendelRouter = createTRPCRouter({
       .mutation(async ({ input }) => {
         try {
           // TODO: add response type definitions
-          const res = await got
-            .put(
-              `${GRENDEL_SOCKET_PATH}:/v1/host/untag/${input.name}?tags=${input.tags}`
-            )
-            .json();
+          const res = await got.put(`${GRENDEL_SOCKET_PATH}:/v1/host/untag/${input.name}?tags=${input.tags}`).json();
 
           return [...res];
         } catch (error) {
@@ -168,31 +144,27 @@ export const grendelRouter = createTRPCRouter({
     }),
   }),
   image: createTRPCRouter({
-    image: privateProcedure
-      .input(grendel_image_schema)
-      .mutation(async ({ input }) => {
-        try {
-          // TODO: add response type definitions
-          const res = await got
-            .post(`${GRENDEL_SOCKET_PATH}:/v1/bootimage`, {
-              json: input,
-            })
-            .json();
+    image: privateProcedure.input(grendel_image_schema).mutation(async ({ input }) => {
+      try {
+        // TODO: add response type definitions
+        const res = await got
+          .post(`${GRENDEL_SOCKET_PATH}:/v1/bootimage`, {
+            json: input,
+          })
+          .json();
 
-          return [...res];
-        } catch (error) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to receive grendel request.",
-            cause: error,
-          });
-        }
-      }),
+        return [...res];
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to receive grendel request.",
+          cause: error,
+        });
+      }
+    }),
     list: privateProcedure.query(async () => {
       try {
-        const res: IGrendelImage[] = await got(
-          `${GRENDEL_SOCKET_PATH}:/v1/bootimage/list`
-        ).json();
+        const res: IGrendelImage[] = await got(`${GRENDEL_SOCKET_PATH}:/v1/bootimage/list`).json();
 
         return res;
       } catch (error) {
@@ -205,9 +177,7 @@ export const grendelRouter = createTRPCRouter({
     }),
     find: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
-        const res: IGrendelImage[] = await got(
-          `${GRENDEL_SOCKET_PATH}:/v1/bootimage/find/${input}`
-        ).json();
+        const res: IGrendelImage[] = await got(`${GRENDEL_SOCKET_PATH}:/v1/bootimage/find/${input}`).json();
 
         return [...res];
       } catch (error) {
@@ -221,9 +191,7 @@ export const grendelRouter = createTRPCRouter({
     delete: privateProcedure.input(z.string()).query(async ({ input }) => {
       try {
         // TODO: add response type definitions
-        const res = await got
-          .delete(`${GRENDEL_SOCKET_PATH}:/v1/bootimage/find/${input}`)
-          .json();
+        const res = await got.delete(`${GRENDEL_SOCKET_PATH}:/v1/bootimage/find/${input}`).json();
 
         return [...res];
       } catch (error) {

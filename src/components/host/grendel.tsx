@@ -36,13 +36,21 @@ const Grendel = ({ host }: { host: string }) => {
       }
     },
   });
+  const update_host = api.grendel.host.host.useMutation({
+    onSuccess: () => {
+      toast.success("Successfully updated host");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   // get boot images and firmware
   const boot_images_res = api.grendel.image.list.useQuery();
   const firmware_res = api.grendel.host.firmware.useQuery();
 
   const onSubmit = (data: IGrendelHost) => {
     data.tags = tags;
-    console.log(data);
+    update_host.mutate([data]);
   };
   return (
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -148,6 +156,7 @@ const Grendel = ({ host }: { host: string }) => {
                   {
                     label: "MTU",
                     register_id: `interfaces.${index}.mtu`,
+                    type: "number",
                   },
                   {
                     label: "VLAN",
@@ -185,7 +194,7 @@ const Grendel = ({ host }: { host: string }) => {
                           autoComplete="off"
                           autoCorrect="off"
                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          {...register<any>(input.register_id)}
+                          {...register<any>(input.register_id, { valueAsNumber: input.type === "number" })}
                         />
                       </div>
                     ))}
