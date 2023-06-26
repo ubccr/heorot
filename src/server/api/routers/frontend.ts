@@ -188,6 +188,9 @@ export const frontendRouter = createTRPCRouter({
     get: privateProcedure.input(z.string()).query(async ({ input }) => {
       return await prisma.hosts.findUnique({ where: { host: input } });
     }),
+    ip: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      console.log("Some coding required");
+    }),
   }),
 });
 

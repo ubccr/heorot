@@ -1,11 +1,22 @@
 import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 
 import { TRPCError } from "@trpc/server";
-import { type dell_redfish_manager_job_status, type dell_redfish_systems } from "~/types/dell";
+import {
+  type dell_redfish_update_service_firmware_inventory,
+  type dell_redfish_manager_job_status,
+  type dell_redfish_systems,
+  type dell_redfish_update_service_firmware_inventory_id,
+} from "~/types/dell";
 import { env } from "~/env.mjs";
-import got from "got";
+import got, { Options } from "got";
 import { prisma } from "~/server/db";
 import { z } from "zod";
+
+const got_bmc_options = {
+  https: { rejectUnauthorized: false },
+  username: env.REDFISH_USERNAME,
+  password: env.REDFISH_PASSWORD,
+};
 
 export const redfishRouter = createTRPCRouter({
   get: createTRPCRouter({
@@ -43,6 +54,12 @@ export const redfishRouter = createTRPCRouter({
           name: sa_collection.name,
           created: sa_collection.created,
         };
+      });
+    }),
+    firmware_collection: privateProcedure.input(z.string()).query(async ({ input }) => {
+      return await prisma.firmwareCollection.findMany({
+        where: { host: input },
+        orderBy: [{ component_id: "asc" }, { previous: "asc" }],
       });
     }),
     // bios_capture: privateProcedure.input(z.string()).query(async ({ input }) => {
@@ -213,6 +230,50 @@ export const redfishRouter = createTRPCRouter({
           data: { host: input.host, name: input.name, collection },
         });
       }),
+    firmware_collection: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+      const host = await prisma.hosts.findUnique({ where: { host: input } });
+      if (!host) throw new TRPCError({ code: "NOT_FOUND", message: "Host not found." });
+      if (!host.bmc_address) throw new TRPCError({ code: "NOT_FOUND", message: "Host's bmc address not found." });
+
+      const url = `https://${host.bmc_address}/redfish/v1/UpdateService/FirmwareInventory`;
+
+      const firmware_list_res = await got(url, got_bmc_options).json<dell_redfish_update_service_firmware_inventory>();
+      if (!firmware_list_res.Members)
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Error getting firmware list` });
+
+      const firmware_res = await Promise.all(
+        firmware_list_res.Members.map(async (firmware_url) => {
+          if (host.bmc_address && firmware_url["@odata.id"].match(/(Installed)|(Previous)/g)) {
+            return await got(
+              `https://${host.bmc_address}${firmware_url["@odata.id"]}`,
+              got_bmc_options
+            ).json<dell_redfish_update_service_firmware_inventory_id>();
+          }
+        })
+      );
+
+      await prisma.firmwareCollection.deleteMany({ where: { host: input } });
+      for (const firmware of firmware_res) {
+        if (!firmware || firmware.Updateable === false) continue;
+        const install_date = firmware.Oem.Dell.DellSoftwareInventory.InstallationDate.match(
+          /[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z/g
+        )
+          ? new Date(firmware.Oem.Dell.DellSoftwareInventory.InstallationDate)
+          : undefined;
+
+        await prisma.firmwareCollection.create({
+          data: {
+            host: input,
+            component_id: parseInt(firmware.Oem.Dell.DellSoftwareInventory.ComponentID) ?? null,
+            firmware_id: firmware.Id,
+            name: firmware.Name,
+            install_date,
+            version: firmware.Version,
+            previous: firmware.Id.match(/^Previous/g) ? true : false,
+          },
+        });
+      }
+    }),
     // bios_capture: privateProcedure.input(z.string()).mutation(async ({ input }) => {
     //   try {
     //     const host = await prisma.hosts.findUnique({ where: { host: input } });

@@ -132,6 +132,82 @@ export const dell_redfish_manager_job_status_schema = z.object({
 });
 export type dell_redfish_manager_job_status = z.infer<typeof dell_redfish_manager_job_status_schema>;
 
+export const dell_redfish_update_service_firmware_inventory_schema = z.object({
+  "@odata.context": z.string(),
+  "@odata.id": z.string(),
+  "@odata.type": z.string(),
+  Description: z.string(),
+  Members: z
+    .object({
+      "@odata.id": z.string(),
+    })
+    .array(),
+  "Members@odata.count": z.number(),
+  Name: z.string(),
+});
+export type dell_redfish_update_service_firmware_inventory = z.infer<
+  typeof dell_redfish_update_service_firmware_inventory_schema
+>;
+
+export const dell_redfish_update_service_firmware_inventory_id_schema = z.object({
+  "@odata.context": z.string(),
+  "@odata.id": z.string(),
+  "@odata.type": z.string(),
+  Description: z.string(),
+  Id: z.string(),
+  Name: z.string(),
+  Oem: z.object({
+    Dell: z.object({
+      "@odata.type": z.string(),
+      DellSoftwareInventory: z.object({
+        "@odata.context": z.string(),
+        "@odata.id": z.string(),
+        "@odata.type": z.string(),
+        BuildNumber: z.number(),
+        Classifications: z.string().array(),
+        "Classifications@odata.count": z.number(),
+        ComponentID: z.string(),
+        ComponentType: z.string(),
+        Description: z.string(),
+        DeviceID: z.string(),
+        ElementName: z.string(),
+        HashValue: z.string(),
+        Id: z.string(),
+        IdentityInfoType: z.string().array(),
+        "IdentityInfoType@odata.count": z.number(),
+        IdentityInfoValue: z.string().array(),
+        "IdentityInfoValue@odata.count": z.number(),
+        InstallationDate: z.string(),
+        IsEntity: z.boolean(),
+        MajorVersion: z.number(),
+        MinorVersion: z.number(),
+        Name: z.string(),
+        PLDMCapabilitiesDuringUpdate: z.string(),
+        PLDMFDPCapabilitiesDuringUpdate: z.string(),
+        RevisionNumber: z.number(),
+        RevisionString: z.string().nullable(), //?
+        SidebandUpdateCapable: z.boolean(),
+        Status: z.string(),
+        SubDeviceID: z.string(),
+        SubVendorID: z.string(),
+        VendorID: z.string(),
+        impactsTPMmeasurements: z.boolean(),
+      }),
+    }),
+  }),
+  ReleaseDate: z.string(),
+  SoftwareId: z.string(),
+  Status: z.object({
+    Health: z.string(),
+    State: z.string(),
+  }),
+  Updateable: z.boolean(),
+  Version: z.string(),
+});
+export type dell_redfish_update_service_firmware_inventory_id = z.infer<
+  typeof dell_redfish_update_service_firmware_inventory_id_schema
+>;
+
 export const dell_os10_show_inventory_schema = z.object({
   "dell-equipment:system": z.object({
     node: z.object({

@@ -63,6 +63,7 @@ model Hosts {
     switch                  Switch?
     ScreenShot              ScreenShot?
     SupportAssistCollection SupportAssistCollection[]
+    FirmwareCollection      FirmwareCollection[]
 }
 
 model Switch {
@@ -140,4 +141,19 @@ model SupportAssistCollection {
     created    DateTime @updatedAt
 
     Hosts Hosts? @relation(fields: [host], references: [host], onDelete: Cascade)
+}
+
+model FirmwareCollection {
+    id           String    @id @default(uuid())
+    host         String
+    firmware_id  String
+    component_id Int
+    name         String
+    install_date DateTime?
+    version      String
+    previous     Boolean
+
+    Hosts Hosts? @relation(fields: [host], references: [host], onDelete: Cascade)
+
+    @@unique([host, firmware_id])
 }

@@ -1,6 +1,7 @@
 import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
 
 import { Actions } from "~/components/host/actions";
+import { Fw_update } from "~/components/host/fw_update";
 import Grendel from "~/components/host/grendel";
 import Link from "next/link";
 // import Backups from "~/components/node/backups";
@@ -83,6 +84,15 @@ const Node: NextPage = () => {
           <Tab
             className={({ selected }) =>
               `${tab_classes} ${selected ? "bg-neutral-100 shadow dark:bg-neutral-600" : ""} ${
+                host_res.isSuccess && host_res.data?.host_type === "node" ? "" : "hidden"
+              }`
+            }
+          >
+            Firmware
+          </Tab>
+          <Tab
+            className={({ selected }) =>
+              `${tab_classes} ${selected ? "bg-neutral-100 shadow dark:bg-neutral-600" : ""} ${
                 host_res.isSuccess && host_res.data?.host_type === "switch" ? "" : "hidden"
               }`
             }
@@ -110,6 +120,9 @@ const Node: NextPage = () => {
           </Tab.Panel>
           <Tab.Panel>
             <Actions host={host} />
+          </Tab.Panel>
+          <Tab.Panel>
+            <Fw_update host={host} />
           </Tab.Panel>
           <Tab.Panel>
             <PortManagement host={host} />
