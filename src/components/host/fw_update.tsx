@@ -19,6 +19,7 @@ export const Fw_update = ({ host }: { host: string }) => {
         <thead>
           <tr>
             <th className={td_classes}>Name</th>
+            <th className={td_classes}>Type</th>
             <th className={td_classes}>Version</th>
             <th className={td_classes}>Installed</th>
             <th className={td_classes}>ID</th>
@@ -26,12 +27,10 @@ export const Fw_update = ({ host }: { host: string }) => {
         </thead>
         <tbody>
           {firmware_list.data?.map((fw, index) => (
-            <tr key={index} className={fw.previous ? "bg-neutral-100" : ""}>
+            <tr key={index} className={fw.type === "Previous" ? "bg-neutral-100" : ""}>
               <td className={td_classes}>{fw.name}</td>
-              <td className={td_classes}>
-                {fw.previous ? "(Previous) " : ""}
-                {fw.version}
-              </td>
+              <td className={td_classes}>{fw.type}</td>
+              <td className={td_classes}>{fw.version}</td>
               <td className={td_classes}>{fw.install_date?.toLocaleString()}</td>
               <td className={td_classes}>{fw.component_id}</td>
             </tr>

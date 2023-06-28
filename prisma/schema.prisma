@@ -151,7 +151,7 @@ model FirmwareCollection {
     name         String
     install_date DateTime?
     version      String
-    previous     Boolean
+    type         String
 
     Hosts Hosts? @relation(fields: [host], references: [host], onDelete: Cascade)
 
