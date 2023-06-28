@@ -14,7 +14,7 @@ type FormData = {
 
 const Login: NextPage = () => {
   const router = useRouter();
-  const { data: auth } = useSession()
+  const { data: auth } = useSession();
 
   const {
     register,
@@ -25,27 +25,28 @@ const Login: NextPage = () => {
 
   useEffect(() => {
     if (auth?.user.role === "disabled") {
-      toast.info("Account is disabled. This is normal if you are a new user. Please ask an administrator to enable your account.", 
-      { delay: 300, autoClose: false })
+      toast.info(
+        "Account is disabled. This is normal if you are a new user. Please ask an administrator to enable your account.",
+        { delay: 300, autoClose: false }
+      );
     }
-  }, [auth])
-  
+  }, [auth]);
 
-  const onSubmit = handleSubmit( async data => {
+  const onSubmit = handleSubmit(async (data) => {
     const signin_res = await signIn("credentials", {
       redirect: false,
       username: data.username,
       password: data.password,
-    })
-    if (!signin_res) return
+    });
+    if (!signin_res) return;
 
     if (signin_res.ok) {
-       toast.success("Successfully logged in")       
-       const url = new URL(signin_res.url as string)        
-       void router.push(url.searchParams.get("callbackUrl") ?? "/")
+      toast.success("Successfully logged in");
+      const url = new URL(signin_res.url as string);
+      void router.push(url.searchParams.get("callbackUrl") ?? "/");
     } else {
-      if (signin_res.error === "CredentialsSignin") toast.error("Invalid credentials or account does not exist.")
-      if (signin_res.error === "Default") toast.error("Unknown error occured") && console.error(signin_res)
+      if (signin_res.error === "CredentialsSignin") toast.error("Invalid credentials or account does not exist.");
+      if (signin_res.error === "Default") toast.error("Unknown error occured") && console.error(signin_res);
     }
   });
 
@@ -68,7 +69,7 @@ const Login: NextPage = () => {
               id="username"
               autoComplete="username"
               type="text"
-              className="block w-full rounded-md border border-gray-500 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-500 px-1 py-1.5 placeholder:text-gray-400"
               {...register("username", {
                 required: "Please enter a Username.",
               })}
@@ -87,7 +88,7 @@ const Login: NextPage = () => {
               id="password"
               autoComplete="current-password"
               type="password"
-              className="block w-full rounded-md border border-gray-500 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
+              className="block w-full rounded-md border border-gray-500 px-1 py-1.5 placeholder:text-gray-400"
               {...register("password", {
                 required: "Please enter a Password.",
               })}
@@ -106,10 +107,7 @@ const Login: NextPage = () => {
 
         <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-300">
           Need an Account?{" "}
-          <Link
-            href="/auth/register"
-            className="text-blue-500 hover:text-blue-400"
-          >
+          <Link href="/auth/register" className="text-blue-500 hover:text-blue-400">
             Register
           </Link>
         </p>
