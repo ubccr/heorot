@@ -8,9 +8,10 @@ import {
   type dell_redfish_update_service_firmware_inventory_id,
 } from "~/types/dell";
 import { env } from "~/env.mjs";
-import got, { Options } from "got";
+import got from "got";
 import { prisma } from "~/server/db";
 import { z } from "zod";
+import { grendel_host_find } from "~/server/functions/grendel";
 
 const got_bmc_options = {
   https: { rejectUnauthorized: false },
@@ -59,7 +60,7 @@ export const redfishRouter = createTRPCRouter({
     firmware_collection: privateProcedure.input(z.string()).query(async ({ input }) => {
       return await prisma.firmwareCollection.findMany({
         where: { host: input },
-        orderBy: [{ component_id: "asc" }, { previous: "asc" }],
+        orderBy: [{ component_id: "asc" }, { type: "asc" }],
       });
     }),
     // bios_capture: privateProcedure.input(z.string()).query(async ({ input }) => {
@@ -269,7 +270,7 @@ export const redfishRouter = createTRPCRouter({
             name: firmware.Name,
             install_date,
             version: firmware.Version,
-            previous: firmware.Id.match(/^Previous/g) ? true : false,
+            type: firmware.Id.match(/^Previous/g) ? "Previous" : "Current",
           },
         });
       }
@@ -302,5 +303,67 @@ export const redfishRouter = createTRPCRouter({
     //     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Error refreshing bios capture` });
     //   }
     // })
+  }),
+  actions: createTRPCRouter({
+    set: createTRPCRouter({
+      bad_request: privateProcedure.input(z.string().array()).mutation(async ({ input }) => {
+        const host_arr = await prisma.hosts.findMany({ where: { host: { in: input } } });
+
+        interface IFailedHosts {
+          host: string;
+          error: string;
+        }
+        const successful_hosts: string[] = [];
+        const failed_hosts: IFailedHosts[] = [];
+
+        const res_arr = await Promise.all(
+          host_arr.map(async (host) => {
+            if (!host.bmc_address) {
+              failed_hosts.push({ host: host.host, error: "BMC address not found." });
+              return;
+            }
+
+            const grendel = await grendel_host_find(host.host);
+            if (!grendel || !grendel[0]) {
+              failed_hosts.push({ host: host.host, error: "Grendel host not found." });
+              return;
+            }
+
+            const bmc_iface = grendel[0].interfaces.find((iface) => iface.bmc === true);
+            if (!bmc_iface) {
+              failed_hosts.push({ host: host.host, error: "Host BMC interface not found." });
+              return;
+            }
+
+            const url = `https://${host.bmc_address}/redfish/v1/Managers/iDRAC.Embedded.1/Attributes`;
+            return got.patch(url, {
+              ...got_bmc_options,
+              json: {
+                Attributes: {
+                  "NIC.1.DNSDomainFromDHCP": "Disabled",
+                  "NIC.1.DNSDomainNameFromDHCP": "Disabled",
+                  "NIC.1.DNSDomainName": bmc_iface.fqdn.split(".").slice(1).join(".") ?? "",
+                  "NIC.1.DNSRacName": bmc_iface.fqdn.split(".")[0] ?? "",
+                },
+              },
+            });
+          })
+        );
+
+        for (const res of res_arr) {
+          if (!res) return;
+          if (res.ok && !!res.headers.host) successful_hosts.push(res.headers.host);
+          else {
+            failed_hosts.push({ host: res.headers.host ?? "", error: res.body });
+            console.error(res);
+          }
+        }
+        console.log({
+          successful_hosts,
+          failed_hosts,
+        });
+        return `Successfully set DNS info for ${successful_hosts.length} of ${input.length} hosts. More details can be found in the console/`;
+      }),
+    }),
   }),
 });
