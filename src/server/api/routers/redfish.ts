@@ -6,12 +6,14 @@ import {
   type dell_redfish_manager_job_status,
   type dell_redfish_systems,
   type dell_redfish_update_service_firmware_inventory_id,
+  type dell_redfish_systems_software_installation_servise_get_repo_updates,
 } from "~/types/dell";
 import { env } from "~/env.mjs";
 import got from "got";
 import { prisma } from "~/server/db";
 import { z } from "zod";
 import { grendel_host_find } from "~/server/functions/grendel";
+import { parseStringPromise } from "xml2js";
 
 const got_bmc_options = {
   https: { rejectUnauthorized: false },
@@ -140,7 +142,11 @@ export const redfishRouter = createTRPCRouter({
           update: { host: input, image },
         });
       } catch (error) {
-        console.error(error);
+        // console.error(error);
+        if (!!error.response.body) {
+          const idrac_error = JSON.parse(error.response.body);
+          throw new TRPCError({ code: "BAD_REQUEST", message: idrac_error.error["@Message.ExtendedInfo"][0].Message });
+        }
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Error refreshing screenshot` });
       }
     }),
@@ -362,7 +368,141 @@ export const redfishRouter = createTRPCRouter({
           successful_hosts,
           failed_hosts,
         });
-        return `Successfully set DNS info for ${successful_hosts.length} of ${input.length} hosts. More details can be found in the console/`;
+        return `Successfully set DNS info for ${successful_hosts.length} of ${input.length} hosts. More details can be found in the console.`;
+      }),
+      reboot_idrac: privateProcedure.input(z.string().array()).mutation(async ({ input }) => {
+        const host_arr = await prisma.hosts.findMany({ where: { host: { in: input } } });
+        interface IFailedHosts {
+          host: string;
+          error: string;
+        }
+        const successful_hosts: string[] = [];
+        const failed_hosts: IFailedHosts[] = [];
+
+        const res_arr = await Promise.all(
+          host_arr.map(async (host) => {
+            if (!host.bmc_address) {
+              failed_hosts.push({ host: host.host, error: "BMC address not found." });
+              return;
+            }
+
+            const url = `https://${host.bmc_address}/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Manager.Reset`;
+            return got.post(url, {
+              ...got_bmc_options,
+              json: {
+                ResetType: "GracefulRestart",
+              },
+            });
+          })
+        );
+
+        for (const res of res_arr) {
+          if (!res) return;
+          if (res.ok && !!res.headers.host) successful_hosts.push(res.headers.host);
+          else {
+            failed_hosts.push({ host: res.headers.host ?? "", error: res.body });
+            console.error(res);
+          }
+        }
+        console.log({
+          successful_hosts,
+          failed_hosts,
+        });
+        return `Successfully rebooted ${successful_hosts.length} of ${input.length} hosts. More details can be found in the console.`;
+      }),
+    }),
+    get: createTRPCRouter({
+      latest_firmware: privateProcedure.input(z.string()).mutation(async ({ input }) => {
+        const host = await prisma.hosts.findUnique({ where: { host: input } });
+        if (!host) throw new TRPCError({ code: "NOT_FOUND", message: "Host not found." });
+        if (!host.bmc_address) throw new TRPCError({ code: "NOT_FOUND", message: "Host's bmc address not found." });
+
+        // const url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.InstallFromRepository`;
+        // // allow checking of local catalog in the future
+        // const res = await got.post(url, {
+        //   ...got_bmc_options,
+        //   json: {
+        //     ApplyUpdate: "False",
+        //     IgnoreCertWarning: "On",
+        //     IPAddress: "downloads.dell.com",
+        //     ShareType: "HTTPS",
+        //   },
+        // });
+
+        // if (!res.ok || !res.headers.location)
+        //   throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error getting latest firmware." });
+
+        // const job_url = `https://${host.bmc_address}${res.headers.location}`;
+
+        // for (let x = 0; x < 10; x++) {
+        //   const job_res = await got(job_url, got_bmc_options).json<dell_redfish_manager_job_status>();
+
+        //   if (job_res.JobState === "Completed") break;
+        //   if (x === 9)
+        //     throw new TRPCError({
+        //       code: "INTERNAL_SERVER_ERROR",
+        //       message: `Error getting latest firmware. Job failed: ${job_res.Message}`,
+        //     });
+        //   await new Promise((r) => setTimeout(r, 5000));
+        // }
+        const updates_url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.GetRepoBasedUpdateList`;
+        const available_updates = await got
+          .post(updates_url, { ...got_bmc_options, json: {} })
+          .json<dell_redfish_systems_software_installation_servise_get_repo_updates>();
+
+        interface IUpdate {
+          CIM: {
+            // $: {};
+            MESSAGE: [
+              {
+                SIMPLEREQ: [
+                  {
+                    "VALUE.NAMEDINSTANCE": [
+                      {
+                        INSTANCENAME: [
+                          {
+                            PROPERTY: [
+                              {
+                                $: { NAME: string; TYPE: string };
+                                VALUE: string[];
+                              }
+                            ];
+                          }
+                        ];
+                      }
+                    ];
+                  }
+                ];
+              }
+            ];
+          };
+        }
+        const json = (await parseStringPromise(available_updates.PackageList)) as IUpdate;
+        await prisma.firmwareCollection.deleteMany({ where: { host: input, type: "Available" } });
+
+        for (const update_package of json.CIM.MESSAGE[0].SIMPLEREQ[0]["VALUE.NAMEDINSTANCE"]) {
+          console.log("1");
+
+          const firmware_id =
+            update_package.INSTANCENAME[0].PROPERTY.find((x) => x.$.NAME === "PackagePath")?.VALUE[0] ?? "";
+          const component_id =
+            update_package.INSTANCENAME[0].PROPERTY.find((x) => x.$.NAME === "ComponentID")?.VALUE[0] ?? "";
+          const name = update_package.INSTANCENAME[0].PROPERTY.find((x) => x.$.NAME === "DisplayName")?.VALUE[0] ?? "";
+          const version =
+            update_package.INSTANCENAME[0].PROPERTY.find((x) => x.$.NAME === "PackageVersion")?.VALUE[0] ?? "";
+          await prisma.firmwareCollection.create({
+            data: {
+              host: input,
+              firmware_id,
+              component_id: parseInt(component_id),
+              name,
+              version,
+              type: "Available",
+            },
+          });
+        }
+        // console.log(json);
+        console.log(json.CIM.MESSAGE[0].SIMPLEREQ);
       }),
     }),
   }),
