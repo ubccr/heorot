@@ -12,9 +12,19 @@ export const Fw_update = ({ host }: { host: string }) => {
       toast.error(error.message);
     },
   });
+  const available_fw = api.redfish.actions.get.latest_firmware.useMutation({
+    onSuccess: () => {
+      toast.success("Available firmware updates refreshed");
+      void firmware_list.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const td_classes = "border border-gray-300 p-2";
   return (
     <>
+      <button onClick={() => available_fw.mutate(host)}>test</button>
       <table>
         <thead>
           <tr>
@@ -27,7 +37,12 @@ export const Fw_update = ({ host }: { host: string }) => {
         </thead>
         <tbody>
           {firmware_list.data?.map((fw, index) => (
-            <tr key={index} className={fw.type === "Previous" ? "bg-neutral-100" : ""}>
+            <tr
+              key={index}
+              className={
+                fw.type === "Previous" ? "bg-neutral-200" : "" || fw.type === "Available" ? "bg-green-200" : ""
+              }
+            >
               <td className={td_classes}>{fw.name}</td>
               <td className={td_classes}>{fw.type}</td>
               <td className={td_classes}>{fw.version}</td>

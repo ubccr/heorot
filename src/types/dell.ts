@@ -109,6 +109,25 @@ export const dell_redfish_systems_schema = z.object({
 });
 export type dell_redfish_systems = z.infer<typeof dell_redfish_systems_schema>;
 
+export const dell_redfish_systems_software_installation_servise_get_repo_updates_schema = z.object({
+  "@Message.ExtendedInfo": z
+    .object({
+      Message: z.string(),
+      // "MessageArgs": [],
+      // "MessageArgs@odata.count": 0,
+      MessageId: z.string(),
+      // "RelatedProperties": [],
+      // "RelatedProperties@odata.count": 0,
+      Resolution: z.string(),
+      Severity: z.string(),
+    })
+    .array(),
+  PackageList: z.string(),
+});
+export type dell_redfish_systems_software_installation_servise_get_repo_updates = z.infer<
+  typeof dell_redfish_systems_software_installation_servise_get_repo_updates_schema
+>;
+
 export const dell_redfish_manager_job_status_schema = z.object({
   "@odata.context": z.string(),
   "@odata.id": z.string(),

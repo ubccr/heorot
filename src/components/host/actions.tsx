@@ -13,12 +13,18 @@ export const Actions = ({ host }: { host: string }) => {
       toast.success("Screenshot refreshed");
       void screen_shot.refetch();
     },
+    onError: (data) => {
+      toast.error(data.message);
+    },
   });
   const support_assist_collections = api.redfish.get.support_assist_collection.useQuery(host, { enabled: false });
   const refresh_support_assist_collection = api.redfish.refresh.support_assist_collection.useMutation({
     onSuccess: () => {
       toast.success("Support Assist Collection refreshed");
       void support_assist_collections.refetch();
+    },
+    onError: (data) => {
+      toast.error(data.message);
     },
   });
 
@@ -41,6 +47,7 @@ export const Actions = ({ host }: { host: string }) => {
   };
   const collection_ref = useRef<HTMLInputElement | null>(null);
   const td_classes = "border border-gray-300 p-2";
+
   return (
     <>
       <div className="flex justify-center">
@@ -64,7 +71,7 @@ export const Actions = ({ host }: { host: string }) => {
             <tr>
               <td className={td_classes}>
                 <button onClick={() => void support_assist_collections.refetch()}>
-                  <ArrowPathIcon className="h-5 w-5" />
+                  <ArrowPathIcon className={`h-5 w-5 ${support_assist_collections.isFetching ? "animate-spin" : ""}`} />
                 </button>
               </td>
               <td className={td_classes}>Name</td>
@@ -95,8 +102,11 @@ export const Actions = ({ host }: { host: string }) => {
         </table>
       </div>
 
+      <hr className="my-6 h-px border-0 bg-gray-200 dark:bg-gray-700" />
+      <h1>Screenshot</h1>
+
       <button type="button" className="rounded-lg p-2" onClick={() => refresh_screen_shot.mutate(host)}>
-        <ArrowPathIcon className="h-5 w-5" />
+        <ArrowPathIcon className={`h-5 w-5 ${refresh_screen_shot.isLoading ? "animate-spin" : ""}`} />
       </button>
       {!!screen_shot.data && (
         <>
