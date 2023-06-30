@@ -151,6 +151,167 @@ export const dell_redfish_manager_job_status_schema = z.object({
 });
 export type dell_redfish_manager_job_status = z.infer<typeof dell_redfish_manager_job_status_schema>;
 
+export const dell_redfish_chassis_schema = z.object({
+  "@odata.context": z.string(),
+  "@odata.id": z.string(),
+  "@odata.type": z.string(),
+  Actions: z.object({
+    "#Chassis.Reset": z.object({
+      "ResetType@Redfish.AllowableValues": z.string().array(),
+      target: z.string(),
+    }),
+  }),
+  Assembly: z.object({
+    "@odata.id": z.string(),
+  }),
+  AssetTag: z.string().nullable(),
+  ChassisType: z.string(),
+  Description: z.string(),
+  EnvironmentalClass: z.string(),
+  Id: z.string(),
+  IndicatorLED: z.string(),
+  "IndicatorLED@Redfish.Deprecated": z.string(),
+  Links: z.object({
+    ComputerSystems: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "ComputerSystems@odata.count": z.number(),
+    Contains: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "Contains@odata.count": z.number(),
+    CooledBy: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "CooledBy@odata.count": z.number(),
+    // "Drives": [],
+    // "Drives@odata.count": z.number(),
+    ManagedBy: z.object({
+      "@odata.id": z.string(),
+    }),
+    "ManagedBy@odata.count": z.number(),
+    ManagersInChassis: z.object({
+      "@odata.id": z.string(),
+    }),
+    "ManagersInChassis@odata.count": z.number(),
+    PCIeDevices: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "PCIeDevices@Redfish.Deprecated": z.string(),
+    "PCIeDevices@odata.count": z.number(),
+    PoweredBy: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "PoweredBy@odata.count": z.number(),
+    Processors: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "Processors@odata.count": z.number(),
+    Storage: z
+      .object({
+        "@odata.id": z.string(),
+      })
+      .array(),
+    "Storage@odata.count": z.number(),
+  }),
+  Location: z.object({
+    Info: z.string(),
+    InfoFormat: z.string(),
+    Placement: z.object({
+      Rack: z.string(),
+      RackOffset: z.number(),
+      RackOffsetUnits: z.string(),
+      Row: z.string(),
+    }),
+    PostalAddress: z.object({
+      Building: z.string(),
+      Room: z.string(),
+    }),
+  }),
+  LocationIndicatorActive: z.boolean(),
+  Manufacturer: z.string(),
+  Memory: z.object({
+    "@odata.id": z.string(),
+  }),
+  Model: z.string(),
+  Name: z.string(),
+  NetworkAdapters: z.object({
+    "@odata.id": z.string(),
+  }),
+  Oem: z.object({
+    Dell: z.object({
+      "@odata.type": z.string(),
+      DellChassis: z.object({
+        "@odata.context": z.string(),
+        "@odata.id": z.string(),
+        "@odata.type": z.string(),
+        CanBeFRUed: z.boolean(),
+        Description: z.string(),
+        Id: z.string(),
+        Links: z.object({
+          ComputerSystem: z.object({
+            "@odata.id": z.string(),
+          }),
+        }),
+        Name: z.string(),
+        SystemID: z.number(),
+      }),
+    }),
+  }),
+  PCIeDevices: z.object({
+    "@odata.id": z.string(),
+  }),
+  PCIeSlots: z.object({
+    "@odata.id": z.string(),
+  }),
+  PartNumber: z.string(),
+  PhysicalSecurity: z.object({
+    IntrusionSensor: z.string(),
+    IntrusionSensorNumber: z.number(),
+    IntrusionSensorReArm: z.string(),
+  }),
+  Power: z.object({
+    "@odata.id": z.string(),
+  }),
+  "Power@Redfish.Deprecated": z.string(),
+  PowerState: z.string(),
+  PowerSubsystem: z.object({
+    "@odata.id": z.string(),
+  }),
+  SKU: z.string(),
+  Sensors: z.object({
+    "@odata.id": z.string(),
+  }),
+  SerialNumber: z.string(),
+  Status: z.object({
+    Health: z.string(),
+    HealthRollup: z.string(),
+    State: z.string(),
+  }),
+  Thermal: z.object({
+    "@odata.id": z.string(),
+  }),
+  "Thermal@Redfish.Deprecated": z.string(),
+  ThermalSubsystem: z.object({
+    "@odata.id": z.string(),
+  }),
+  UUID: z.string(),
+});
+
+export type dell_redfish_chassis = z.infer<typeof dell_redfish_chassis_schema>;
+
 export const dell_redfish_update_service_firmware_inventory_schema = z.object({
   "@odata.context": z.string(),
   "@odata.id": z.string(),
