@@ -7,6 +7,7 @@ import {
   type dell_redfish_systems,
   type dell_redfish_update_service_firmware_inventory_id,
   type dell_redfish_systems_software_installation_servise_get_repo_updates,
+  type dell_redfish_chassis,
 } from "~/types/dell";
 import { env } from "~/env.mjs";
 import got from "got";
@@ -259,7 +260,9 @@ export const redfishRouter = createTRPCRouter({
         })
       );
 
-      await prisma.firmwareCollection.deleteMany({ where: { host: input } });
+      await prisma.firmwareCollection.deleteMany({
+        where: { host: input, OR: [{ type: "Previous" }, { type: "Current" }] },
+      });
       for (const firmware of firmware_res) {
         if (!firmware || firmware.Updateable === false) continue;
         const install_date = firmware.Oem.Dell.DellSoftwareInventory.InstallationDate.match(
@@ -398,7 +401,7 @@ export const redfishRouter = createTRPCRouter({
 
         for (const res of res_arr) {
           if (!res) return;
-          if (res.ok && !!res.headers.host) successful_hosts.push(res.headers.host);
+          if (res.ok) successful_hosts.push(res.ip ?? "");
           else {
             failed_hosts.push({ host: res.headers.host ?? "", error: res.body });
             console.error(res);
@@ -408,8 +411,76 @@ export const redfishRouter = createTRPCRouter({
           successful_hosts,
           failed_hosts,
         });
-        return `Successfully rebooted ${successful_hosts.length} of ${input.length} hosts. More details can be found in the console.`;
+        return `Successfully rebooted iDRACs on ${successful_hosts.length} of ${input.length} hosts. More details can be found in the console.`;
       }),
+      reboot_host: privateProcedure
+        .input(
+          z.object({
+            hosts: z.string().array(),
+            power_option: z.string().optional().default("PowerCycle"),
+            boot_option: z.string().optional().default("None"),
+          })
+        )
+        .mutation(async ({ input }) => {
+          const host_arr = await prisma.hosts.findMany({ where: { host: { in: input.hosts } } });
+          interface IFailedHosts {
+            host: string;
+            error: string;
+          }
+          const successful_hosts: string[] = [];
+          const failed_hosts: IFailedHosts[] = [];
+
+          const res_arr = await Promise.all(
+            host_arr.map(async (host) => {
+              if (!host.bmc_address) {
+                failed_hosts.push({ host: host.host, error: "BMC address not found." });
+                return;
+              }
+
+              const power_url = `https://${host.bmc_address}/redfish/v1/Chassis/System.Embedded.1`;
+              const power_res = await got(power_url, got_bmc_options).json<dell_redfish_chassis>();
+
+              if (power_res.PowerState === "Off" && input.power_option !== "On") {
+                failed_hosts.push({ host: host.host, error: "Host is currently powered off." });
+                return;
+              }
+
+              if (input.boot_option !== "None") {
+                const boot_url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1`;
+                return got.patch(boot_url, {
+                  ...got_bmc_options,
+                  json: {
+                    Boot: {
+                      BootSourceOverrideTarget: input.boot_option,
+                    },
+                  },
+                });
+              }
+
+              const url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1/Actions/ComputerSystem.Reset`;
+              return got.post(url, {
+                ...got_bmc_options,
+                json: {
+                  ResetType: input.power_option,
+                },
+              });
+            })
+          );
+
+          for (const res of res_arr) {
+            if (!res) return;
+            const host = await prisma.hosts.findFirst({ where: { bmc_address: res.ip ?? "" } });
+
+            if (res.ok) successful_hosts.push(host?.host ?? res.ip ?? "unknown");
+            else failed_hosts.push({ host: host?.host ?? res.headers.host ?? "", error: res.body });
+          }
+
+          return {
+            message: `Successfully sent boot option: ${input.boot_option} with power option: ${input.power_option} to ${successful_hosts.length} of ${input.hosts.length} hosts.`,
+            successful_hosts,
+            failed_hosts,
+          };
+        }),
     }),
     get: createTRPCRouter({
       latest_firmware: privateProcedure.input(z.string()).mutation(async ({ input }) => {
@@ -417,34 +488,34 @@ export const redfishRouter = createTRPCRouter({
         if (!host) throw new TRPCError({ code: "NOT_FOUND", message: "Host not found." });
         if (!host.bmc_address) throw new TRPCError({ code: "NOT_FOUND", message: "Host's bmc address not found." });
 
-        // const url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.InstallFromRepository`;
-        // // allow checking of local catalog in the future
-        // const res = await got.post(url, {
-        //   ...got_bmc_options,
-        //   json: {
-        //     ApplyUpdate: "False",
-        //     IgnoreCertWarning: "On",
-        //     IPAddress: "downloads.dell.com",
-        //     ShareType: "HTTPS",
-        //   },
-        // });
+        const url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.InstallFromRepository`;
+        // allow checking of local catalog in the future
+        const res = await got.post(url, {
+          ...got_bmc_options,
+          json: {
+            ApplyUpdate: "False",
+            IgnoreCertWarning: "On",
+            IPAddress: "downloads.dell.com",
+            ShareType: "HTTPS",
+          },
+        });
 
-        // if (!res.ok || !res.headers.location)
-        //   throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error getting latest firmware." });
+        if (!res.ok || !res.headers.location)
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error getting latest firmware." });
 
-        // const job_url = `https://${host.bmc_address}${res.headers.location}`;
+        const job_url = `https://${host.bmc_address}${res.headers.location}`;
 
-        // for (let x = 0; x < 10; x++) {
-        //   const job_res = await got(job_url, got_bmc_options).json<dell_redfish_manager_job_status>();
+        for (let x = 0; x < 10; x++) {
+          const job_res = await got(job_url, got_bmc_options).json<dell_redfish_manager_job_status>();
 
-        //   if (job_res.JobState === "Completed") break;
-        //   if (x === 9)
-        //     throw new TRPCError({
-        //       code: "INTERNAL_SERVER_ERROR",
-        //       message: `Error getting latest firmware. Job failed: ${job_res.Message}`,
-        //     });
-        //   await new Promise((r) => setTimeout(r, 5000));
-        // }
+          if (job_res.JobState === "Completed") break;
+          if (x === 9)
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Error getting latest firmware. Job failed: ${job_res.Message}`,
+            });
+          await new Promise((r) => setTimeout(r, 5000));
+        }
         const updates_url = `https://${host.bmc_address}/redfish/v1/Systems/System.Embedded.1/Oem/Dell/DellSoftwareInstallationService/Actions/DellSoftwareInstallationService.GetRepoBasedUpdateList`;
         const available_updates = await got
           .post(updates_url, { ...got_bmc_options, json: {} })
@@ -502,7 +573,7 @@ export const redfishRouter = createTRPCRouter({
           });
         }
         // console.log(json);
-        console.log(json.CIM.MESSAGE[0].SIMPLEREQ);
+        // console.log(json.CIM.MESsSAGE[0].SIMPLEREQ);
       }),
     }),
   }),
