@@ -1348,3 +1348,18 @@ export const dell_os10_show_interfaces_status_schema = z.object({
 });
 
 export type dell_os10_show_interfaces_status = z.infer<typeof dell_os10_show_interfaces_status_schema>;
+
+export const dell_os10_show_mac_address_table_schema = z.object({
+  "dell-l2-mac:fwd-table": z
+    .object({
+      "mac-addr": z.string(),
+      vlan: z.string(),
+      "entry-type": z.string(),
+      "if-name": z.string(),
+      status: z.string(),
+      "dot1d-port-index": z.number(),
+    })
+    .array(),
+});
+
+export type dell_os10_show_mac_address_table = z.infer<typeof dell_os10_show_mac_address_table_schema>;

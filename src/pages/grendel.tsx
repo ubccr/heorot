@@ -4,18 +4,32 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 
 interface IAddNodes {
-  switch?: string;
-  mgmt_switch?: string;
+  core_subnet: string;
+  mgmt_subnet: string;
+  rack: string;
+  core_switch: string;
+  mgmt_switch: string;
   nodes: string;
 }
 
 const Grendel: NextPage = () => {
   const { control, register, reset, handleSubmit, watch } = useForm<IAddNodes>();
 
+  const add_hosts = api.frontend.host.add.useMutation({
+    onSuccess: () => toast.success("Successfully added hosts!"),
+    onError: () => toast.error("An issue occured!"),
+  });
+
   const onSubmit = (data: IAddNodes) => {
     console.log(data);
     const raw_node_arr = data.nodes.split("\n");
-    const node_arr = raw_node_arr.map((node) => {
+    interface InodeArr {
+      host: string;
+      core_port: string;
+      mgmt_port: string;
+    }
+    const node_arr: InodeArr[] = [];
+    raw_node_arr.forEach((node) => {
       const [host, ports] = node.split(":");
       if (!ports || !host) {
         toast.error(
@@ -28,12 +42,15 @@ const Grendel: NextPage = () => {
         return;
       }
       const [core_port, mgmt_port] = ports.split(",");
-      return {
+
+      node_arr.push({
         host,
-        core_port,
-        mgmt_port,
-      };
+        core_port: core_port ?? "",
+        mgmt_port: mgmt_port ?? "",
+      });
     });
+    console.log(node_arr);
+    add_hosts.mutate({ ...data, nodes: node_arr });
   };
 
   const input_classes = "rounded-lg border px-2 py-1 dark:border-white dark:bg-neutral-700";
@@ -43,7 +60,10 @@ const Grendel: NextPage = () => {
       <br />
       <div className="flex justify-center gap-3">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <input type="text" className={input_classes} placeholder="Switch" {...register("switch")} />
+          <input type="text" className={input_classes} placeholder="Core Subnet" {...register("core_subnet")} />
+          <input type="text" className={input_classes} placeholder="MGMT Subnet" {...register("mgmt_subnet")} />
+          <input type="text" className={input_classes} placeholder="Rack" {...register("rack")} />
+          <input type="text" className={input_classes} placeholder="Switch" {...register("core_switch")} />
           <input type="text" className={input_classes} placeholder="MGMT Switch" {...register("mgmt_switch")} />
           <br />
           <textarea
