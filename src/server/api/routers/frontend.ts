@@ -223,100 +223,106 @@ export const frontendRouter = createTRPCRouter({
         const core_switch_mac_address_table = await get_dell_os10_show_mac_address_table(core_switch.bmc_address);
         const mgmt_switch_mac_address_table = await get_dell_os10_show_mac_address_table(mgmt_switch.bmc_address);
 
-        // if (!input.subnet.match(/^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/g)) throw new TRPCError({ code: "BAD_REQUEST", message: `Invalid subnet: ${input.subnet}`});
-        // const netmask = parseInt(input.subnet.split("/")[1] as string);
-        // const subnet_arr = input.subnet.split("/")[0]?.split(".") as string[]
-        // const subnet_length = 2 ^ (32 - netmask)
-        // const first_ip = parseInt(subnet_arr[3] as string) + 1
-        // const last_ip = parseInt(subnet_arr[3] as string) + subnet_length
-
-        const core_subnet_mask = input.core_subnet.split("/")[1] as string;
-        const mgmt_subnet_mask = input.mgmt_subnet.split("/")[1] as string;
         const grendel_list = await grendel_host_list();
         // get list of all grendel ips
         const grendel_ip_arr: string[] = [];
-        grendel_list.forEach((host) => host.interfaces.forEach((iface) => grendel_ip_arr.push(iface.ip)));
+        grendel_list.forEach((host) =>
+          host.interfaces.forEach((iface) => grendel_ip_arr.push(iface.ip.split("/")[0] as string))
+        );
         // filter already allocated core ips
-        const core_ip_range: string[] = [];
         const core_total_ip_range = getIPRange(input.core_subnet);
-        core_total_ip_range.forEach((ip) => {
-          if (!grendel_ip_arr.includes(ip)) core_ip_range.push(ip);
-        });
+        const core_ip_range = core_total_ip_range.filter((ip) => !grendel_ip_arr.includes(ip));
+        // remove unusable IPs
+        core_ip_range.shift();
+        core_ip_range.pop();
+
         if (core_ip_range.length < input.nodes.length)
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: `Not enough IPs in subnet: Total subnet IPs = ${core_total_ip_range.length}, IPs not in Grendel DB = ${core_ip_range.length}`,
           });
         // filter already allocated mgmt ips
-        const mgmt_ip_range: string[] = [];
         const mgmt_total_ip_range = getIPRange(input.mgmt_subnet);
-        mgmt_total_ip_range.forEach((ip) => {
-          if (!grendel_ip_arr.includes(ip)) mgmt_ip_range.push(ip);
-        });
+        const mgmt_ip_range = mgmt_total_ip_range.filter((ip) => !grendel_ip_arr.includes(ip));
+        // remove unusable IPs
+        mgmt_ip_range.shift();
+        mgmt_ip_range.pop();
+
         if (mgmt_ip_range.length < input.nodes.length)
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: `Not enough IPs in subnet: Total subnet IPs = ${mgmt_total_ip_range.length}, IPs not in Grendel DB = ${mgmt_ip_range.length}`,
           });
 
-        const new_hosts = input.nodes.map(async (new_host) => {
+        // const valid_core_ip_arr: string[] = [];
+        // const valid_mgmt_ip_arr: string[] = [];
+
+        // ping module
+        // for (let x = 0; x < input.nodes.length; x++) {
+        //   const core_ip = core_ip_range.shift();
+        //   const mgmt_ip = mgmt_ip_range.shift();
+
+        //   if (!core_ip || !mgmt_ip) throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough IPs" });
+
+        //   const core_res = await ping.promise.probe(core_ip, { timeout: 1, extra: ["-c 1"] });
+        //   const mgmt_res = await ping.promise.probe(mgmt_ip, { timeout: 1, extra: ["-c 1"] });
+        //   if (!core_res.alive && !mgmt_res.alive) {
+        //     valid_core_ip_arr.push(core_ip);
+        //     valid_mgmt_ip_arr.push(mgmt_ip);
+        //   } else x--;
+        // }
+
+        const new_hosts = input.nodes.map((new_host) => {
           const core_switch_mac_address = core_switch_mac_address_table.find((table) => {
             const port = table["if-name"].split("/")[2] ?? "";
+
             if (port === new_host.core_port) return true;
+            return false;
           });
           const mgmt_switch_mac_address = mgmt_switch_mac_address_table.find((table) => {
             const port = table["if-name"].split("/")[2] ?? "";
+
             if (port === new_host.mgmt_port) return true;
+            return false;
           });
 
-          let core_ip = "";
-          for (const ip of core_ip_range) {
-            console.log(ip);
+          const core_ip = core_ip_range.shift();
+          const mgmt_ip = mgmt_ip_range.shift();
 
-            const res = await ping.promise.probe(ip);
-            console.log(res);
-
-            if (!res.alive) {
-              core_ip = ip;
-              core_ip_range.shift();
-              break;
-            } else core_ip_range.shift();
-          }
-          console.log(core_ip_range[0]);
-
-          let mgmt_ip = "";
-          for (const ip of mgmt_ip_range) {
-            const res = await ping.promise.probe(ip, { timeout: 1, extra: ["-c", "1"] });
-            if (!res.alive) {
-              mgmt_ip = ip;
-              break;
-            }
-          }
-          mgmt_ip_range.splice(mgmt_ip_range.indexOf(mgmt_ip));
+          if (!core_ip || !mgmt_ip) throw new TRPCError({ code: "BAD_REQUEST", message: "Not enough IPs" });
 
           const interfaces = [
             {
               ifname: "",
-              fqdn: `${new_host.host}.mgmt.ccr.buffalo.edu`,
-              ip: mgmt_ip + "/" + mgmt_subnet_mask,
+              fqdn: `${new_host.host.replace(/(cpn)|(srv)/, "bmc")}.mgmt.ccr.buffalo.edu`,
+              ip: mgmt_ip + "/20",
               mac: mgmt_switch_mac_address?.["mac-addr"],
               bmc: true,
               vlan: "",
               mtu: 1500,
             },
-            {
+          ];
+          if (!!core_switch_mac_address) {
+            interfaces.push({
               ifname: "eno12399",
               fqdn: `${new_host.host}.core.ccr.buffalo.edu`,
-              ip: core_ip + "/" + core_subnet_mask,
+              ip: core_ip + "/20",
               mac: core_switch_mac_address?.["mac-addr"],
               bmc: false,
               vlan: "",
               mtu: 9000,
-            },
-          ];
-          return { name: new_host.host, interfaces };
+            });
+          }
+          return {
+            name: new_host.host,
+            interfaces,
+            firmware: "snponly-x86_64.efi",
+            provision: true,
+            boot_image: "flatcar",
+            tags: [`${input.rack}`, "nvme", "auto_import"],
+          };
         });
-        console.log(await Promise.all(new_hosts));
+        return await Promise.all(new_hosts);
       }),
   }),
 });

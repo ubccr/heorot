@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 interface IAddNodes {
   core_subnet: string;
@@ -14,9 +15,13 @@ interface IAddNodes {
 
 const Grendel: NextPage = () => {
   const { control, register, reset, handleSubmit, watch } = useForm<IAddNodes>();
+  const [host_json, set_host_json] = useState<any[]>([]);
 
   const add_hosts = api.frontend.host.add.useMutation({
-    onSuccess: () => toast.success("Successfully added hosts!"),
+    onSuccess: (data) => {
+      toast.success("Successfully added hosts!");
+      set_host_json(data);
+    },
     onError: () => toast.error("An issue occured!"),
   });
 
@@ -76,6 +81,16 @@ const Grendel: NextPage = () => {
           <button type="submit">Submit</button>
         </form>
       </div>
+      {add_hosts.isSuccess && (
+        <div>
+          <textarea
+            className={`${input_classes} w-full`}
+            aria-multiline
+            rows={20}
+            value={JSON.stringify(host_json, null, 4)}
+          />
+        </div>
+      )}
     </>
   );
 };
