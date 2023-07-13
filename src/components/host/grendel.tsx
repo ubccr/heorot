@@ -1,6 +1,7 @@
 import { ArrowTopRightOnSquareIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useFieldArray, useForm } from "react-hook-form";
 
+import Button from "../button";
 // import Backups from "~/components/host/backups";
 import type { IGrendelHost } from "~/types/grendel";
 import { api } from "~/utils/api";
@@ -205,9 +206,7 @@ const Grendel = ({ host }: { host: string }) => {
           </tr>
         </tbody>
       </table>
-      <button type="submit" className="rounded-lg border border-neutral-400 px-2 dark:border-white">
-        Submit
-      </button>
+      <Button type="submit">Submit</Button>
     </form>
   );
 };

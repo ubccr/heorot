@@ -1,3 +1,4 @@
+import Button from "~/components/button";
 import type { NextPage } from "next";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
@@ -75,13 +76,7 @@ const Users: NextPage = () => {
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
-        <button
-          type="button"
-          className="rounded-md border border-neutral-300 p-2 dark:border-neutral-500"
-          onClick={() => handleSubmit()}
-        >
-          Submit
-        </button>
+        <Button onClick={() => handleSubmit()}>Submit</Button>
       </div>
     </>
   );

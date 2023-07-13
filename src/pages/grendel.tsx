@@ -1,3 +1,4 @@
+import Button from "~/components/button";
 import type { NextPage } from "next";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
@@ -78,7 +79,7 @@ const Grendel: NextPage = () => {
             placeholder="cpn-z01-01:core_port, mgmt_port"
             {...register("nodes")}
           />
-          <button type="submit">Submit</button>
+          <Button type="submit">Submit</Button>
         </form>
       </div>
       {add_hosts.isSuccess && (

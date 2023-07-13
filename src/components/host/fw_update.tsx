@@ -1,3 +1,4 @@
+import Button from "../button";
 import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 
@@ -24,8 +25,7 @@ export const Fw_update = ({ host }: { host: string }) => {
   const td_classes = "border border-gray-300 p-2";
   return (
     <>
-      <button onClick={() => available_fw.mutate(host)}>test</button>
-      <table>
+      <table className="mb-2">
         <thead>
           <tr>
             <th className={td_classes}>Name</th>
@@ -53,7 +53,10 @@ export const Fw_update = ({ host }: { host: string }) => {
           <tr></tr>
         </tbody>
       </table>
-      <button onClick={() => firmware_refresh.mutate(host)}>Refresh Firmware</button>
+      <div className="flex justify-center gap-2">
+        <Button onClick={() => firmware_refresh.mutate(host)}>Refresh Firmware</Button>
+        <Button onClick={() => available_fw.mutate(host)}>Pull Latest FW</Button>
+      </div>
     </>
   );
 };

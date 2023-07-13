@@ -1,3 +1,4 @@
+import Button from "~/components/button";
 import Link from "next/link";
 import type { NextPage } from "next";
 import { signIn } from "next-auth/react";
@@ -96,12 +97,12 @@ const Login: NextPage = () => {
           </div>
 
           <div className="flex justify-center pt-3">
-            <button
+            <Button
               type="submit"
               className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-white shadow-lg hover:bg-blue-500"
             >
               login
-            </button>
+            </Button>
           </div>
         </form>
 

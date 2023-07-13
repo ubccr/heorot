@@ -1,6 +1,7 @@
 import { ArrowPathIcon, ArrowUturnLeftIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useRef, useState } from "react";
 
+import Button from "~/components/button";
 import Link from "next/link";
 import type { NextPage } from "next";
 import { api } from "~/utils/api";
@@ -47,9 +48,6 @@ const Rack: NextPage = () => {
     onSuccess: (data) => toast.success(data?.message),
     onError: (error) => toast.error(error.message),
   });
-
-  const button_classes =
-    "px-3 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700";
 
   return (
     <>
@@ -154,8 +152,7 @@ const Rack: NextPage = () => {
         <div>
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <button
-                className={button_classes}
+              <Button
                 onClick={() => {
                   const host_list = rack_res.data?.rack
                     .map((host) => {
@@ -166,18 +163,12 @@ const Rack: NextPage = () => {
                 }}
               >
                 Select all
-              </button>
-              <button className={button_classes} onClick={() => setSelectedNodes([])}>
-                Clear
-              </button>
+              </Button>
+              <Button onClick={() => setSelectedNodes([])}>Clear</Button>
             </div>
             <div className="flex gap-2">
-              <button className={button_classes} onClick={() => fix_bad_request.mutate(selectedNodes)}>
-                Fix Bad Request
-              </button>
-              <button className={button_classes} onClick={() => reboot_idrac.mutate(selectedNodes)}>
-                Reboot iDRAC(s)
-              </button>
+              <Button onClick={() => fix_bad_request.mutate(selectedNodes)}>Fix Bad Request</Button>
+              <Button onClick={() => reboot_idrac.mutate(selectedNodes)}>Reboot iDRAC(s)</Button>
             </div>
 
             <div className="flex gap-2">
@@ -202,8 +193,7 @@ const Rack: NextPage = () => {
                 <option value="GracefulShutdown">Graceful Shutdown</option>
                 <option value="On">Power On</option>
               </select>
-              <button
-                className={button_classes}
+              <Button
                 onClick={() => {
                   reboot_host.mutate({
                     hosts: selectedNodes,
@@ -213,7 +203,7 @@ const Rack: NextPage = () => {
                 }}
               >
                 Submit
-              </button>
+              </Button>
             </div>
           </div>
         </div>

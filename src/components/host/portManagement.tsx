@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import Button from "../button";
 import type { InterfaceStatus } from "@prisma/client";
 import Modal from "../modal";
 import ProgressBar from "../progressbar";
@@ -20,17 +21,16 @@ const PortManagement = ({ host }: { host: string }) => {
       toast.error(error.message);
     },
   });
-  const config_interface_mutation =
-    api.switches.interface.configure.useMutation({
-      onSuccess: () => {
-        setOpen(true);
-        // await refresh();
-        // toast.success("Successfully updated interfaces");
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    });
+  const config_interface_mutation = api.switches.interface.configure.useMutation({
+    onSuccess: () => {
+      setOpen(true);
+      // await refresh();
+      // toast.success("Successfully updated interfaces");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const [updatePortArr, setUpdatePortArr] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -72,27 +72,24 @@ const PortManagement = ({ host }: { host: string }) => {
     <div>
       <div className="flex flex-col justify-center gap-3">
         <div className="flex justify-center gap-3">
-          <button
-            type="button"
+          <Button
             /* eslint-disable-next-line @typescript-eslint/no-misused-promises*/
             onClick={() => refresh()}
-            className="rounded-md border px-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 dark:border-white"
+            className="rounded-md border px-2 hover:bg-neutral-100 dark:border-white dark:hover:bg-neutral-700"
           >
             Refresh
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
             onClick={() => {
               setUpdatePortArr([]);
               toast.success("Successfully cleared port selection");
             }}
-            className="rounded-md border px-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 dark:border-white"
+            className="rounded-md border px-2 hover:bg-neutral-100 dark:border-white dark:hover:bg-neutral-700"
           >
             Clear Selection
-          </button>
+          </Button>
         </div>
-        {interfaces.isLoading ||
-          (interface_mutation.isLoading && <ProgressBar />)}
+        {interfaces.isLoading || (interface_mutation.isLoading && <ProgressBar />)}
       </div>
       <table className="table-fixed border-separate">
         <tbody>
@@ -131,10 +128,7 @@ const PortManagement = ({ host }: { host: string }) => {
       </table>
       <br />
       <Modal open={open} setOpen={setOpen} title="Configuration:">
-        <pre>
-          {config_interface_mutation.isSuccess &&
-            config_interface_mutation.data}
-        </pre>
+        <pre>{config_interface_mutation.isSuccess && config_interface_mutation.data}</pre>
       </Modal>
       {/* <form
         onSubmit={handleSubmit(onSubmit)}
@@ -224,18 +218,10 @@ const BladeGen = ({
         </td>
       )}
       {display === "even" && index % 2 === 0 && (
-        <Ports
-          iface={iface}
-          addUpdatePort={addUpdatePort}
-          updatePortArr={updatePortArr}
-        />
+        <Ports iface={iface} addUpdatePort={addUpdatePort} updatePortArr={updatePortArr} />
       )}
       {display === "odd" && index % 2 === 1 && (
-        <Ports
-          iface={iface}
-          addUpdatePort={addUpdatePort}
-          updatePortArr={updatePortArr}
-        />
+        <Ports iface={iface} addUpdatePort={addUpdatePort} updatePortArr={updatePortArr} />
       )}
     </React.Fragment>
   );
@@ -252,22 +238,11 @@ const Ports = ({
 }) => {
   let border_color = "border-white";
   if (iface.line_protocol_status === "down") border_color = "border-red-600";
-  else if (iface.line_protocol_status === "up")
-    border_color = "border-green-600";
-  else if (iface.line_protocol_status === "lowerLayerDown")
-    border_color = "border-red-800";
-  else if (iface.line_protocol_status === "lowerLayerDown")
-    border_color = "border-red-800";
-  else if (
-    iface.line_protocol_status === "notPresent" &&
-    iface.description === ""
-  )
-    border_color = "border-gray-400";
-  else if (
-    iface.line_protocol_status === "notPresent" &&
-    iface.description !== ""
-  )
-    border_color = "border-teal-400";
+  else if (iface.line_protocol_status === "up") border_color = "border-green-600";
+  else if (iface.line_protocol_status === "lowerLayerDown") border_color = "border-red-800";
+  else if (iface.line_protocol_status === "lowerLayerDown") border_color = "border-red-800";
+  else if (iface.line_protocol_status === "notPresent" && iface.description === "") border_color = "border-gray-400";
+  else if (iface.line_protocol_status === "notPresent" && iface.description !== "") border_color = "border-teal-400";
   const tooltip_table = [
     { title: "Port", value: iface.port_name },
     { title: "Description", value: iface.description },
@@ -285,7 +260,7 @@ const Ports = ({
       height={20}
       className={`rounded-sm border ${border_color} hover:bg-neutral-200 dark:hover:bg-neutral-700 ${
         updatePortArr.find((port) => port === iface.port_name)
-          ? "bg-neutral-100 text-blue-600 border-2 font-medium dark:bg-neutral-500"
+          ? "border-2 bg-neutral-100 font-medium text-blue-600 dark:bg-neutral-500"
           : ""
       }`}
       onClick={() => addUpdatePort(iface.port_name)}

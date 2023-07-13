@@ -1,3 +1,4 @@
+import Button from "~/components/button";
 import Link from "next/link";
 import type { NextPage } from "next";
 import ProgressSpinner from "~/components/progressSpinner";
@@ -104,8 +105,7 @@ const Register: NextPage = ({}) => {
               {...register("verify_password", {
                 required: "Please enter a Password.",
                 validate: (val: string) => {
-                  if (watch("password") !== val)
-                    return "Passwords do not match.";
+                  if (watch("password") !== val) return "Passwords do not match.";
                 },
               })}
               className="block w-full rounded-md border border-gray-600 px-1 py-1.5 text-gray-900 placeholder:text-gray-400"
@@ -113,25 +113,18 @@ const Register: NextPage = ({}) => {
           </div>
 
           <div className="flex justify-center pt-3">
-            <button
+            <Button
               type="submit"
               className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-white shadow-lg hover:bg-blue-500"
             >
-              {register_req.isLoading ? (
-                <ProgressSpinner classes="fill-white w-5 h-5" />
-              ) : (
-                "Register"
-              )}
-            </button>
+              {register_req.isLoading ? <ProgressSpinner classes="fill-white w-5 h-5" /> : "Register"}
+            </Button>
           </div>
         </form>
 
         <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-300">
           Already have an Account?{" "}
-          <Link
-            href="/auth/login"
-            className="text-blue-500 hover:text-indigo-400"
-          >
+          <Link href="/auth/login" className="text-blue-500 hover:text-indigo-400">
             Login
           </Link>
         </p>

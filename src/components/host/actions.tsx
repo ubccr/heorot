@@ -1,5 +1,6 @@
 import { ArrowDownOnSquareStackIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
+import Button from "../button";
 import Image from "next/image";
 import ProgressBar from "../progressbar";
 import { api } from "~/utils/api";
@@ -56,15 +57,15 @@ export const Actions = ({ host }: { host: string }) => {
             <tr>
               <td colSpan={3} className={td_classes}>
                 <input type="text" className="rounded-lg border p-2" placeholder="Name" ref={collection_ref} />
-                <button
+                <Button
                   type="button"
-                  className="mb-2 rounded-lg border p-2"
+                  addClasses="mb-2"
                   onClick={() =>
                     refresh_support_assist_collection.mutate({ host, name: collection_ref.current?.value ?? "" })
                   }
                 >
                   Create Collection
-                </button>
+                </Button>
                 {refresh_support_assist_collection.isLoading && <ProgressBar />}
               </td>
             </tr>
