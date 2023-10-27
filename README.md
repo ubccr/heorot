@@ -1,3 +1,6 @@
+ > Dev update: Heorot is currently being re-written in GO and integrated directly into the Grendel binary. Early beta code can be compiled from [here.](https://github.com/jafurlan/grendel/tree/frontend)
+
+
 <h1 align="center">Heorot</h1>
 
 <div align="center">
@@ -17,13 +20,7 @@
 </div>
 
 <!-- Status  -->
-<!-- <hr> -->
- <!-- <h2 align="center">
-	🚧  Heorot is under construction...  🚧
-</h2> -->
-
-<hr>
-
+ 
 ## :dart: About
 
 Heorot is a companion to [Grendel](https://github.com/ubccr/grendel) providing a Web-UI for managing a data center worth of nodes. It's focus is on improving the workflow of hardware lifecycle management, everything from importing and configuring nodes to hardware maintenance.\
