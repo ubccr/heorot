@@ -1,4 +1,4 @@
- > Dev update: Heorot is currently being re-written in GO and integrated directly into the Grendel binary. Early beta code can be compiled from [here.](https://github.com/jafurlan/grendel/tree/frontend)
+ > Dev update: Heorot is currently being re-written in GO and integrated directly into the Grendel binary. Beta code can found starting with [Grendel v0.0.9](https://github.com/ubccr/grendel/releases/tag/v0.0.9)
 
 
 <h1 align="center">Heorot</h1>
